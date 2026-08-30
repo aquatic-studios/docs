@@ -1,0 +1,91 @@
+---
+title: Documentation
+description: Official documentation for every Aquatic Studios plugin, library and API. Written and maintained by Senkex.
+---
+
+<Hero
+  eyebrow="Aquatic Studios"
+  title="Documentation"
+  tagline="The official source of truth for every plugin, library and API we ship. Versioned alongside the source code — what you read here is what runs on your server."
+  actions={[
+    { text: 'Get started', href: '/start/introduction', variant: 'primary' },
+    { text: 'Browse plugins', href: '/plugins/aquacore/overview' },
+    { text: 'GitHub', href: 'https://github.com/aquatic-studios' }
+  ]}
+/>
+
+<FeatureGrid>
+  <Feature title="Built for modern servers" emoji="🌊">
+    Bukkit 1.16 → latest, Java 17+, Folia-ready schedulers and Paper-first APIs. No NMS, no version
+    lock-in, no surprises after an update.
+  </Feature>
+  <Feature title="Configuration first" emoji="⚙️">
+    Every behaviour is a key in a YAML file. Templates, messages, cooldowns and Discord payloads are
+    editable without touching a single line of Java.
+  </Feature>
+  <Feature title="Documented API" emoji="🧩">
+    Public events, services and a stable façade published on JitPack so you can build on top of our
+    plugins instead of around them.
+  </Feature>
+  <Feature title="Actually maintained" emoji="🛠️">
+    One author, one codebase, one changelog. Bugs get fixed, breaking changes get announced, and this
+    site is updated in the same commit.
+  </Feature>
+</FeatureGrid>
+
+## Where to go next
+
+<CardGrid>
+  <LinkCard
+    title="Getting started"
+    href="/start/introduction"
+    description="Requirements, installation and the conventions used across this site."
+  />
+  <LinkCard
+    title="Plugins"
+    href="/plugins/aquacore/overview"
+    description="End-user documentation for every released plugin."
+    badge="Stable"
+  />
+  <LinkCard
+    title="Libraries"
+    href="/libraries/aqualib"
+    description="Reusable Java libraries published on JitPack."
+    badge="Library"
+  />
+  <LinkCard
+    title="API"
+    href="/api/aquaapi"
+    description="Events, services and everything exposed to other developers."
+    badge="API"
+  />
+  <LinkCard
+    title="Work in progress"
+    href="/wip/aquacrates"
+    description="Plugins that are still in development."
+    badge="Soon"
+  />
+  <LinkCard
+    title="Changelog"
+    href="/changelog"
+    description="Every release, every breaking change, in one place."
+  />
+</CardGrid>
+
+## Community
+
+Support happens on Discord. Bug reports live on GitHub. Both are read by the same person, so pick
+whichever is faster for you.
+
+<CardGrid>
+  <LinkCard
+    title="Discord"
+    href="https://discord.gg/aquaticstudios"
+    description="Questions, config help and release pings."
+  />
+  <LinkCard
+    title="Issue tracker"
+    href="https://github.com/aquatic-studios"
+    description="Reproducible bugs and feature requests."
+  />
+</CardGrid>

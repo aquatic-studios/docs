@@ -1,0 +1,95 @@
+---
+title: Introduction
+description: What Aquatic Studios ships, how this documentation is organised and what you can expect from it.
+---
+
+# Introduction
+
+Official documentation for every plugin, library and API maintained by **Aquatic Studios**. Every
+page here is versioned next to the source code — if a feature is not documented on this site, treat
+it as unofficial and subject to change without notice.
+
+<Callout type="info">
+  This site documents the **latest release** of each project. Older versions are archived in the
+  [changelog](/changelog), not on their own pages.
+</Callout>
+
+## What we ship
+
+| Type | What it is | Who it's for |
+| --- | --- | --- |
+| **Plugins** | Drop-in `.jar` files for Bukkit/Spigot/Paper | Server owners |
+| **Libraries** | Shaded Java dependencies published on JitPack | Plugin developers |
+| **API** | Public events and services exposed by our plugins | Plugin developers |
+
+## Requirements
+
+Everything we publish targets the same baseline. If your server meets this, every project on this
+site will run.
+
+<PluginMeta
+  items={{
+    'Server software': 'Bukkit, Spigot, Paper or any fork',
+    'Minecraft version': '`1.16` and newer',
+    Java: '`17` or newer',
+    Folia: 'Supported on every plugin',
+    'Soft dependencies': 'PlaceholderAPI, Vault (optional)'
+  }}
+/>
+
+<Callout type="warning">
+  Java 8 and 11 are **not** supported. Minecraft 1.16 is the floor because everything we render uses
+  HEX colours, which do not exist below that version.
+</Callout>
+
+## How this site is organised
+
+<CardGrid>
+  <LinkCard
+    title="Installation"
+    href="/start/installation"
+    description="Dropping the jar in, first boot and generated files."
+  />
+  <LinkCard
+    title="Conventions"
+    href="/start/conventions"
+    description="How commands, permissions and config keys are written here."
+  />
+  <LinkCard
+    title="Support"
+    href="/start/support"
+    description="How to report a bug so it actually gets fixed."
+  />
+</CardGrid>
+
+## Reading a page
+
+Every plugin follows the same structure, so once you learn one you know them all:
+
+<Steps>
+
+### Overview
+
+What the plugin does, the technical fact sheet and a working example you can paste into console.
+
+### Commands
+
+Every command, its aliases, its arguments and the exact error messages it can print.
+
+### Permissions
+
+The full node list, including which nodes are granted by the admin wildcard.
+
+### Configuration
+
+Every key in every file, with defaults and the effect of changing it.
+
+### Developer API
+
+Events, services and how to depend on the plugin from your own project.
+
+</Steps>
+
+<Callout type="default">
+  Prefer keyboard? Press <kbd>Ctrl</kbd> + <kbd>K</kbd> anywhere on this site to search.
+</Callout>

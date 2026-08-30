@@ -1,0 +1,95 @@
+---
+title: Installation
+description: Install any Aquatic Studios plugin, verify it loaded and understand the files it generates.
+---
+
+# Installation
+
+The process is identical for every plugin we publish.
+
+<Steps>
+
+### Download the jar
+
+Grab the latest build from the release page of the plugin you want. Always download the file named
+`PluginName-x.y.z.jar` — never a `-sources` or `-javadoc` artifact.
+
+### Drop it into `plugins/`
+
+Stop the server first. Hot-swapping jars with `/reload` corrupts config state and is not supported.
+
+<FileTree>
+  <FileTree.Folder name="server" defaultOpen>
+    <FileTree.Folder name="plugins" defaultOpen>
+      <FileTree.File name="AquaCore-2.0.0.jar" />
+      <FileTree.File name="AquaTags-1.3.1.jar" />
+      <FileTree.File name="PlaceholderAPI.jar" />
+    </FileTree.Folder>
+    <FileTree.File name="server.jar" />
+  </FileTree.Folder>
+</FileTree>
+
+### Start the server
+
+On first boot the plugin creates its own folder and writes the default files.
+
+<FileTree>
+  <FileTree.Folder name="plugins" defaultOpen>
+    <FileTree.Folder name="AquaCore" defaultOpen>
+      <FileTree.File name="config.yml" />
+      <FileTree.File name="messages.yml" />
+      <FileTree.File name="modules.yml" />
+      <FileTree.Folder name="templates">
+        <FileTree.File name="default.yml" />
+      </FileTree.Folder>
+    </FileTree.Folder>
+  </FileTree.Folder>
+</FileTree>
+
+### Verify it loaded
+
+```
+[INFO] [AquaCore] Loading AquaCore v2.0.0
+[INFO] [AquaCore] Detected Paper 1.21.4 (Folia: false)
+[INFO] [AquaCore] Hooked into PlaceholderAPI
+[INFO] [AquaCore] Loaded 3 templates, 12 messages
+[INFO] [AquaCore] Enabled in 84ms
+```
+
+### Configure and reload
+
+Edit the YAML files, then apply them without a restart:
+
+```
+/aqua reload
+```
+
+</Steps>
+
+## Updating
+
+<Tabs items={['Minor update (1.4.0 → 1.4.1)', 'Major update (1.x → 2.x)']}>
+  <Tabs.Tab>
+    Stop the server, replace the jar, start it again. New config keys are appended automatically and
+    your existing values are preserved.
+  </Tabs.Tab>
+  <Tabs.Tab>
+    Major versions may rename or remove keys. Back up your plugin folder, read the
+    [changelog](/changelog) for that release, then replace the jar. The console prints a
+    `Config migration` block listing every key it moved.
+  </Tabs.Tab>
+</Tabs>
+
+<Callout type="error">
+  Never use `/reload` or `/reload confirm` to update a plugin. Bukkit's reload leaks the old
+  classloader, duplicates listeners and produces bug reports we cannot reproduce.
+</Callout>
+
+## Common install problems
+
+| Symptom | Cause | Fix |
+| --- | --- | --- |
+| `Unsupported class file major version 61` | Server running Java 8/11 | Install Java 17+ |
+| `Plugin already initialized` | Two copies of the jar in `plugins/` | Delete the old one |
+| Placeholders print raw, e.g. `%aquacore_version%` | PlaceholderAPI missing | Install PlaceholderAPI and restart |
+| Colours show as `&x&1&2&3…` | Client below 1.16 | HEX requires 1.16+ |
