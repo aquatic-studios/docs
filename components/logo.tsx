@@ -1,6 +1,5 @@
 import { site } from '../site.config'
 
-/** Isotipo + wordmark de Aquatic Studios usado en la navbar. */
 export function AquaticLogo() {
   return (
     <span className="aq-logo">

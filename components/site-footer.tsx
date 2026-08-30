@@ -1,6 +1,5 @@
 import { site } from '../site.config'
 
-/** Footer propio: créditos de autoría + disclaimer legal de Minecraft. */
 export function SiteFooter() {
   const year = new Date().getFullYear()
 

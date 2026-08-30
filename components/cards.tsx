@@ -1,18 +1,10 @@
 import type { ReactNode } from 'react'
 import Link from 'next/link'
 
-/** Grilla responsive para `<LinkCard />`. */
 export function CardGrid({ children }: { children: ReactNode }) {
   return <div className="aq-cardgrid">{children}</div>
 }
 
-/**
- * Tarjeta con enlace.
- *
- * ```mdx
- * <LinkCard title="Commands" href="/plugins/aquacore/commands" description="Todos los comandos." />
- * ```
- */
 export function LinkCard({
   title,
   href,

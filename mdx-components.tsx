@@ -10,10 +10,6 @@ import { Since } from './components/since'
 
 const themeComponents = getThemeComponents()
 
-/**
- * Componentes disponibles en TODOS los `.mdx` sin necesidad de importarlos.
- * Si agregás uno nuevo en /components, sumalo acá y ya lo podés usar.
- */
 const customComponents = {
   Badge,
   Callout,

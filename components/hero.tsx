@@ -7,10 +7,6 @@ type Action = {
   variant?: 'primary' | 'minimal'
 }
 
-/**
- * Cabecera de la landing (`content/index.mdx`).
- * Todo el estilo vive en `app/globals.css` bajo `.aq-hero`.
- */
 export function Hero({
   eyebrow,
   title,

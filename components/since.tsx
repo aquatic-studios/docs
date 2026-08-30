@@ -1,10 +1,3 @@
-/**
- * Marca desde qué versión existe una función.
- *
- * ```mdx
- * <Since v="1.4.0" />
- * ```
- */
 export function Since({ v }: { v: string }) {
   return (
     <span className="aq-since" title={`Disponible desde la versión ${v}`}>

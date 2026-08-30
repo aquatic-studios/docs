@@ -1,17 +1,5 @@
-/* ==========================================================================
-   Aquatic Studios Documentation - hoja de estilos propia
-   Autor: Senkex
-   --------------------------------------------------------------------------
-   Se carga DESPUES de nextra-theme-docs/style.css, asi que todo lo que
-   escribas aca gana. Esta dividido en secciones: tokens, tipografia, ajustes
-   al tema de Nextra y componentes propios (.aq-*).
-   ========================================================================== */
-
-/* --------------------------------------------------------------------------
-   1. Tokens de marca
-   -------------------------------------------------------------------------- */
 :root {
-  /* Paleta Aquatic */
+
   --aq-cyan: #38ecff;
   --aq-blue: #0a84ff;
   --aq-deep: #1244d6;
@@ -19,7 +7,6 @@
   --aq-accent-soft: rgba(10, 132, 255, 0.12);
   --aq-accent-line: rgba(10, 132, 255, 0.35);
 
-  /* Superficies (light) */
   --aq-surface: #ffffff;
   --aq-surface-2: #f3f7fb;
   --aq-border: #dfe7ef;
@@ -27,10 +14,8 @@
   --aq-text: #10151c;
   --aq-text-muted: #5b6875;
 
-  /* Layout del tema */
   --nextra-content-width: 92rem;
 
-  /* Tipografia del tema */
   --x-font-sans: "Poppins", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --x-font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
@@ -51,9 +36,6 @@
   --aq-text-muted: #93a2b4;
 }
 
-/* --------------------------------------------------------------------------
-   2. Base
-   -------------------------------------------------------------------------- */
 html {
   font-family: var(--x-font-sans);
   scroll-behavior: smooth;
@@ -86,7 +68,6 @@ samp {
   border: 0;
 }
 
-/* Profundidad sutil detras del contenido, solo en dark */
 .dark body {
   background-image:
     radial-gradient(60rem 30rem at 50% -10rem, rgba(10, 132, 255, 0.1), transparent 70%),
@@ -94,11 +75,6 @@ samp {
   background-repeat: no-repeat;
 }
 
-/* --------------------------------------------------------------------------
-   3. Ajustes al tema de Nextra
-   -------------------------------------------------------------------------- */
-
-/* Navbar */
 .nextra-navbar {
   border-bottom: 1px solid var(--aq-border);
 }
@@ -107,7 +83,6 @@ samp {
   backdrop-filter: saturate(180%) blur(14px);
 }
 
-/* Banner superior */
 .nextra-banner {
   background: linear-gradient(90deg, var(--aq-deep), var(--aq-blue) 55%, var(--aq-cyan));
   color: #041018;
@@ -121,7 +96,6 @@ samp {
   text-underline-offset: 3px;
 }
 
-/* Sidebar */
 .nextra-sidebar {
   font-size: 0.9rem;
 }
@@ -130,17 +104,14 @@ samp {
   box-shadow: inset 2px 0 0 0 var(--aq-accent);
 }
 
-/* Tabla de contenidos */
 .nextra-toc {
   font-size: 0.85rem;
 }
 
-/* Bordes generales del tema */
 .nextra-border {
   border-color: var(--aq-border) !important;
 }
 
-/* Encabezados */
 article h1 {
   font-weight: 700;
   letter-spacing: -0.03em;
@@ -163,13 +134,11 @@ article h4 {
   letter-spacing: -0.01em;
 }
 
-/* Enlaces dentro del contenido */
 article a:not(.aq-card):not(.aq-btn) {
   text-decoration-thickness: 1px;
   text-underline-offset: 3px;
 }
 
-/* Codigo en linea */
 article :not(pre) > code {
   background: var(--aq-accent-soft);
   border: 1px solid var(--aq-border-soft);
@@ -178,7 +147,6 @@ article :not(pre) > code {
   font-size: 0.86em;
 }
 
-/* Bloques de codigo */
 .nextra-code pre {
   border-radius: var(--aq-radius) !important;
   font-size: 0.87rem;
@@ -195,7 +163,6 @@ article :not(pre) > code {
   letter-spacing: 0.02em;
 }
 
-/* Tablas */
 article table {
   width: 100%;
   display: table;
@@ -229,19 +196,16 @@ article tbody tr:hover {
   background: var(--aq-accent-soft);
 }
 
-/* Callouts */
 .nextra-callout {
   border-radius: var(--aq-radius);
   border-width: 1px;
   border-left-width: 3px;
 }
 
-/* Steps */
 .nextra-steps h3 {
   font-size: 1.05rem;
 }
 
-/* Filetree */
 .nextra-filetree {
   border-radius: var(--aq-radius);
   border-color: var(--aq-border) !important;
@@ -249,7 +213,6 @@ article tbody tr:hover {
   font-size: 0.84rem;
 }
 
-/* Teclas */
 article kbd {
   display: inline-block;
   padding: 0.15em 0.45em;
@@ -261,9 +224,6 @@ article kbd {
   line-height: 1.4;
 }
 
-/* --------------------------------------------------------------------------
-   4. Logo
-   -------------------------------------------------------------------------- */
 .aq-logo {
   display: inline-flex;
   align-items: center;
@@ -304,9 +264,6 @@ article kbd {
   }
 }
 
-/* --------------------------------------------------------------------------
-   5. Botones
-   -------------------------------------------------------------------------- */
 .aq-btn {
   display: inline-flex;
   align-items: center;
@@ -347,9 +304,6 @@ article kbd {
   background: var(--aq-surface-2);
 }
 
-/* --------------------------------------------------------------------------
-   6. Hero (landing)
-   -------------------------------------------------------------------------- */
 .aq-hero {
   position: relative;
   padding: 5.5rem 1.5rem 4rem;
@@ -412,9 +366,6 @@ article kbd {
   margin-top: 2.25rem;
 }
 
-/* --------------------------------------------------------------------------
-   7. Features
-   -------------------------------------------------------------------------- */
 .aq-features {
   display: grid;
   gap: 1rem;
@@ -456,9 +407,6 @@ article kbd {
   color: var(--aq-text-muted);
 }
 
-/* --------------------------------------------------------------------------
-   8. Cards
-   -------------------------------------------------------------------------- */
 .aq-cardgrid {
   display: grid;
   gap: 0.85rem;
@@ -526,9 +474,6 @@ article kbd {
   color: var(--aq-text-muted);
 }
 
-/* --------------------------------------------------------------------------
-   9. Badges y Since
-   -------------------------------------------------------------------------- */
 .aq-badge {
   display: inline-block;
   padding: 0.16rem 0.55rem;
@@ -604,9 +549,6 @@ article kbd {
   vertical-align: middle;
 }
 
-/* --------------------------------------------------------------------------
-   10. Ficha tecnica (PluginMeta)
-   -------------------------------------------------------------------------- */
 .aq-meta {
   margin: 1.5rem 0;
   border: 1px solid var(--aq-border);
@@ -659,9 +601,6 @@ article kbd {
   }
 }
 
-/* --------------------------------------------------------------------------
-   11. Footer
-   -------------------------------------------------------------------------- */
 .aq-footer {
   width: 100%;
   font-size: 0.88rem;
@@ -748,9 +687,6 @@ article kbd {
   max-width: 62rem;
 }
 
-/* --------------------------------------------------------------------------
-   12. Pagina 404
-   -------------------------------------------------------------------------- */
 .aq-404 {
   display: flex;
   flex-direction: column;
@@ -783,9 +719,6 @@ article kbd {
   margin: 0 0 1rem;
 }
 
-/* --------------------------------------------------------------------------
-   13. Impresion
-   -------------------------------------------------------------------------- */
 @media print {
   .nextra-navbar,
   .nextra-sidebar,

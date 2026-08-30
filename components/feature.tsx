@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react'
 
-/** Grilla usada en la landing para listar lo que hace el estudio. */
 export function FeatureGrid({ children }: { children: ReactNode }) {
   return <div className="aq-features">{children}</div>
 }

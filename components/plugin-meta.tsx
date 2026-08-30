@@ -1,17 +1,3 @@
-/**
- * Ficha técnica que abre cada página de plugin/library.
- *
- * ```mdx
- * <PluginMeta
- *   items={{
- *     'Base command': '`/aqua`',
- *     API: 'Bukkit `1.16+`, Java `17+`'
- *   }}
- * />
- * ```
- *
- * Los valores aceptan texto plano o `código` entre backticks simples.
- */
 export function PluginMeta({ items }: { items: Record<string, string> }) {
   return (
     <dl className="aq-meta">

@@ -1,11 +1,5 @@
 import type { MetaRecord } from 'nextra'
 
-/**
- * Orden y títulos del nivel raíz.
- * - `type: 'page'` -> aparece en la navbar en vez del sidebar.
- * - `display: 'hidden'` -> no se lista en ningún lado.
- * - `theme` -> overrides de layout por página.
- */
 export default {
   index: {
     type: 'page',

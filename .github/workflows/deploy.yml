@@ -3,16 +3,13 @@ name: Deploy documentation
 on:
   push:
     branches: [main]
-  # Permite lanzar el deploy a mano desde la pestaña Actions
   workflow_dispatch:
 
-# Permisos mínimos que necesita GitHub Pages
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Un solo deploy a la vez; los pushes nuevos cancelan el anterior
 concurrency:
   group: pages
   cancel-in-progress: true
@@ -41,8 +38,6 @@ jobs:
       - name: Configure Pages
         uses: actions/configure-pages@v5
         with:
-          # Habilita GitHub Pages en el repo si todavía no lo está,
-          # así no hace falta tocar Settings a mano.
           enablement: true
 
       - name: Upload artifact
