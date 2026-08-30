@@ -1,0 +1,111 @@
+---
+title: Commands
+description: Every AquaCore command, its aliases, arguments and the exact errors it can print.
+---
+
+# Commands
+
+## Aliases
+
+`/aqua` · `/aquacore` · `/ac` · `/acore`
+
+All aliases behave identically. Every example on this site uses `/aqua`.
+
+## Reference
+
+| Command | Permission | Description |
+| --- | --- | --- |
+| `/aqua` | — | Plugin info. Console gets the usage block. |
+| `/aqua help` | `aquacore.help` | Paginated help menu. |
+| `/aqua reload` | `aquacore.reload` | Reload every YAML file without a restart. |
+| `/aqua modules` | `aquacore.modules` | List modules and their state. |
+| `/aqua args` | `aquacore.args` | List the configured custom arguments. |
+| `/aqua broadcast <template> key(value)…` | `aquacore.broadcast` | Fire a template. |
+| `/aqua preview <template>` | `aquacore.preview` | Render a template to yourself only. |
+| `/aqua debug dump` | `aquacore.debug` | Write a support dump file. |
+
+`aquacore.admin` grants every node above.
+
+## Broadcast
+
+```
+/aqua broadcast <template> key(value)… [--silent]
+```
+
+```
+/aqua broadcast welcome player(Senkex) rank(VIP) price($10)
+```
+
+The `--silent` flag suppresses sounds while still sending every visual output — useful when you
+chain several broadcasts in a row.
+
+### Multi-value arguments
+
+Join values with `;`. They are rendered using `broadcast.separator` from `config.yml`.
+
+```
+/aqua broadcast bundle player(Senkex) rank(VIP;MVP;ASTRO) price($45)
+```
+
+Output with the default separator (`&8, &r`):
+
+```
+Senkex just bought VIP, MVP, ASTRO for $45
+```
+
+<Callout type="info">
+  Pair multi-value broadcasts with a template that has `actionbar` and `bossbar` enabled — big
+  orders deserve to be seen.
+</Callout>
+
+## Preview
+
+Renders a template to you and nobody else. Placeholders that were not supplied fall back to
+`broadcast.preview-fallback`.
+
+```
+/aqua preview welcome
+```
+
+## Custom arguments
+
+Arguments are not hardcoded. Declare them once and use them anywhere.
+
+```yaml filename="config.yml"
+broadcast:
+  custom-args:
+    - player
+    - rank
+    - price
+    - coupon
+```
+
+Reference them as `{player}`, `{rank}`, `{price}`, `{coupon}` in any template, message or webhook
+field.
+
+<Callout type="error">
+  If a broadcast supplies an argument that is not declared under `broadcast.custom-args`, the whole
+  broadcast is **rejected** and the console prints `Argument does not exist: <arg>`. Declare the key
+  first, then `/aqua reload`.
+</Callout>
+
+## Tab completion
+
+Templates, module names and declared argument keys are all tab-completed. Completion respects
+permissions — a player without `aquacore.broadcast` sees nothing for that branch.
+
+## Errors
+
+| Situation | Console / chat message |
+| --- | --- |
+| Malformed `key(value)` | `Missing '(' or ')' in arguments.` |
+| Undeclared argument | `Argument does not exist: <arg>` |
+| Template needs an argument you did not pass | `Missing required argument: <arg>` |
+| Template file not found | `Unknown template: <name>` |
+| Player runs a console-only command | `This command can only be executed from console.` |
+| YAML is invalid on reload | `Reload aborted — <file> line <n>: <reason>` |
+
+<Callout type="warning">
+  A failed reload keeps the **previous** configuration in memory. The plugin never runs with a
+  half-loaded config, so your server stays in a working state while you fix the file.
+</Callout>

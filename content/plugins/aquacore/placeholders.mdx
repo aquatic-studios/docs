@@ -1,0 +1,77 @@
+---
+title: Placeholders
+description: The AquaCore PlaceholderAPI expansion — every placeholder, what it returns and where it works.
+---
+
+# Placeholders
+
+AquaCore registers a PlaceholderAPI expansion under the identifier `aquacore`. It is enabled
+automatically when PlaceholderAPI is present and the `placeholders` module is on.
+
+<PluginMeta
+  items={{
+    Identifier: '`aquacore`',
+    Requires: 'PlaceholderAPI `2.11+`',
+    Module: '`placeholders`',
+    Registration: 'Automatic on enable'
+  }}
+/>
+
+## Server placeholders
+
+| Placeholder | Returns | Example |
+| --- | --- | --- |
+| `%aquacore_version%` | Plugin version | `2.0.0` |
+| `%aquacore_templates%` | Number of loaded templates | `7` |
+| `%aquacore_modules%` | Enabled module count | `4` |
+| `%aquacore_last_broadcast%` | Name of the last template fired | `welcome` |
+| `%aquacore_last_broadcast_ago%` | Seconds since the last broadcast | `184` |
+
+## Player placeholders
+
+| Placeholder | Returns | Example |
+| --- | --- | --- |
+| `%aquacore_cooldown%` | Seconds left on the sender's cooldown | `12` |
+| `%aquacore_cooldown_formatted%` | Same, humanised | `12s` |
+| `%aquacore_can_broadcast%` | `true` / `false` | `true` |
+| `%aquacore_head_line_<n>%` | Line `n` of the player's rendered head (1–8) | `██████` |
+
+<Callout type="info">
+  Head placeholders require the `heads` module. Each line is 8 characters wide, so a full head is
+  `%aquacore_head_line_1%` through `%aquacore_head_line_8%`.
+</Callout>
+
+## Using them in templates
+
+Inside AquaCore's own YAML you can mix custom arguments, placeholders and colours freely:
+
+```yaml filename="templates/welcome.yml"
+chat:
+  - "&#38ecff{player} &7joined as &#0a84ff{rank}"
+  - "&8Server uptime: &7%server_uptime% &8| &7%server_online%&8/&7%server_max_players%"
+```
+
+<Callout type="warning">
+  `{argument}` braces are resolved by AquaCore **before** PlaceholderAPI runs. If a placeholder
+  returns text containing braces, it will not be re-parsed — that is intentional and prevents
+  injection through player names.
+</Callout>
+
+## Using them elsewhere
+
+Any plugin that supports PlaceholderAPI can read AquaCore values — scoreboards, tab lists, holograms,
+chat formatters:
+
+```yaml filename="scoreboard.yml"
+lines:
+  - "&8» &7Templates: &#38ecff%aquacore_templates%"
+  - "&8» &7Cooldown: &#38ecff%aquacore_cooldown_formatted%"
+```
+
+## Troubleshooting
+
+| Symptom | Cause |
+| --- | --- |
+| Placeholder prints raw | PlaceholderAPI missing, or `placeholders` module disabled |
+| Always returns empty | Placeholder is player-scoped and was requested with no player context |
+| `%aquacore_head_line_1%` empty | `heads` module disabled, or the skin is still being fetched (async) |

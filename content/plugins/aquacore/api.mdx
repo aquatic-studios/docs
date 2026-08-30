@@ -1,0 +1,187 @@
+---
+title: Developer API
+description: Depend on AquaCore, listen to its events and send broadcasts from your own plugin.
+---
+
+# Developer API
+
+AquaCore exposes a small, stable façade. Everything public lives under
+`com.aquaticstudios.aquacore.api` — anything outside that package can change in a patch release.
+
+<PluginMeta
+  items={{
+    Group: '`com.github.aquatic-studios`',
+    Artifact: '`AquaCore`',
+    Repository: 'JitPack',
+    Java: '`17+`',
+    Scope: '`compileOnly` / `provided`'
+  }}
+/>
+
+## Installation
+
+<Tabs items={['Gradle (Kotlin)', 'Gradle (Groovy)', 'Maven']}>
+  <Tabs.Tab>
+```kotlin filename="build.gradle.kts"
+repositories {
+    maven("https://jitpack.io")
+}
+
+dependencies {
+    compileOnly("com.github.aquatic-studios:AquaCore:2.0.0")
+}
+```
+  </Tabs.Tab>
+  <Tabs.Tab>
+```groovy filename="build.gradle"
+repositories {
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    compileOnly 'com.github.aquatic-studios:AquaCore:2.0.0'
+}
+```
+  </Tabs.Tab>
+  <Tabs.Tab>
+```xml filename="pom.xml"
+<repositories>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
+</repositories>
+
+<dependency>
+    <groupId>com.github.aquatic-studios</groupId>
+    <artifactId>AquaCore</artifactId>
+    <version>2.0.0</version>
+    <scope>provided</scope>
+</dependency>
+```
+  </Tabs.Tab>
+</Tabs>
+
+Declare the dependency in your plugin descriptor so load order is correct:
+
+```yaml filename="plugin.yml"
+name: MyPlugin
+main: com.example.MyPlugin
+api-version: "1.16"
+depend: [AquaCore]
+```
+
+<Callout type="warning">
+  Use `compileOnly` / `provided`. Shading AquaCore into your jar puts two copies of the API on the
+  classpath and every `instanceof` check against our classes silently fails.
+</Callout>
+
+## Getting the API
+
+```java
+import com.aquaticstudios.aquacore.api.AquaCoreAPI;
+
+public final class MyPlugin extends JavaPlugin {
+
+    private AquaCoreAPI aqua;
+
+    @Override
+    public void onEnable() {
+        this.aqua = AquaCoreAPI.get();
+        getLogger().info("Hooked into AquaCore " + aqua.version());
+    }
+}
+```
+
+`AquaCoreAPI.get()` throws `IllegalStateException` if AquaCore is not enabled yet. With
+`depend: [AquaCore]` in your `plugin.yml` that cannot happen inside `onEnable`.
+
+## Sending a broadcast
+
+```java
+import com.aquaticstudios.aquacore.api.broadcast.BroadcastRequest;
+
+aqua.broadcasts().send(
+    BroadcastRequest.template("welcome")
+        .arg("player", player.getName())
+        .arg("rank", "VIP")
+        .arg("price", "$10")
+        .silent(false)
+        .build()
+);
+```
+
+`send` returns a `BroadcastResult`:
+
+| Method | Returns |
+| --- | --- |
+| `isSuccess()` | `boolean` |
+| `failureReason()` | `Optional<String>` |
+| `receivers()` | `int` — players that actually got it |
+| `elapsedNanos()` | `long` |
+
+## Events
+
+All events live in `com.aquaticstudios.aquacore.api.event`.
+
+| Event | Cancellable | Fired |
+| --- | --- | --- |
+| `AquaBroadcastPreEvent` | Yes | Before anything is sent |
+| `AquaBroadcastPostEvent` | No | After every output finished |
+| `AquaTemplateReloadEvent` | No | After `/aqua reload` |
+| `AquaModuleToggleEvent` | Yes | When a module is enabled or disabled |
+
+```java
+@EventHandler
+public void onBroadcast(AquaBroadcastPreEvent event) {
+    if (event.template().name().equals("vip")) {
+        event.arg("rank", "VIP+");       // rewrite an argument
+        event.receivers().removeIf(Player::isSleeping);
+    }
+
+    if (Bukkit.getOnlinePlayers().size() < 5) {
+        event.setCancelled(true);        // too few players, skip it
+    }
+}
+```
+
+<Callout type="info">
+  `AquaBroadcastPreEvent` is fired on the main thread even when the broadcast was requested async, so
+  it is always safe to touch the Bukkit API inside the handler.
+</Callout>
+
+## Rendering a head
+
+```java
+aqua.heads().render(player.getUniqueId(), 8).thenAccept(lines -> {
+    for (Component line : lines) {
+        player.sendMessage(line);
+    }
+});
+```
+
+Returns a `CompletableFuture<List<Component>>`. Skins are fetched off the main thread and cached for
+`heads.cache-minutes`.
+
+<Callout type="error">
+  Never call `.join()` or `.get()` on that future from the main thread. Skin fetching hits Mojang's
+  session server — blocking on it freezes the whole server for as long as the request takes.
+</Callout>
+
+## Folia
+
+Every scheduled task inside AquaCore goes through an internal scheduler abstraction, so the API
+behaves identically on Paper and Folia. When you receive a callback, you are already on the correct
+thread for the entity or region involved.
+
+## Versioning
+
+The API follows semantic versioning:
+
+- **Patch** (`2.0.0` → `2.0.1`) — no API change.
+- **Minor** (`2.0` → `2.1`) — additions only, safe to update.
+- **Major** (`2.x` → `3.x`) — may remove or rename. Announced in the [changelog](/changelog) with a
+  migration table.
+
+Deprecated methods stay for at least one full minor cycle and always carry a `@Deprecated(forRemoval)`
+annotation pointing at the replacement.

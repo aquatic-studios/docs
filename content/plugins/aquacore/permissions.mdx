@@ -1,0 +1,90 @@
+---
+title: Permissions
+description: Every AquaCore permission node, its default and what it unlocks.
+---
+
+# Permissions
+
+## Node reference
+
+| Node | Default | Grants |
+| --- | --- | --- |
+| `aquacore.help` | `true` | `/aqua help` |
+| `aquacore.reload` | `op` | `/aqua reload` |
+| `aquacore.modules` | `op` | `/aqua modules` |
+| `aquacore.args` | `op` | `/aqua args` |
+| `aquacore.broadcast` | `op` | `/aqua broadcast` |
+| `aquacore.preview` | `op` | `/aqua preview` |
+| `aquacore.debug` | `op` | `/aqua debug dump` |
+| `aquacore.notify.update` | `op` | Update message on join |
+| `aquacore.bypass.cooldown` | `false` | Ignore broadcast cooldowns |
+| `aquacore.admin` | `op` | Everything above |
+
+<Callout type="info">
+  `default` is what a player has when **no** permission plugin is installed. `op` means only
+  operators hold it, `true` means everyone does, `false` means nobody does until it is granted.
+</Callout>
+
+## Recommended setup
+
+<Tabs items={['LuckPerms', 'PermissionsEx', 'Plain permissions.yml']}>
+  <Tabs.Tab>
+```
+/lp group staff permission set aquacore.broadcast true
+/lp group staff permission set aquacore.preview true
+/lp group admin permission set aquacore.admin true
+/lp group default permission set aquacore.help true
+```
+  </Tabs.Tab>
+  <Tabs.Tab>
+```yaml filename="permissions.yml"
+groups:
+  staff:
+    permissions:
+      - aquacore.broadcast
+      - aquacore.preview
+  admin:
+    permissions:
+      - aquacore.admin
+```
+  </Tabs.Tab>
+  <Tabs.Tab>
+```yaml filename="permissions.yml"
+aquacore.staff:
+  description: Staff-level AquaCore access
+  children:
+    aquacore.help: true
+    aquacore.broadcast: true
+    aquacore.preview: true
+```
+  </Tabs.Tab>
+</Tabs>
+
+## Console-only actions
+
+Some actions are deliberately unreachable from in-game, no matter which node a player holds:
+
+- `/aqua broadcast` when `broadcast.console-only: true` (the default).
+- `/aqua debug dump` when the dump would include the server IP.
+
+A player attempting either gets:
+
+```
+This command can only be executed from console.
+```
+
+<Callout type="error">
+  Do not grant `*` to your staff group. It hands out every node registered by every plugin on the
+  server, including ones marked console-only by other authors. Grant `aquacore.admin` instead.
+</Callout>
+
+## Per-template permissions
+
+Templates can require their own node. Add `permission` to the template file:
+
+```yaml filename="templates/vip.yml"
+permission: aquacore.template.vip
+```
+
+Then the broadcast only fires for senders holding that node. Useful when different staff ranks are
+allowed to announce different things.
