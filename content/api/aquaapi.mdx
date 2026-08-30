@@ -3,25 +3,21 @@ title: AquaAPI
 description: The cross-plugin service registry — one entry point to every Aquatic Studios plugin running on the server.
 ---
 
-# AquaAPI
+import { Callout } from 'nextra/components'
 
-<p>
-  <Badge variant="caution">API</Badge> <Badge variant="version">v2.0.0</Badge>
-</p>
+# AquaAPI
 
 A single, version-safe entry point to every Aquatic plugin installed on the server. Instead of
 hard-depending on each plugin, you ask the registry what is available and get back a typed service —
 or an empty `Optional` when the plugin is not installed.
 
-<PluginMeta
-  items={{
-    Group: '`com.github.aquatic-studios`',
-    Artifact: '`AquaAPI`',
-    Provided: 'By AquaCore `2.0+`',
-    Java: '`17+`',
-    Scope: '`compileOnly` / `provided`'
-  }}
-/>
+| | |
+| --- | --- |
+| **Group** | `com.github.aquatic-studios` |
+| **Artifact** | `AquaAPI` |
+| **Provided** | By AquaCore `2.0+` |
+| **Java** | `17+` |
+| **Scope** | `compileOnly` / `provided` |
 
 ## Installation
 

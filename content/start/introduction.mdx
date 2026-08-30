@@ -3,6 +3,8 @@ title: Introduction
 description: What Aquatic Studios ships, how this documentation is organised and what you can expect from it.
 ---
 
+import { Callout, Steps } from 'nextra/components'
+
 # Introduction
 
 Official documentation for every plugin, library and API maintained by **Aquatic Studios**. Every
@@ -27,15 +29,13 @@ it as unofficial and subject to change without notice.
 Everything we publish targets the same baseline. If your server meets this, every project on this
 site will run.
 
-<PluginMeta
-  items={{
-    'Server software': 'Bukkit, Spigot, Paper or any fork',
-    'Minecraft version': '`1.16` and newer',
-    Java: '`17` or newer',
-    Folia: 'Supported on every plugin',
-    'Soft dependencies': 'PlaceholderAPI, Vault (optional)'
-  }}
-/>
+| | |
+| --- | --- |
+| **Server software** | Bukkit, Spigot, Paper or any fork |
+| **Minecraft version** | `1.16` and newer |
+| **Java** | `17` or newer |
+| **Folia** | Supported on every plugin |
+| **Soft dependencies** | PlaceholderAPI, Vault (optional) |
 
 <Callout type="warning">
   Java 8 and 11 are **not** supported. Minecraft 1.16 is the floor because everything we render uses
@@ -44,23 +44,9 @@ site will run.
 
 ## How this site is organised
 
-<CardGrid>
-  <LinkCard
-    title="Installation"
-    href="/start/installation"
-    description="Dropping the jar in, first boot and generated files."
-  />
-  <LinkCard
-    title="Conventions"
-    href="/start/conventions"
-    description="How commands, permissions and config keys are written here."
-  />
-  <LinkCard
-    title="Support"
-    href="/start/support"
-    description="How to report a bug so it actually gets fixed."
-  />
-</CardGrid>
+- [Installation](/start/installation) — Dropping the jar in, first boot and generated files.
+- [Conventions](/start/conventions) — How commands, permissions and config keys are written here.
+- [Support](/start/support) — How to report a bug so it actually gets fixed.
 
 ## Reading a page
 

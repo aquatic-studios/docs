@@ -3,26 +3,22 @@ title: AquaLib
 description: The shared utility library behind every Aquatic Studios plugin — config mapping, item builders, Folia-safe scheduling and a colour engine.
 ---
 
-# AquaLib
+import { Callout, Tabs } from 'nextra/components'
 
-<p>
-  <Badge variant="note">Library</Badge> <Badge variant="version">v1.6.0</Badge>
-</p>
+# AquaLib
 
 The boring parts of a Bukkit plugin, solved once. Config mapping, item building, GUI plumbing, a
 Folia-safe scheduler and the HEX/gradient colour engine used across every Aquatic project. No runtime
 dependency on any of our plugins — drop it into your own project and use it standalone.
 
-<PluginMeta
-  items={{
-    Group: '`com.github.aquatic-studios`',
-    Artifact: '`AquaLib`',
-    Repository: 'JitPack',
-    MC: '`1.16+` (HEX colours required)',
-    Java: '`17+`',
-    Platform: 'Bukkit / Spigot / Paper / Folia'
-  }}
-/>
+| | |
+| --- | --- |
+| **Group** | `com.github.aquatic-studios` |
+| **Artifact** | `AquaLib` |
+| **Repository** | JitPack |
+| **MC** | `1.16+` (HEX colours required) |
+| **Java** | `17+` |
+| **Platform** | Bukkit / Spigot / Paper / Folia |
 
 <Callout type="error">
   If you ship AquaLib inside a plugin you **must** relocate it. Two plugins bundling the same

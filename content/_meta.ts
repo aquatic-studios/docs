@@ -1,20 +1,7 @@
 import type { MetaRecord } from 'nextra'
 
 export default {
-  index: {
-    type: 'page',
-    display: 'hidden',
-    theme: {
-      layout: 'full',
-      sidebar: false,
-      toc: false,
-      breadcrumb: false,
-      pagination: false,
-      timestamp: false,
-      copyPage: false,
-      footer: true
-    }
-  },
+  index: 'Introduction',
   start: {
     title: 'Getting started'
   },
@@ -30,8 +17,5 @@ export default {
   wip: {
     title: 'Work in progress'
   },
-  changelog: {
-    title: 'Changelog',
-    theme: { toc: true }
-  }
+  changelog: 'Changelog'
 } satisfies MetaRecord

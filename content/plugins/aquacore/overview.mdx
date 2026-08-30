@@ -3,11 +3,9 @@ title: Overview
 description: AquaCore — the shared engine behind every Aquatic Studios plugin. Templates, broadcasts, messages, placeholders and modules.
 ---
 
-# AquaCore
+import { Callout } from 'nextra/components'
 
-<p>
-  <Badge variant="tip">Stable</Badge> <Badge variant="version">v2.0.0</Badge>
-</p>
+# AquaCore
 
 The engine every other Aquatic plugin sits on top of. It owns the message pipeline (chat, titles,
 actionbar, bossbar, sounds), the template system, the placeholder bridge and the module loader — so
@@ -15,16 +13,14 @@ each plugin only has to describe *what* to send, never *how*.
 
 Install it on its own and you already get a full broadcast system driven by YAML.
 
-<PluginMeta
-  items={{
-    'Base command': '`/aqua`',
-    Aliases: '`aquacore`, `ac`, `acore`',
-    API: 'Bukkit `1.16+`, Java `17+`',
-    Folia: 'Supported',
-    'Soft-depend': 'PlaceholderAPI, Vault',
-    'Config files': '`config.yml`, `messages.yml`, `modules.yml`, `templates/*.yml`'
-  }}
-/>
+| | |
+| --- | --- |
+| **Base command** | `/aqua` |
+| **Aliases** | `aquacore`, `ac`, `acore` |
+| **API** | Bukkit `1.16+`, Java `17+` |
+| **Folia** | Supported |
+| **Soft-depend** | PlaceholderAPI, Vault |
+| **Config files** | `config.yml`, `messages.yml`, `modules.yml`, `templates/*.yml` |
 
 ## Example
 
@@ -80,10 +76,8 @@ modules:
 
 ## Sections
 
-<CardGrid>
-  <LinkCard title="Commands" href="/plugins/aquacore/commands" description="Aliases, arguments and error output." />
-  <LinkCard title="Permissions" href="/plugins/aquacore/permissions" description="Every node and what it unlocks." />
-  <LinkCard title="Configuration" href="/plugins/aquacore/configuration" description="Every key across all four files." />
-  <LinkCard title="Placeholders" href="/plugins/aquacore/placeholders" description="PlaceholderAPI expansion reference." />
-  <LinkCard title="Developer API" href="/plugins/aquacore/api" description="Events, services and JitPack setup." />
-</CardGrid>
+- [Commands](/plugins/aquacore/commands) — Aliases, arguments and error output.
+- [Permissions](/plugins/aquacore/permissions) — Every node and what it unlocks.
+- [Configuration](/plugins/aquacore/configuration) — Every key across all four files.
+- [Placeholders](/plugins/aquacore/placeholders) — PlaceholderAPI expansion reference.
+- [Developer API](/plugins/aquacore/api) — Events, services and JitPack setup.

@@ -3,26 +3,22 @@ title: HeadRender
 description: Render a Minecraft skin head into chat as HEX-coloured pixels. Async, cached, zero configuration.
 ---
 
-# HeadRender
+import { Callout } from 'nextra/components'
 
-<p>
-  <Badge variant="note">Library</Badge> <Badge variant="version">v1.2.0</Badge>
-</p>
+# HeadRender
 
 Fetches a skin, downscales it and turns each pixel into a HEX-coloured chat line — a real Minecraft
 head, in chat, next to whatever text you want. One static façade, async by default, with an in-memory
 LRU cache so repeated lookups are free.
 
-<PluginMeta
-  items={{
-    Group: '`com.github.aquatic-studios`',
-    Artifact: '`HeadRender`',
-    MC: '`1.16+` (HEX colours required)',
-    Java: '`17+`',
-    Platform: 'Bukkit / Spigot / Paper (any fork)',
-    Dependencies: 'None'
-  }}
-/>
+| | |
+| --- | --- |
+| **Group** | `com.github.aquatic-studios` |
+| **Artifact** | `HeadRender` |
+| **MC** | `1.16+` (HEX colours required) |
+| **Java** | `17+` |
+| **Platform** | Bukkit / Spigot / Paper (any fork) |
+| **Dependencies** | None |
 
 <Callout type="error">
   Relocate `com.aquaticstudios.headrender` when shading. See

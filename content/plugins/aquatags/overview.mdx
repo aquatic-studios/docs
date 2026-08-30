@@ -3,28 +3,24 @@ title: Overview
 description: AquaTags — a permission-driven prefix and suffix system with a configurable GUI.
 ---
 
-# AquaTags
+import { Steps } from 'nextra/components'
 
-<p>
-  <Badge variant="tip">Stable</Badge> <Badge variant="version">v1.3.1</Badge>
-</p>
+# AquaTags
 
 Cosmetic prefixes and suffixes players pick themselves, from a GUI you design in YAML. Tags are
 granted by permission, so any rank plugin already knows how to hand them out. Selection is persisted
 per player and exposed through PlaceholderAPI so your chat plugin, tab list and scoreboard all show
 the same thing.
 
-<PluginMeta
-  items={{
-    'Base command': '`/tags`',
-    Aliases: '`tag`, `aquatags`',
-    API: 'Bukkit `1.16+`, Java `17+`',
-    Folia: 'Supported',
-    Depends: 'AquaCore `2.0+`',
-    'Soft-depend': 'PlaceholderAPI',
-    Storage: 'SQLite (default) or MySQL'
-  }}
-/>
+| | |
+| --- | --- |
+| **Base command** | `/tags` |
+| **Aliases** | `tag`, `aquatags` |
+| **API** | Bukkit `1.16+`, Java `17+` |
+| **Folia** | Supported |
+| **Depends** | AquaCore `2.0+` |
+| **Soft-depend** | PlaceholderAPI |
+| **Storage** | SQLite (default) or MySQL |
 
 ## How it works
 
@@ -75,7 +71,5 @@ format: "%aquatags_prefix% &f{player}&7: &f{message}"
 
 ## Sections
 
-<CardGrid>
-  <LinkCard title="Commands" href="/plugins/aquatags/commands" description="Player and admin commands." />
-  <LinkCard title="Configuration" href="/plugins/aquatags/configuration" description="Tags, GUI layout and storage." />
-</CardGrid>
+- [Commands](/plugins/aquatags/commands) — Player and admin commands.
+- [Configuration](/plugins/aquatags/configuration) — Tags, GUI layout and storage.
