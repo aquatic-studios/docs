@@ -1,0 +1,81 @@
+---
+title: Overview
+description: AquaTags — a permission-driven prefix and suffix system with a configurable GUI.
+---
+
+# AquaTags
+
+<p>
+  <Badge variant="tip">Stable</Badge> <Badge variant="version">v1.3.1</Badge>
+</p>
+
+Cosmetic prefixes and suffixes players pick themselves, from a GUI you design in YAML. Tags are
+granted by permission, so any rank plugin already knows how to hand them out. Selection is persisted
+per player and exposed through PlaceholderAPI so your chat plugin, tab list and scoreboard all show
+the same thing.
+
+<PluginMeta
+  items={{
+    'Base command': '`/tags`',
+    Aliases: '`tag`, `aquatags`',
+    API: 'Bukkit `1.16+`, Java `17+`',
+    Folia: 'Supported',
+    Depends: 'AquaCore `2.0+`',
+    'Soft-depend': 'PlaceholderAPI',
+    Storage: 'SQLite (default) or MySQL'
+  }}
+/>
+
+## How it works
+
+<Steps>
+
+### Define a tag
+
+Each tag is an entry in `tags.yml` with a display string, an icon and a permission node.
+
+### Grant the permission
+
+`aquatags.tag.vip` unlocks the `vip` tag. Any permission plugin works.
+
+### Player opens the menu
+
+`/tags` shows every tag; the ones they cannot use are rendered greyed out with a configurable "locked"
+lore.
+
+### Selection is stored
+
+The choice survives restarts and server switches when you point every server at the same MySQL
+database.
+
+### Everything else reads the placeholder
+
+`%aquatags_prefix%` in your chat format, tab list or scoreboard.
+
+</Steps>
+
+## Example
+
+```yaml filename="tags.yml"
+tags:
+  vip:
+    display: "&#38ecff[VIP]"
+    permission: aquatags.tag.vip
+    icon: DIAMOND
+    slot: 10
+    lore:
+      - "&7A clean blue tag."
+      - ""
+      - "&#38ecffClick to equip"
+```
+
+```yaml filename="chat-plugin-format.yml"
+format: "%aquatags_prefix% &f{player}&7: &f{message}"
+```
+
+## Sections
+
+<CardGrid>
+  <LinkCard title="Commands" href="/plugins/aquatags/commands" description="Player and admin commands." />
+  <LinkCard title="Configuration" href="/plugins/aquatags/configuration" description="Tags, GUI layout and storage." />
+</CardGrid>

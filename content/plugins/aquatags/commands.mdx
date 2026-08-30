@@ -1,0 +1,53 @@
+---
+title: Commands
+description: AquaTags commands, permissions and admin actions.
+---
+
+# Commands
+
+## Reference
+
+| Command | Permission | Description |
+| --- | --- | --- |
+| `/tags` | `aquatags.use` | Open the tag menu. |
+| `/tags list` | `aquatags.use` | List tags you can equip. |
+| `/tags set <id>` | `aquatags.use` | Equip a tag without the GUI. |
+| `/tags clear` | `aquatags.use` | Remove your current tag. |
+| `/tags reload` | `aquatags.reload` | Reload `config.yml` and `tags.yml`. |
+| `/tags give <player> <id>` | `aquatags.give` | Force-equip a tag on someone. |
+| `/tags info <id>` | `aquatags.info` | Show a tag's raw definition. |
+
+`aquatags.admin` grants every node above.
+
+## Equipping without the GUI
+
+```
+/tags set vip
+```
+
+Useful in command blocks, NPC scripts or as a reward from a crate:
+
+```yaml filename="crate-rewards.yml"
+commands:
+  - "tags give %player% vip"
+  - "lp user %player% permission set aquatags.tag.vip true"
+```
+
+<Callout type="warning">
+  `/tags give` equips the tag but does **not** grant the permission. If the player does not hold
+  `aquatags.tag.<id>`, the tag is removed the next time they log in. Grant the node too.
+</Callout>
+
+## Errors
+
+| Situation | Message |
+| --- | --- |
+| Tag id does not exist | `&cUnknown tag: &f{id}` |
+| Player lacks the tag node | `&cYou haven't unlocked that tag yet.` |
+| Target offline for `/tags give` | `&cPlayer not found: &f{player}` |
+| Storage unreachable | `&cCouldn't save your tag — try again in a moment.` |
+
+<Callout type="info">
+  When storage is unreachable the tag still applies for the current session. It is re-synced
+  automatically once the database answers again.
+</Callout>
