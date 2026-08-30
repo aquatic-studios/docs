@@ -1,0 +1,35 @@
+{
+  "name": "aquatic-studios-docs",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Official documentation for every Aquatic Studios plugin, library and API.",
+  "author": "Senkex",
+  "license": "MIT",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build && npm run search && npm run nojekyll",
+    "search": "pagefind --site out --output-path out/_pagefind",
+    "nojekyll": "node -e \"require('fs').writeFileSync('out/.nojekyll','')\"",
+    "preview": "npx --yes serve out",
+    "clean": "node -e \"require('fs').rmSync('out',{recursive:true,force:true});require('fs').rmSync('.next',{recursive:true,force:true})\""
+  },
+  "dependencies": {
+    "@fontsource/jetbrains-mono": "^5.3.0",
+    "@fontsource/poppins": "^5.3.0",
+    "next": "^15.5.4",
+    "nextra": "^4.6.1",
+    "nextra-theme-docs": "^4.6.1",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.1.0",
+    "pagefind": "^1.5.2",
+    "typescript": "^5.7.0"
+  },
+  "overrides": {
+    "zod": "4.1.12"
+  }
+}
