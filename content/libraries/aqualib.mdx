@@ -1,0 +1,201 @@
+---
+title: AquaLib
+description: The shared utility library behind every Aquatic Studios plugin — config mapping, item builders, Folia-safe scheduling and a colour engine.
+---
+
+# AquaLib
+
+<p>
+  <Badge variant="note">Library</Badge> <Badge variant="version">v1.6.0</Badge>
+</p>
+
+The boring parts of a Bukkit plugin, solved once. Config mapping, item building, GUI plumbing, a
+Folia-safe scheduler and the HEX/gradient colour engine used across every Aquatic project. No runtime
+dependency on any of our plugins — drop it into your own project and use it standalone.
+
+<PluginMeta
+  items={{
+    Group: '`com.github.aquatic-studios`',
+    Artifact: '`AquaLib`',
+    Repository: 'JitPack',
+    MC: '`1.16+` (HEX colours required)',
+    Java: '`17+`',
+    Platform: 'Bukkit / Spigot / Paper / Folia'
+  }}
+/>
+
+<Callout type="error">
+  If you ship AquaLib inside a plugin you **must** relocate it. Two plugins bundling the same
+  unrelocated classes will fight over the classloader. See [Shading](#shading).
+</Callout>
+
+## Installation
+
+<Tabs items={['Gradle (Kotlin)', 'Gradle (Groovy)', 'Maven']}>
+  <Tabs.Tab>
+```kotlin filename="build.gradle.kts"
+repositories {
+    maven("https://jitpack.io")
+}
+
+dependencies {
+    implementation("com.github.aquatic-studios:AquaLib:1.6.0")
+}
+```
+  </Tabs.Tab>
+  <Tabs.Tab>
+```groovy filename="build.gradle"
+repositories {
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    implementation 'com.github.aquatic-studios:AquaLib:1.6.0'
+}
+```
+  </Tabs.Tab>
+  <Tabs.Tab>
+```xml filename="pom.xml"
+<repositories>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
+</repositories>
+
+<dependency>
+    <groupId>com.github.aquatic-studios</groupId>
+    <artifactId>AquaLib</artifactId>
+    <version>1.6.0</version>
+</dependency>
+```
+  </Tabs.Tab>
+</Tabs>
+
+## Shading
+
+Relocate `com.aquaticstudios.aqualib` into your own namespace.
+
+<Tabs items={['Gradle Shadow', 'Maven Shade']}>
+  <Tabs.Tab>
+```kotlin filename="build.gradle.kts"
+plugins {
+    id("com.gradleup.shadow") version "8.3.5"
+}
+
+tasks {
+    shadowJar {
+        relocate("com.aquaticstudios.aqualib", "com.example.myplugin.libs.aqualib")
+        minimize()
+    }
+}
+```
+  </Tabs.Tab>
+  <Tabs.Tab>
+```xml filename="pom.xml"
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-shade-plugin</artifactId>
+    <version>3.6.0</version>
+    <configuration>
+        <relocations>
+            <relocation>
+                <pattern>com.aquaticstudios.aqualib</pattern>
+                <shadedPattern>com.example.myplugin.libs.aqualib</shadedPattern>
+            </relocation>
+        </relocations>
+    </configuration>
+    <executions>
+        <execution>
+            <phase>package</phase>
+            <goals><goal>shade</goal></goals>
+        </execution>
+    </executions>
+</plugin>
+```
+  </Tabs.Tab>
+</Tabs>
+
+## Colours
+
+```java
+import com.aquaticstudios.aqualib.text.Colors;
+
+Component line = Colors.parse("&#38ecff&lAqua&#0a84ffLib &8» &7ready");
+Component grad = Colors.parse("<gradient:#38ecff:#0a84ff>Smooth</gradient>");
+```
+
+| Input | Supported since |
+| --- | --- |
+| `&a`, `&l` legacy codes | `1.0.0` |
+| `&#rrggbb` HEX | `1.0.0` |
+| `<gradient:#a:#b>text</gradient>` | `1.2.0` |
+| `<rainbow>text</rainbow>` | `1.5.0` |
+
+## Items
+
+```java
+import com.aquaticstudios.aqualib.item.ItemBuilder;
+
+ItemStack star = ItemBuilder.of(Material.NETHER_STAR)
+    .name("&#38ecff&lLegend Tag")
+    .lore("&7Animated gradient tag.", "", "&#38ecffClick to equip")
+    .glow(true)
+    .flags(ItemFlag.HIDE_ATTRIBUTES)
+    .amount(1)
+    .build();
+```
+
+Every setter accepts the same colour syntax as `Colors.parse`.
+
+## Config mapping
+
+Annotate a class, get a typed config with defaults, comments and automatic migration.
+
+```java
+import com.aquaticstudios.aqualib.config.*;
+
+@ConfigFile("config.yml")
+public final class Settings {
+
+    @Comment("Prefix prepended to every plugin message.")
+    @Key("settings.prefix")
+    public String prefix = "&#38ecff&lAqua &8» &r";
+
+    @Key("settings.check-updates")
+    public boolean checkUpdates = true;
+
+    @Key("broadcast.cooldown")
+    public int cooldown = 3;
+}
+```
+
+```java
+Settings settings = ConfigLoader.load(this, Settings.class);
+getLogger().info("Cooldown: " + settings.cooldown);
+```
+
+New fields are appended to the existing file on the next boot, keeping the user values and your
+comments intact.
+
+## Scheduling
+
+One API that behaves correctly on both Paper and Folia.
+
+```java
+import com.aquaticstudios.aqualib.scheduler.Schedulers;
+
+Schedulers.global(this).runLater(() -> broadcast(), 20L);
+Schedulers.entity(player).run(() -> player.setHealth(20.0));
+Schedulers.async(this).run(() -> fetchSkin(uuid));
+```
+
+<Callout type="info">
+  On Paper these map to the classic `BukkitScheduler`. On Folia they map to the global, entity and
+  async schedulers respectively. Your code does not change.
+</Callout>
+
+## Versioning
+
+Semantic versioning. Anything under `com.aquaticstudios.aqualib.internal` is not public API and can
+change in any release.

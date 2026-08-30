@@ -1,0 +1,126 @@
+---
+title: AquaAPI
+description: The cross-plugin service registry — one entry point to every Aquatic Studios plugin running on the server.
+---
+
+# AquaAPI
+
+<p>
+  <Badge variant="caution">API</Badge> <Badge variant="version">v2.0.0</Badge>
+</p>
+
+A single, version-safe entry point to every Aquatic plugin installed on the server. Instead of
+hard-depending on each plugin, you ask the registry what is available and get back a typed service —
+or an empty `Optional` when the plugin is not installed.
+
+<PluginMeta
+  items={{
+    Group: '`com.github.aquatic-studios`',
+    Artifact: '`AquaAPI`',
+    Provided: 'By AquaCore `2.0+`',
+    Java: '`17+`',
+    Scope: '`compileOnly` / `provided`'
+  }}
+/>
+
+## Installation
+
+```kotlin filename="build.gradle.kts"
+repositories {
+    maven("https://jitpack.io")
+}
+
+dependencies {
+    compileOnly("com.github.aquatic-studios:AquaAPI:2.0.0")
+}
+```
+
+```yaml filename="plugin.yml"
+softdepend: [AquaCore, AquaTags]
+```
+
+<Callout type="info">
+  Use `softdepend`, not `depend`. The whole point of the registry is that your plugin keeps working
+  when an Aquatic plugin is missing.
+</Callout>
+
+## Looking up a service
+
+```java
+import com.aquaticstudios.api.AquaAPI;
+import com.aquaticstudios.api.tags.TagService;
+
+AquaAPI.service(TagService.class).ifPresent(tags -> {
+    tags.equipped(player).ifPresent(tag ->
+        getLogger().info(player.getName() + " is wearing " + tag.id())
+    );
+});
+```
+
+| Service | Provided by | Since |
+| --- | --- | --- |
+| `BroadcastService` | AquaCore | `2.0.0` |
+| `MessageService` | AquaCore | `2.0.0` |
+| `HeadService` | AquaCore | `2.0.0` |
+| `TagService` | AquaTags | `1.3.0` |
+| `CrateService` | AquaCrates | *unreleased* |
+
+## Checking what is installed
+
+```java
+if (AquaAPI.isPresent("AquaTags")) {
+    // AquaTags is installed and enabled
+}
+
+AquaAPI.installed().forEach((name, version) ->
+    getLogger().info(name + " " + version)
+);
+```
+
+## Events
+
+Registry-level events, all in `com.aquaticstudios.api.event`.
+
+| Event | Cancellable | Fired |
+| --- | --- | --- |
+| `AquaServiceRegisterEvent` | No | A plugin publishes a service |
+| `AquaServiceUnregisterEvent` | No | A plugin is disabled |
+| `AquaReadyEvent` | No | Every Aquatic plugin finished enabling |
+
+```java
+@EventHandler
+public void onReady(AquaReadyEvent event) {
+    getLogger().info("Aquatic stack ready: " + event.services().size() + " services");
+}
+```
+
+<Callout type="warning">
+  Do not resolve services inside your own `onEnable`. Plugin load order is not guaranteed — listen for
+  `AquaReadyEvent` instead, or resolve lazily at the point of use.
+</Callout>
+
+## Version guards
+
+Every service carries the version of the plugin that published it, so you can degrade gracefully
+instead of throwing `NoSuchMethodError`.
+
+```java
+AquaAPI.service(TagService.class).ifPresent(tags -> {
+    if (tags.apiVersion().isAtLeast(1, 4)) {
+        tags.setTemporary(player, "vip", Duration.ofHours(1));
+    } else {
+        tags.equip(player, "vip");
+    }
+});
+```
+
+## Stability contract
+
+| Package | Stability |
+| --- | --- |
+| `com.aquaticstudios.api.*` | Stable, semver |
+| `com.aquaticstudios.api.event.*` | Stable, semver |
+| `com.aquaticstudios.*.internal.*` | No guarantees, do not use |
+
+Deprecated methods survive at least one full minor cycle and always name their replacement in the
+`@Deprecated` annotation.
