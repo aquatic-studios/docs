@@ -13,8 +13,9 @@
   --as-orange: #b25000;
   --as-red: #d0342c;
 
-  --as-code-bg: #f7f7f9;
-  --as-code-bar: #ececf1;
+  --as-code-bg: #f5f5f7;
+  --as-code-bar: #e9e9ee;
+  --as-hairline: rgba(0, 0, 0, 0.07);
 
   --as-r-sm: 8px;
   --as-r-md: 12px;
@@ -45,6 +46,7 @@
 
   --as-code-bg: #141416;
   --as-code-bar: #0b0b0d;
+  --as-hairline: rgba(255, 255, 255, 0.07);
 }
 
 html {
@@ -123,8 +125,8 @@ samp {
 }
 
 .nextra-search kbd {
-  background: transparent !important;
-  border: 1px solid var(--as-separator) !important;
+  background: var(--as-hairline) !important;
+  border: 0 !important;
   color: var(--as-text-secondary) !important;
   border-radius: 5px !important;
 }
@@ -281,7 +283,7 @@ article td code {
 }
 
 div.nextra-code {
-  border: 1px solid var(--as-separator);
+  border: 0;
   border-radius: var(--as-r-md);
   overflow: hidden;
   background: var(--as-code-bg);
@@ -300,7 +302,6 @@ div.nextra-code > pre {
 div.nextra-code > div:first-child {
   background: var(--as-code-bar);
   border: 0 !important;
-  border-bottom: 1px solid var(--as-separator) !important;
   border-radius: 0 !important;
   height: 2.5rem;
   padding-left: 0 !important;
@@ -317,7 +318,7 @@ div.nextra-code > div:first-child > span {
   align-items: center;
   padding: 0 1rem;
   background: var(--as-code-bg);
-  border-right: 1px solid var(--as-separator);
+  border: 0;
   box-shadow: inset 0 2px 0 0 var(--as-accent);
   color: var(--as-text);
   max-width: 60%;
@@ -329,9 +330,9 @@ div.nextra-code > div:first-child > button {
 }
 
 div.nextra-code button {
-  border: 1px solid var(--as-separator) !important;
+  border: 0 !important;
   border-radius: 7px !important;
-  background: var(--as-bg) !important;
+  background: var(--as-hairline) !important;
   color: var(--as-text-secondary) !important;
   box-shadow: none !important;
 }
@@ -384,14 +385,15 @@ article table {
   border-collapse: separate;
   border-spacing: 0;
   font-size: 0.875rem;
-  border: 1px solid var(--as-separator);
+  border: 0;
   border-radius: var(--as-r-md);
   overflow: hidden;
+  background: var(--as-surface);
   margin: 1.5rem 0;
 }
 
 article th {
-  background: var(--as-surface);
+  background: transparent;
   color: var(--as-text);
   font-weight: 600;
   text-align: left;
@@ -401,7 +403,7 @@ article th {
 article th,
 article td {
   border: 0;
-  border-bottom: 1px solid var(--as-separator);
+  border-bottom: 1px solid var(--as-hairline);
   padding: 0.7rem 0.95rem;
   vertical-align: top;
   line-height: 1.6;
@@ -412,7 +414,7 @@ article tbody tr:last-child td {
 }
 
 article tbody tr:hover td {
-  background: var(--as-surface);
+  background: var(--as-hairline);
 }
 
 article thead:has(th:empty) {
@@ -471,7 +473,7 @@ article thead:has(th:empty) + tbody tr:first-child td {
 }
 
 .nextra-steps {
-  border-left: 1px solid var(--as-separator);
+  border-left: 1px solid var(--as-hairline);
   margin-left: 0.6rem;
 }
 
@@ -484,13 +486,13 @@ article thead:has(th:empty) + tbody tr:first-child td {
 .nextra-steps h3::before {
   background: var(--as-surface) !important;
   color: var(--as-text) !important;
-  border: 1px solid var(--as-separator);
+  border: 0;
   font-family: var(--as-sans);
   font-weight: 600;
 }
 
 .nextra-filetree {
-  border: 1px solid var(--as-separator) !important;
+  border: 0 !important;
   border-radius: var(--as-r-md);
   background: var(--as-surface);
   font-family: var(--as-mono);
@@ -503,17 +505,16 @@ article thead:has(th:empty) + tbody tr:first-child td {
 }
 
 .nextra-card {
-  border: 1px solid var(--as-separator) !important;
+  border: 0 !important;
   border-radius: var(--as-r-md) !important;
   background: var(--as-surface) !important;
   box-shadow: none !important;
   color: var(--as-text) !important;
-  transition: background 0.15s ease, border-color 0.15s ease;
+  transition: background 0.15s ease;
 }
 
 .nextra-card:hover {
   background: var(--as-surface-hover) !important;
-  border-color: var(--as-accent) !important;
 }
 
 article kbd,
@@ -525,9 +526,9 @@ article kbd,
 article kbd {
   display: inline-block;
   padding: 0.15em 0.45em;
-  border: 1px solid var(--as-separator);
+  border: 0;
   border-radius: 6px;
-  background: var(--as-surface);
+  background: var(--as-surface-hover);
   color: var(--as-text);
 }
 
