@@ -252,57 +252,113 @@ article blockquote {
   font-style: normal;
 }
 
-article :not(pre) > code {
+article :not(pre) > code,
+article code.nextra-code {
   background: var(--as-surface);
-  border: 0;
-  border-radius: 6px;
-  padding: 0.14em 0.4em;
+  border: 0 !important;
+  border-radius: 6px !important;
+  box-shadow: none !important;
+  padding: 0.14em 0.42em;
   font-size: 0.85em;
   color: var(--as-text);
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
 }
 
 article a > code {
   color: var(--as-accent);
 }
 
-.nextra-code {
-  border-radius: var(--as-r-md);
-  overflow: hidden;
-  border: 1px solid var(--as-separator);
+article th code,
+article td code {
+  background: var(--as-surface-hover);
 }
 
-.nextra-code pre {
-  background: var(--as-surface) !important;
+div.nextra-code {
+  border: 1px solid var(--as-separator);
+  border-radius: var(--as-r-md);
+  overflow: hidden;
+  background: var(--as-surface);
+}
+
+.dark div.nextra-code {
+  background: #141416;
+}
+
+div.nextra-code > pre {
+  background: transparent !important;
   border: 0 !important;
   border-radius: 0 !important;
+  box-shadow: none !important;
+  padding-block: 1rem;
   font-size: 0.845rem;
   line-height: 1.7;
 }
 
-.dark .nextra-code pre {
-  background: #141416 !important;
-}
-
-.nextra-code figcaption,
-.nextra-code > div:first-child {
+div.nextra-code > div:first-child {
   background: var(--as-surface);
-  border-bottom: 1px solid var(--as-separator);
+  border: 0 !important;
+  border-bottom: 1px solid var(--as-separator) !important;
+  border-radius: 0 !important;
+  height: 2.6rem;
   color: var(--as-text-secondary);
   font-family: var(--as-mono);
   font-size: 0.75rem;
   letter-spacing: 0;
 }
 
-.dark .nextra-code figcaption,
-.dark .nextra-code > div:first-child {
+.dark div.nextra-code > div:first-child {
   background: #1c1c1e;
 }
 
-.nextra-code button {
-  border-radius: 6px !important;
-  border-color: var(--as-separator) !important;
+div.nextra-code button {
+  border: 1px solid var(--as-separator) !important;
+  border-radius: 7px !important;
   background: var(--as-bg) !important;
   color: var(--as-text-secondary) !important;
+  box-shadow: none !important;
+}
+
+div.nextra-code button:hover {
+  background: var(--as-surface-hover) !important;
+  color: var(--as-text) !important;
+}
+
+article [role="tablist"] {
+  display: inline-flex;
+  width: auto !important;
+  gap: 2px;
+  padding: 3px;
+  margin-top: 1.5rem;
+  border: 0 !important;
+  border-radius: 10px;
+  background: var(--as-surface);
+}
+
+article [role="tab"] {
+  border: 0 !important;
+  border-radius: 7px !important;
+  margin: 0 !important;
+  padding: 0.35rem 0.85rem !important;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--as-text-secondary) !important;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+article [role="tab"]:hover {
+  color: var(--as-text) !important;
+}
+
+article [role="tab"][aria-selected="true"] {
+  background: #ffffff;
+  color: var(--as-text) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.dark article [role="tab"][aria-selected="true"] {
+  background: #3a3a3c;
+  box-shadow: none;
 }
 
 article table {
