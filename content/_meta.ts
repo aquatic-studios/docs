@@ -8,9 +8,6 @@ export default {
   libraries: {
     title: 'Libraries'
   },
-  api: {
-    title: 'API'
-  },
   plugins: {
     title: 'Plugins'
   },

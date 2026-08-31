@@ -1,8 +1,7 @@
 import type { MetaRecord } from 'nextra'
 
 export default {
-  introduction: 'Introduction',
-  installation: 'Installation',
-  conventions: 'Conventions',
-  support: 'Support'
+  colors: 'Colors',
+  integration: 'Integration',
+  webhook: 'Webhook'
 } satisfies MetaRecord

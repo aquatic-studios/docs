@@ -1,6 +1,6 @@
 import type { MetaRecord } from 'nextra'
 
 export default {
-  aqualib: 'AquaLib',
+  centermessage: 'CenterMessage',
   headrender: 'HeadRender'
 } satisfies MetaRecord

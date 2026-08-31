@@ -1,6 +1,11 @@
 import type { MetaRecord } from 'nextra'
 
 export default {
-  aquacore: 'AquaCore',
-  aquatags: 'AquaTags'
+  aquaclan: 'AquaClan',
+  aqualang: 'AquaLang',
+  aqualive: 'AquaLive',
+  aquashulk: 'AquaShulk',
+  aquaspawn: 'AquaSpawn',
+  aquatac: 'AquaTac',
+  aquatebex: 'AquaTebex'
 } satisfies MetaRecord
