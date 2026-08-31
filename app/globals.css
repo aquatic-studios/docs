@@ -262,9 +262,16 @@ article blockquote {
   font-style: normal;
 }
 
+article pre code,
+article pre code.nextra-code {
+  background: transparent !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+}
+
 article :not(pre) > code,
-article code.nextra-code {
-  background: var(--as-chip);
+article :not(pre) > code.nextra-code {
+  background: var(--as-chip) !important;
   border: 0 !important;
   border-radius: 4px !important;
   box-shadow: none !important;
