@@ -7,7 +7,9 @@
   "author": "Senkex",
   "license": "MIT",
   "scripts": {
+    "predev": "node scripts/git-info.mjs",
     "dev": "next dev",
+    "prebuild": "node scripts/git-info.mjs",
     "build": "next build && npm run search && npm run nojekyll",
     "search": "pagefind --site out --output-path out/_pagefind",
     "nojekyll": "node -e \"require('fs').writeFileSync('out/.nojekyll','')\"",

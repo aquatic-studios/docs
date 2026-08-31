@@ -2,6 +2,8 @@ import { Footer, Layout, Navbar } from 'nextra-theme-docs'
 import { Head } from 'nextra/components'
 import { getPageMap } from 'nextra/page-map'
 
+import { LastUpdated } from '../components/last-updated'
+
 import '@fontsource-variable/inter'
 import 'nextra-theme-docs/style.css'
 import './globals.css'
@@ -45,8 +47,14 @@ const navbar = (
 const footer = (
   <Footer>
     <div className="as-footer">
-      <span>© {new Date().getFullYear()} Aquatic Studios</span>
-      <span>Written and maintained by Senkex</span>
+      Powered by{' '}
+      <a href="https://github.com/aquatic-studios" target="_blank" rel="noopener noreferrer">
+        Aquatic Studios
+      </a>{' '}
+      @{' '}
+      <a href="https://github.com/senkex" target="_blank" rel="noopener noreferrer">
+        Senkex
+      </a>
     </div>
   </Footer>
 )
@@ -65,6 +73,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           docsRepositoryBase="https://github.com/aquatic-studios/docs/tree/main"
           footer={footer}
           sidebar={{ defaultMenuCollapseLevel: 1, toggleButton: true }}
+          lastUpdated={<LastUpdated />}
           toc={{ backToTop: 'Back to top' }}
           nextThemes={{ defaultTheme: 'dark' }}
         >
