@@ -13,13 +13,14 @@
   --as-orange: #b25000;
   --as-red: #d0342c;
 
-  --as-code-bg: #f5f5f7;
-  --as-code-bar: #e9e9ee;
+  --as-line: rgba(0, 0, 0, 0.14);
   --as-hairline: rgba(0, 0, 0, 0.07);
+  --as-chip: rgba(0, 0, 0, 0.06);
+  --as-tint: rgba(0, 0, 0, 0.03);
 
-  --as-r-sm: 8px;
-  --as-r-md: 12px;
-  --as-r-lg: 16px;
+  --as-r-sm: 6px;
+  --as-r-md: 0px;
+  --as-r-lg: 0px;
 
   --as-sans: "Inter Variable", "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text",
     "Segoe UI", system-ui, sans-serif;
@@ -44,9 +45,10 @@
   --as-orange: #ff9f0a;
   --as-red: #ff453a;
 
-  --as-code-bg: #141416;
-  --as-code-bar: #0b0b0d;
+  --as-line: rgba(255, 255, 255, 0.13);
   --as-hairline: rgba(255, 255, 255, 0.07);
+  --as-chip: rgba(255, 255, 255, 0.08);
+  --as-tint: rgba(255, 255, 255, 0.03);
 }
 
 html {
@@ -262,9 +264,9 @@ article blockquote {
 
 article :not(pre) > code,
 article code.nextra-code {
-  background: var(--as-surface);
+  background: var(--as-chip);
   border: 0 !important;
-  border-radius: 6px !important;
+  border-radius: 4px !important;
   box-shadow: none !important;
   padding: 0.14em 0.42em;
   font-size: 0.85em;
@@ -279,14 +281,14 @@ article a > code {
 
 article th code,
 article td code {
-  background: var(--as-surface-hover);
+  background: var(--as-chip);
 }
 
 div.nextra-code {
-  border: 0;
-  border-radius: var(--as-r-md);
+  border: 1px solid var(--as-line);
+  border-radius: 0;
   overflow: hidden;
-  background: var(--as-code-bg);
+  background: transparent;
 }
 
 div.nextra-code > pre {
@@ -300,12 +302,13 @@ div.nextra-code > pre {
 }
 
 div.nextra-code > div:first-child {
-  background: var(--as-code-bar);
+  background: transparent;
   border: 0 !important;
+  border-bottom: 1px solid var(--as-line) !important;
   border-radius: 0 !important;
-  height: 2.5rem;
+  height: 2.4rem;
   padding-left: 0 !important;
-  padding-right: 0.6rem !important;
+  padding-right: 0.5rem !important;
   align-items: stretch !important;
   color: var(--as-text-secondary);
   font-family: var(--as-mono);
@@ -316,9 +319,10 @@ div.nextra-code > div:first-child {
 div.nextra-code > div:first-child > span {
   display: flex;
   align-items: center;
-  padding: 0 1rem;
-  background: var(--as-code-bg);
+  padding: 0 0.95rem;
+  background: var(--as-tint);
   border: 0;
+  border-right: 1px solid var(--as-line);
   box-shadow: inset 0 2px 0 0 var(--as-accent);
   color: var(--as-text);
   max-width: 60%;
@@ -330,35 +334,37 @@ div.nextra-code > div:first-child > button {
 }
 
 div.nextra-code button {
-  border: 0 !important;
-  border-radius: 7px !important;
-  background: var(--as-hairline) !important;
+  border: 1px solid var(--as-line) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
   color: var(--as-text-secondary) !important;
   box-shadow: none !important;
 }
 
 div.nextra-code button:hover {
-  background: var(--as-surface-hover) !important;
+  background: var(--as-chip) !important;
   color: var(--as-text) !important;
 }
 
 article [role="tablist"] {
-  display: inline-flex;
-  width: auto !important;
-  gap: 2px;
-  padding: 3px;
+  display: flex;
+  width: 100% !important;
+  gap: 0;
+  padding: 0;
   margin-top: 1.5rem;
   border: 0 !important;
-  border-radius: 10px;
-  background: var(--as-surface);
+  border-bottom: 1px solid var(--as-line) !important;
+  border-radius: 0;
+  background: transparent;
 }
 
 article [role="tab"] {
   border: 0 !important;
-  border-radius: 7px !important;
+  border-radius: 0 !important;
   margin: 0 !important;
-  padding: 0.35rem 0.85rem !important;
-  font-size: 0.82rem;
+  padding: 0.5rem 1rem !important;
+  font-family: var(--as-mono);
+  font-size: 0.76rem;
   font-weight: 500;
   color: var(--as-text-secondary) !important;
   transition: background 0.15s ease, color 0.15s ease;
@@ -369,15 +375,12 @@ article [role="tab"]:hover {
 }
 
 article [role="tab"][aria-selected="true"] {
-  background: #ffffff;
+  background: var(--as-tint);
   color: var(--as-text) !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: inset 0 2px 0 0 var(--as-accent);
 }
 
-.dark article [role="tab"][aria-selected="true"] {
-  background: #3a3a3c;
-  box-shadow: none;
-}
+
 
 article table {
   width: 100%;
@@ -385,15 +388,15 @@ article table {
   border-collapse: separate;
   border-spacing: 0;
   font-size: 0.875rem;
-  border: 0;
-  border-radius: var(--as-r-md);
+  border: 1px solid var(--as-line);
+  border-radius: 0;
   overflow: hidden;
-  background: var(--as-surface);
+  background: transparent;
   margin: 1.5rem 0;
 }
 
 article th {
-  background: transparent;
+  background: var(--as-tint);
   color: var(--as-text);
   font-weight: 600;
   text-align: left;
@@ -403,7 +406,7 @@ article th {
 article th,
 article td {
   border: 0;
-  border-bottom: 1px solid var(--as-hairline);
+  border-bottom: 1px solid var(--as-line);
   padding: 0.7rem 0.95rem;
   vertical-align: top;
   line-height: 1.6;
@@ -414,7 +417,7 @@ article tbody tr:last-child td {
 }
 
 article tbody tr:hover td {
-  background: var(--as-hairline);
+  background: var(--as-tint);
 }
 
 article thead:has(th:empty) {
@@ -427,8 +430,9 @@ article thead:has(th:empty) + tbody tr:first-child td {
 
 .nextra-callout {
   border: 0 !important;
-  border-radius: var(--as-r-md) !important;
-  background: var(--as-surface) !important;
+  border-left: 2px solid currentColor !important;
+  border-radius: 0 !important;
+  background: var(--as-tint) !important;
   color: var(--as-text) !important;
   padding: 0.9rem 1rem !important;
   margin: 1.5rem 0 !important;
@@ -492,12 +496,12 @@ article thead:has(th:empty) + tbody tr:first-child td {
 }
 
 .nextra-filetree {
-  border: 0 !important;
-  border-radius: var(--as-r-md);
-  background: var(--as-surface);
+  border: 1px solid var(--as-line) !important;
+  border-radius: 0;
+  background: transparent;
   font-family: var(--as-mono);
   font-size: 0.82rem;
-  padding: 0.5rem;
+  padding: 0.6rem;
 }
 
 .nextra-cards {
@@ -505,16 +509,17 @@ article thead:has(th:empty) + tbody tr:first-child td {
 }
 
 .nextra-card {
-  border: 0 !important;
-  border-radius: var(--as-r-md) !important;
-  background: var(--as-surface) !important;
+  border: 1px solid var(--as-line) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
   box-shadow: none !important;
   color: var(--as-text) !important;
-  transition: background 0.15s ease;
+  transition: background 0.15s ease, border-color 0.15s ease;
 }
 
 .nextra-card:hover {
-  background: var(--as-surface-hover) !important;
+  background: var(--as-tint) !important;
+  border-color: var(--as-accent) !important;
 }
 
 article kbd,
@@ -526,9 +531,9 @@ article kbd,
 article kbd {
   display: inline-block;
   padding: 0.15em 0.45em;
-  border: 0;
-  border-radius: 6px;
-  background: var(--as-surface-hover);
+  border: 1px solid var(--as-line);
+  border-radius: 4px;
+  background: transparent;
   color: var(--as-text);
 }
 
