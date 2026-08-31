@@ -1,7 +1,6 @@
 import type { MetaRecord } from 'nextra'
 
 export default {
-  overview: 'Overview',
   commands: 'Commands',
   permissions: 'Permissions',
   configuration: 'Configuration',
