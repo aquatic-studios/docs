@@ -3,7 +3,7 @@ import type { MetaRecord } from 'nextra'
 export default {
   index: 'Introduction',
   start: {
-    title: 'Getting started'
+    title: 'All Features'
   },
   libraries: {
     title: 'Libraries'

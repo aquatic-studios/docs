@@ -9,7 +9,39 @@ Release notes for every plugin, newest first.
 
 ## AquaClan
 
-No releases documented yet.
+### 1.1.1
+
+[Aug 20, 2026](https://www.spigotmc.org/resources/aquaclan-advanced-clan-system-1-8-1-26-2.136918/update?update=652740)
+
+- Added `/clan short`, a quick menu with four buttons: create clan, invitations, all clans and profile.
+- Added clan creation from chat. Click the button and write the name, with title, boss bar countdown and a clickable cancel. No command needed.
+- Added a full invitation system. Invites are saved to `invites.json`, survive restarts and reach offline players. Left click accepts, right click denies.
+- Added `/clan invites`, `/clan revoke <player>` and `/clan open <menu> [clan]`, so any menu can be opened for any clan, like `/clan open levels ClanMuerte`.
+- Added 20 menus: create, invitations, sent invitations, invite players, profile, all clans, rankings hub, seven rankings and the clan panel with members, allies, rivals and statistics.
+- Added a profile menu where each player turns clan invitations, invitation alerts, combat alerts and mail alerts on or off.
+- Added clan context to menus. Any menu shows `%clan_<x>%` of the clan it was opened for, including its position in every ranking.
+- Added the button options `head`, `clan-banner`, `permission`, `hide-with-clan` and `hide-without-clan`, plus the actions `[input]`, `[invite-accept]`, `[invite-deny]`, `[invite-send]`, `[invite-revoke]`, `[profile-toggle]`, `[clan-info]` and `[refresh]`.
+- Added the placeholders `create_cost`, `invite_cost`, `balance`, `pending_invites`, `sent_invites`, `profile_kills`, `profile_deaths`, `profile_kdr`, `profile_first_seen`, `profile_setting_<key>`, `rank_points`, `rank_kills` and `rank_level`.
+- Added the `invites` and `chat-input` sections to `config.yml`, plus `menu.top-limit` and `economy.costs.invite`. Creation is charged through Vault from the menu as well.
+- Fixed invitations being lost on restart and limited to one per player for 60 seconds. A player now holds several at once with a configurable expiry.
+- Fixed `/clan invite` only working with online players. Names are resolved offline as well.
+- Fixed invites staying alive after a clan was renamed or disbanded. They are remapped or removed now.
+- Fixed clickable messages printing `</hover></click>` as plain text, caused by hex colors closing the tag they were inside.
+- Fixed menu commands running with an unresolved `%clan_name%`. A menu opened without a clan falls back to your own, and broken commands are skipped.
+- Fixed profile toggles reporting the raw key such as `clan_invites`. They use readable names from `messages.yml` now.
+- Removed the `filler` option. Glass pane fillers are gone from every menu and from the code.
+- Improved every layout. Lists show 45 entries per page with the navigation on the bottom row, and the main menu moved up now that the panes are gone.
+
+### 1.1.0
+
+[Jul 20, 2026](https://www.spigotmc.org/resources/aquaclan-advanced-clan-system-1-8-1-26-2.136918/update?update=648924)
+
+- Reworked the `/clan top` command into a fully paginated leaderboard menu. Clans are now ranked by points and displayed with their leader's head instead of being listed in chat.
+- Added `menus/leaderboard.yml`, allowing you to fully customize the leaderboard menu, including its title, layout, slots, items, display names, lore and navigation buttons.
+- Added support for `%page%` and `%pages%` placeholders in the titles of all paginated menus.
+- Added an in-game update notifier. Players with the `aquaclan.admin` permission now receive a chat notification when a new version is available. This can be disabled through the `update-notification` option in `config.yml`.
+- Improved PlaceholderAPI support. Clan placeholders no longer return empty values for players without a clan. The fallback text for `%aquaclan_name%`, `%aquaclan_tag%`, `%aquaclan_leader%`, `%aquaclan_role%`, `%aquaclan_nickname%`, `%aquaclan_description%` and `%aquaclan_created%` is now fully configurable under the `placeholders` section in `config.yml`.
+- Added configurable values for `%aquaclan_has_clan%`, allowing you to customize the text returned for both true and false states.
 
 ## AquaLang
 
@@ -17,15 +49,77 @@ No releases documented yet.
 
 ## AquaLive
 
-No releases documented yet.
+### 1.1.1
+
+[Aug 14, 2026](https://www.spigotmc.org/resources/aqualive-the-ultimate-live-stream-plugin-1-8-26-2.137594/update?update=651986)
+
+- Fixed new platforms doing nothing after `/aqualive reload`. A platform only works when its id exists in `config.yml`, `platforms.yml` and `webhook.yml`, and a missing block was skipped without a word. The three files are now cross-checked on every reload.
+- Fixed platforms missing the `domain` line in `config.yml` being dropped in silence, so `/live` replied with the syntax message as if the platform did not exist.
+- Fixed Discord webhooks being skipped with no explanation when the platform had no block in `webhook.yml` or the url was still `INSERT-URL-HERE`. Both are now reported in the console.
+- Fixed `%button_<platform>%` showing as raw text when that platform had no button block. It now falls back to the link button, so a new platform still gets a clickable announcement.
+- Fixed command aliases needing a full restart. They were registered once on startup, so adding `directo` or `envivo` and reloading did nothing. They are now re-registered on `/aqualive reload`.
+- Fixed duplicated and blank aliases. `Live` and `live` registered the same command twice, and an empty entry registered a nameless one. The list is now trimmed, lowercased and deduplicated.
+- Removed the domains `/live` suggested on TAB. They pushed players to send the bare domain such as `https://twitch.tv/` instead of their own channel link.
+- Added a configuration report after `/aqualive reload`, listing every block that does not line up between the three files, in the console and to whoever ran the command.
+- Added the `reload-warning` message to `messages.yml`. Existing files do not need to be touched, the warnings fall back to a built in format.
+- Note: on BungeeCord and Velocity a new alias works the moment it is typed, but the client side command list only refreshes on reconnect. On Bukkit based servers it refreshes right away.
+- Improved the startup and reload log, which now lists how many platforms loaded and their ids.
+
+### 1.1.0
+
+[Aug 4, 2026](https://www.spigotmc.org/resources/aqualive-the-ultimate-live-stream-plugin-1-8-26-2.137594/update?update=650853)
+
+- Fixed titles not showing on Spigot, Paper, Purpur and Folia. They were dropped silently with no console error, so it looked like the feature did not exist. Now sent through the server's own API.
+- Fixed chat buttons not being clickable and having no hover text outside proxies. Announcements arrived as plain text, which cannot carry click or hover actions. Now sent as real chat components.
+- Fixed hex colors turning into the 16 classic ones, so Twitch purple showed up blue. The server version now decides: full hex on `1.16+`, clean conversion on older versions.
+- Fixed announcements never reaching players on Velocity. The plugin bundled its own copy of the text library while Velocity provides that library itself, so nothing matched. Velocity now behaves exactly like BungeeCord.
+- Fixed one failing player cancelling the announcement for everyone after them. Each player is handled on its own now, and failures are logged instead of passing unnoticed.
+- Added action bar announcements, shown above the hotbar. New `actionbar` section per platform in `platforms.yml` with `enabled`, `text` and duration in seconds.
+- Added boss bar announcements, shown at the top of the screen. New `bossbar` section per platform with `enabled`, `text`, `color`, `style`, `progress` and duration in seconds.
+- Note: existing configurations will not show either feature until you add both sections by hand or delete `platforms.yml` to regenerate it.
+- Improved Folia support, where delayed work such as removing a boss bar when its timer ends was being dropped.
+- Improved console and command replies, which now render colors the same way as announcements.
 
 ## AquaShulk
 
-No releases documented yet.
+### 1.1.0
+
+[Aug 4, 2026](https://www.spigotmc.org/resources/aquashulk-open-shulker-boxes-anywhere-1-11-26-2.137568/update?update=650843)
+
+- Fixed the plugin disabling itself on Minecraft `26.1` and newer, where version detection assumed the old `1.x` naming and read `26.2` as minor version 2, failing the `1.11+` support check, so any major other than 1 is now treated as a modern release.
+- Updated NBT-API from `2.15.7` to `2.16.0`, adding the mappings for `26.2` that the previous build was missing.
+- Added an update checker that asks SpigotMC for the latest release on startup and logs it to console when a newer one exists, also notifying players with `aquashulk.update` when they join, toggleable through the new `update-notify` option in `config.yml`.
+
+### 1.0.0
+
+[Jul 31, 2026](https://www.spigotmc.org/resources/aquashulk-open-shulker-boxes-anywhere-1-11-26-2.137568/update?update=650338)
+
+- Added statistics, [bStats](https://bstats.org/plugin/bukkit/AquaShulk/32868).
 
 ## AquaSpawn
 
-No releases documented yet.
+### 1.1.0
+
+[Jul 25, 2026](https://www.spigotmc.org/resources/aquaspawn-fast-modern-spawn-management-1-8-26-2.136871/update?update=649581)
+
+- Added a custom join system with separate messages and effects for every join and for a player's very first join ever, each independently toggleable.
+- Added fully custom join and quit messages that replace the vanilla ones, with color, HEX and PlaceholderAPI support.
+- Added custom titles, subtitles and action bars shown when a player joins, with configurable fade in, stay and fade out timings.
+- Added a custom boss bar on join, with its own color, style, fill amount and how long it stays on screen.
+- Added fireworks on join, with configurable type, colors, fade colors, power, flicker and trail.
+- Added join sounds, playable with custom volume and pitch.
+- Added player head art. The joining player's head can be rendered as pixel art in chat using `<hd>`, and inline heads can be placed anywhere with `<head:name>`.
+- Added join actions, letting you run commands, potion effects and more on join through `[PLAYER]`, `[CONSOLE]` and `[EFFECT]`.
+- Added a players counter through the `%aquaspawn_total_players%` placeholder, showing how many unique players have ever joined the server.
+- Added a custom spawn mode. `/aquaspawn custom first:<name> force:<name>` sends new players and returning players to different spawns.
+- Added a spawn menu. `/aquaspawn menu` opens a paginated GUI to browse and teleport to your created spawns.
+- Added an in-game update notifier. Staff with the `aquaspawn.admin` permission now receive a chat notification on join when a new version is available. This can be disabled through the `update-notify` option in `config.yml`.
+
+### 1.0.0
+
+[Jul 8, 2026](https://www.spigotmc.org/resources/aquaspawn-fast-modern-spawn-management-1-8-26-2.136871/update?update=647428)
+
+- Added statistics, [bStats](https://bstats.org/plugin/bukkit/AquaSpawn-Original/32483).
 
 ## AquaTac
 
