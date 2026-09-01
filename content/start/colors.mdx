@@ -1,55 +1,21 @@
 ---
 title: Colors
-description: Color formats supported across every Aquatic Studios plugin.
+description: Color formats supported by every Aquatic Studios plugin.
 ---
 
 # Colors
 
-Every message field in every Aquatic Studios plugin accepts the same three formats. You can mix them
-in the same line.
+Every plugin accepts these formats, in any message field:
 
-## MiniMessage
-
-The recommended format. Tags are readable and never collide with player input.
-
-```yaml
-message: "<gradient:#38ecff:#0a84ff>Welcome</gradient> <gray>to the server</gray>"
-```
-
-| Tag | Result |
-| --- | --- |
-| `<red>`, `<gray>`, `<gold>` | Named colors |
-| `<#38ecff>` | HEX color |
-| `<gradient:#a:#b>text</gradient>` | Gradient across the text |
-| `<bold>`, `<italic>`, `<underlined>` | Decorations |
-| `<reset>` | Clears color and decorations |
-
-## HEX
-
-Any 6-digit HEX color. Requires Minecraft `1.16` or newer.
+- MiniMessage
+- `<#rrggbb>`
+- `&#rrggbb`
+- `&x&r&r&g&g&b&b`
+- `§x§r§r§g§g§b§b`
+- Legacy `&` codes
 
 ```yaml
-message: "&#38ecffWelcome &#0a84ffback"
+message: "<gradient:#38ecff:#0a84ff>Aquatic</gradient> &#38ecffStudios &7— &bready"
 ```
 
-## Legacy
-
-The classic `&` codes. Always supported, on every version.
-
-```yaml
-message: "&bWelcome &7back"
-```
-
-| Code | Color | Code | Color |
-| --- | --- | --- | --- |
-| `&0` | Black | `&8` | Dark Gray |
-| `&1` | Dark Blue | `&9` | Blue |
-| `&2` | Dark Green | `&a` | Green |
-| `&3` | Dark Aqua | `&b` | Aqua |
-| `&4` | Dark Red | `&c` | Red |
-| `&5` | Dark Purple | `&d` | Light Purple |
-| `&6` | Gold | `&e` | Yellow |
-| `&7` | Gray | `&f` | White |
-
-Formatting codes: `&l` bold, `&o` italic, `&n` underline, `&m` strikethrough, `&k` obfuscated,
-`&r` reset.
+JSON is not supported.

@@ -624,20 +624,6 @@ article kbd {
   border-radius: 999px;
 }
 
-.as-discord-cta {
-  display: inline-block;
-  margin: 0.5rem 0 1.25rem;
-  padding: 0.55rem 1.1rem;
-  background: var(--as-accent);
-  color: #ffffff !important;
-  font-size: 0.88rem;
-  font-weight: 600;
-  text-decoration: none !important;
-}
-
-.as-discord-cta:hover {
-  filter: brightness(1.1);
-}
 
 .as-discord-widget {
   display: block;
