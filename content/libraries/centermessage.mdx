@@ -1,31 +1,306 @@
 ---
 title: CenterMessage
-description: Center chat messages in Minecraft.
+description: Center chat messages in Minecraft, mixing legacy, hex and MiniMessage in the same string.
 ---
+
+import { Callout, Tabs } from 'nextra/components'
 
 # CenterMessage
 
-Centers chat messages so they line up in the middle of the chat box.
-
-**GitHub:** [senkex/CenterMessage](https://github.com/senkex/CenterMessage)
+Centers chat messages. Mix legacy `&` and `§`, hex `&#RRGGBB`, Spigot hex `§x§R§R§G§G§B§B` and
+MiniMessage tags in the same string: color codes never push the text off center, only visible glyphs
+count toward the padding. Static facade, no `onEnable` hook, no config files.
 
 | | |
 | --- | --- |
-| **MC** | `1.8+` |
-| **Java** | `17+` |
-| **Platform** | Bukkit / Spigot / Paper |
-| **Author** | Senkex — Aquatic Studios |
+| **Minecraft** | `1.16+` |
+| **Java** | `8` bytecode |
+| **Platforms** | Spigot, Paper, Folia, BungeeCord, Velocity |
+| **Author** | [Senkex](https://github.com/senkex/) |
+| **Source** | [senkex/CenterMessage](https://github.com/senkex/CenterMessage) |
+| **JitPack** | [jitpack.io](https://jitpack.io/#senkex/CenterMessage) |
+| **License** | MIT |
 
-## Installation
+The centering engine is dependency free. Legacy and hex input is measured and padded with pure
+`java.*`, so `CenterMessage.center(...)` runs with nothing on the classpath. Adventure and
+MiniMessage load lazily, only when you use a tag or the `Component` API.
 
+<Callout type="error">
+  Relocate the package when you bundle it. Two plugins shading different versions of
+  `com.github.senkex.centermessage` will clash on the classpath. See [Shading](#shading).
+</Callout>
+
+## Install
+
+<Tabs items={['Gradle (Kotlin)', 'Gradle (Groovy)', 'Maven']}>
+  <Tabs.Tab>
 ```kotlin filename="build.gradle.kts"
 repositories {
     maven("https://jitpack.io")
 }
 
 dependencies {
-    implementation("com.github.senkex:CenterMessage:VERSION")
+    implementation("com.github.senkex:CenterMessage:version")
 }
 ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+```groovy filename="build.gradle"
+repositories {
+    maven { url 'https://jitpack.io' }
+}
 
-Replace `VERSION` with the latest release on [JitPack](https://jitpack.io/#senkex/CenterMessage).
+dependencies {
+    implementation 'com.github.senkex:CenterMessage:version'
+}
+```
+  </Tabs.Tab>
+  <Tabs.Tab>
+```xml filename="pom.xml"
+<repository>
+    <id>jitpack.io</id>
+    <url>https://jitpack.io</url>
+</repository>
+
+<dependency>
+    <groupId>com.github.senkex</groupId>
+    <artifactId>CenterMessage</artifactId>
+    <version>version</version>
+</dependency>
+```
+  </Tabs.Tab>
+</Tabs>
+
+Bukkit, PlaceholderAPI and Adventure are `compileOnly`. They are not transitive and never reach your
+POM.
+
+| Feature | Needs at runtime |
+| --- | --- |
+| `CenterMessage`, `CenterHead`, `CenterOptions` | nothing, pure `java.*` |
+| MiniMessage tags, `CenterMessageComponents` | `adventure-api`, `adventure-text-minimessage`, `adventure-text-serializer-legacy` |
+| `CenterMessageBukkit` | the Spigot or Paper server it runs on |
+| PlaceholderAPI expansion | PlaceholderAPI installed, resolved lazily |
+
+Paper and Velocity ship Adventure. On Spigot and BungeeCord, shade the matching
+`adventure-platform-*` bridge yourself.
+
+## Usage
+
+The zero dependency core. It never touches Adventure, so it works everywhere.
+
+```java
+String line = CenterMessage.center("&#FF55AA Centered &ltext");
+player.sendMessage(line);
+```
+
+Multi line and `<center>` blocks are string level too.
+
+```java
+String block = CenterMessage.processCenterTags(
+        "<center>&6&lWelcome</center>\n" +
+        "&7Use /help to see commands.\n" +
+        "<center>&7Have fun.</center>");
+```
+
+## Components and audiences
+
+`CenterMessageComponents` is the only class that pulls in Adventure, loaded lazily. Use it for
+`Component` results, hover and click decoration, or sending straight to an `Audience`.
+
+```java
+CenterMessageComponents.send(audience, "&aHello &b<bold>World</bold>");
+
+Component comp = CenterMessageComponents.centerComponent("<gradient:#f00:#0f0>Hi</gradient>");
+player.sendMessage(comp);
+
+// Re center an existing component, keeping its click and hover events
+Component custom = Component.text("hello").color(NamedTextColor.AQUA);
+player.sendMessage(CenterMessageComponents.centerComponent(custom));
+
+CenterMessageComponents.sendBlock(audience, "<center>&6&lWelcome</center>\n&7Use /help");
+```
+
+On Bukkit, pass a `CommandSender` straight into the Bukkit facade. It uses Adventure when the sender
+supports it and falls back to legacy `sendMessage` otherwise.
+
+```java
+CenterMessageBukkit.send(player, "&aHello &b<bold>World</bold>");
+CenterMessageBukkit.sendBlock(player, "<center>&6&lWelcome</center>\n&7Use /help");
+```
+
+## Options
+
+The default is chat width, `CenterOptions.CHAT`, 154 px. For signs, books, holograms or custom UIs,
+set the half width through the builder.
+
+```java
+CenterOptions sign = CenterOptions.builder().centerPx(45).build();
+CenterMessage.center("&aTitle", sign);
+
+CenterOptions custom = CenterOptions.builder()
+        .centerPx(80)
+        .parseMiniMessage(false)
+        .build();
+
+String centered = CenterMessage.center("&aTitle", custom);
+```
+
+Every centering method on `CenterMessage`, `CenterMessageComponents` and `CenterMessageBukkit` takes
+an optional `CenterOptions`.
+
+## Heads
+
+`CenterHead` centers a rendered head next to text. It never imports HeadRender: feed it the
+`List<String>` that [`HeadRender.render(...)`](/libraries/headrender#rendering) returns plus the
+text for each row.
+
+```java
+HeadRender.render("Senkex").thenAccept(head -> {
+    List<String> text = List.of("", "&fSenkex", "&7VIP", "", "&eCoins: 1200", "", "", "");
+
+    // Type 1, everything centered, head included
+    CenterHead.card(head, text).forEach(player::sendMessage);
+
+    // Type 2, head stays put, text centered beside it
+    CenterHead.beside(head, text).forEach(player::sendMessage);
+});
+```
+
+Head width is measured through `FontInfo.BLOCK_WIDTH`, the same value HeadRender uses, so both
+libraries agree.
+
+## PlaceholderAPI
+
+PlaceholderAPI is Bukkit only, so it lives in `CenterMessageBukkit`. If PAPI is installed, every
+method there that receives a `Player` or `OfflinePlayer` expands placeholders before parsing. No
+hard dependency is needed.
+
+```java
+CenterMessageBukkit.send(player, "&6Balance: &a%vault_eco_balance%");
+```
+
+## Colorize
+
+`CenterMessage.colorize` is a drop in replacement for `ChatColor.translateAlternateColorCodes` that
+also understands `&#RRGGBB` and MiniMessage tags.
+
+```java
+String colored = CenterMessage.colorize("&aHello &#FF55AA world <bold>!</bold>");
+```
+
+## Notes
+
+- Pipeline order: `&#RRGGBB`, then `&x`, then legacy to MiniMessage conversion, then MiniMessage
+  parse. Mixing formats in the same string is fine. PlaceholderAPI expansion runs before all of it
+  when going through `CenterMessageBukkit`.
+- Width is measured against the vanilla font. Resource packs can override widths with
+  `FontInfo.registerWidth(char, int)`.
+- Bold is honored end to end. Nested `<bold>` and legacy `§l` both add the correct extra pixel per
+  character when measuring.
+
+## Package layout
+
+```
+com.github.senkex.centermessage
+├── CenterMessage              facade, legacy §x strings, zero dependencies
+├── CenterHead                 head and text layouts: card, beside
+├── components/
+│   └── CenterMessageComponents  facade, Adventure Component and Audience
+├── options/
+│   └── CenterOptions          immutable config, CHAT prefab plus builder
+├── text/
+│   ├── FontInfo               per character pixel widths of the vanilla font
+│   ├── TextMeasurer           measures a legacy string's rendered width
+│   ├── Spacing                leading space math
+│   └── LegacyToMini           unifies legacy § codes into MiniMessage tags
+└── bukkit/
+    ├── CenterMessageBukkit    CommandSender, broadcast, PlaceholderAPI
+    └── PlaceholderHook        lazy PlaceholderAPI bridge
+```
+
+`CenterMessage`, `CenterHead`, `options.*` and `text.*` are pure `java.*`. Only
+`components.CenterMessageComponents` requires Adventure, and only `bukkit` touches the server.
+
+## Migrating from 2.x
+
+In 2.x the facade imported `org.bukkit.*`, so it could not load on BungeeCord or Velocity. `3.0.0`
+splits it: `CenterMessage` keeps every platform neutral method, the Bukkit typed ones moved to
+`CenterMessageBukkit` unchanged.
+
+| 2.x | 3.0.0 |
+| --- | --- |
+| `CenterMessage.send(CommandSender, ...)` | `CenterMessageBukkit.send(CommandSender, ...)` |
+| `CenterMessage.sendBlock(CommandSender, ...)` | `CenterMessageBukkit.sendBlock(CommandSender, ...)` |
+| `CenterMessage.broadcast(...)` | `CenterMessageBukkit.broadcast(...)` |
+| `CenterMessage.center(String, CenterOptions, OfflinePlayer)` | `CenterMessageBukkit.center(...)` |
+| `CenterMessage.centerComponent(String, CenterOptions, OfflinePlayer)` | `CenterMessageBukkit.centerComponent(...)` |
+| `CenterMessage.parse(String, CenterOptions, OfflinePlayer)` | `CenterMessageBukkit.parse(...)` |
+
+The Adventure typed methods moved off `CenterMessage` as well.
+
+| Before | Now |
+| --- | --- |
+| `CenterMessage.centerComponent(...)` | `CenterMessageComponents.centerComponent(...)` |
+| `CenterMessage.parse(...)` | `CenterMessageComponents.parse(...)` |
+| `CenterMessage.send(Audience, ...)` | `CenterMessageComponents.send(Audience, ...)` |
+| `CenterMessage.sendBlock(Audience, ...)` | `CenterMessageComponents.sendBlock(Audience, ...)` |
+
+The string methods `center`, `centerLines`, `processCenterTags`, `colorize`, `translateAmp` and
+`translateAmpHex` keep working untouched, and now work on proxies too.
+
+## Shading
+
+<Tabs items={['Gradle (Kotlin)', 'Gradle (Groovy)', 'Maven (Shade)']}>
+  <Tabs.Tab>
+```kotlin filename="build.gradle.kts"
+plugins {
+    id("com.gradleup.shadow") version "8.3.5"
+}
+
+tasks {
+    shadowJar {
+        relocate("com.github.senkex.centermessage", "my.plugin.libs.centermessage")
+    }
+}
+```
+  </Tabs.Tab>
+  <Tabs.Tab>
+```groovy filename="build.gradle"
+plugins {
+    id 'com.gradleup.shadow' version '8.3.5'
+}
+
+tasks {
+    shadowJar {
+        relocate 'com.github.senkex.centermessage', 'my.plugin.libs.centermessage'
+    }
+}
+```
+  </Tabs.Tab>
+  <Tabs.Tab>
+```xml filename="pom.xml"
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-shade-plugin</artifactId>
+    <version>3.6.0</version>
+    <executions>
+        <execution>
+            <phase>package</phase>
+            <goals><goal>shade</goal></goals>
+            <configuration>
+                <relocations>
+                    <relocation>
+                        <pattern>com.github.senkex.centermessage</pattern>
+                        <shadedPattern>my.plugin.libs.centermessage</shadedPattern>
+                    </relocation>
+                </relocations>
+            </configuration>
+        </execution>
+    </executions>
+</plugin>
+```
+  </Tabs.Tab>
+</Tabs>
+
+Change `my.plugin.libs.centermessage` to a package inside your own plugin. The shaded jar in
+`build/libs/` or `target/` is what you ship.
