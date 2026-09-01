@@ -198,29 +198,6 @@ String colored = CenterMessage.colorize("&aHello &#FF55AA world <bold>!</bold>")
 - Bold is honored end to end. Nested `<bold>` and legacy `§l` both add the correct extra pixel per
   character when measuring.
 
-## Package layout
-
-```
-com.github.senkex.centermessage
-├── CenterMessage              facade, legacy §x strings, zero dependencies
-├── CenterHead                 head and text layouts: card, beside
-├── components/
-│   └── CenterMessageComponents  facade, Adventure Component and Audience
-├── options/
-│   └── CenterOptions          immutable config, CHAT prefab plus builder
-├── text/
-│   ├── FontInfo               per character pixel widths of the vanilla font
-│   ├── TextMeasurer           measures a legacy string's rendered width
-│   ├── Spacing                leading space math
-│   └── LegacyToMini           unifies legacy § codes into MiniMessage tags
-└── bukkit/
-    ├── CenterMessageBukkit    CommandSender, broadcast, PlaceholderAPI
-    └── PlaceholderHook        lazy PlaceholderAPI bridge
-```
-
-`CenterMessage`, `CenterHead`, `options.*` and `text.*` are pure `java.*`. Only
-`components.CenterMessageComponents` requires Adventure, and only `bukkit` touches the server.
-
 ## Migrating from 2.x
 
 In 2.x the facade imported `org.bukkit.*`, so it could not load on BungeeCord or Velocity. `3.0.0`

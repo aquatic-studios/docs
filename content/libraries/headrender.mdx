@@ -319,25 +319,6 @@ HeadRender.shutdown(); // on plugin disable, releases the thread pool
   Mojang's rate limit, `HTTP 429`.
 </Callout>
 
-## Package layout
-
-```
-com.github.senkex.headrender
-├── HeadRender              facade, legacy §x strings
-├── HeadRenderComponents    facade, Adventure Components
-├── DefaultHeadRenderService
-├── RenderOptions
-├── api/                    HeadRenderService, HeadRenderer, SkinProvider, SkinCache
-├── render/                 HexPixelRenderer, FontHeadRenderer, ResourcePackGenerator
-├── skin/                   HeadSource, SkinFaces, TextureProperty, InMemorySkinCache
-│   └── provider/           every SkinProvider
-├── text/                   HeadTagParser, HeadRowMerger
-│   └── adventure/          AdventureTextSerializer, HeadRenderTags, NativeHeadComponents
-└── item/                   HeadItem
-```
-
-Only `text.adventure` needs Adventure at runtime.
-
 ## Shading
 
 <Tabs items={['Gradle (Shadow)', 'Maven (Shade)']}>
