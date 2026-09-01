@@ -14,7 +14,7 @@ export const metadata = {
     default: 'Aquatic Studios Documentation',
     template: '%s – Aquatic Studios'
   },
-  description: 'Official documentation for every Aquatic Studios plugin, library and API.',
+  description: 'Official documentation for every Aquatic Studios plugin and library.',
   authors: [{ name: 'Senkex', url: 'https://github.com/senkex' }],
   creator: 'Senkex',
   icons: {
@@ -27,7 +27,7 @@ export const metadata = {
     url: 'https://docs.aquatic-studios.com',
     siteName: 'Aquatic Studios Documentation',
     title: 'Aquatic Studios Documentation',
-    description: 'Official documentation for every Aquatic Studios plugin, library and API.',
+    description: 'Official documentation for every Aquatic Studios plugin and library.',
     images: ['/logo.png'],
     locale: 'en_US'
   }
