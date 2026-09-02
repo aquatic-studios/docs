@@ -1,0 +1,102 @@
+---
+title: Developer API
+description: Read and control AquaShulk shulkers from your own plugin.
+---
+
+import { Callout } from 'nextra/components'
+
+# Developer API
+
+Everything public lives in `com.aquaticstudios.aquashulk.api`.
+
+```yaml filename="plugin.yml"
+depend: [AquaShulk]
+```
+
+```java
+if (!AquaShulkAPI.isAvailable()) return;
+AquaShulkAPI api = AquaShulkAPI.get();
+```
+
+## Reading an item
+
+```java
+api.isShulkerItem(item);   // any shulker box
+api.isManaged(item);       // has an AquaShulk id
+UUID id = api.getId(item); // null if not managed
+
+api.isOpen(id);
+api.isCached(id);
+api.getViewerCount(id);
+api.getCachedCount();
+```
+
+## Contents
+
+Reads hit the database, so they are async and answer through a callback.
+
+```java
+api.getContents(item, contents -> {
+    for (ItemStack stack : contents) {
+        // runs when the read finishes
+    }
+});
+
+api.getContents(uuid, contents -> { });
+```
+
+## Opening
+
+```java
+api.open(player, item);
+
+api.open(player, item, success -> {
+    if (!success) player.sendMessage("Couldn't open it");
+});
+```
+
+## Managing
+
+```java
+api.closeViewers(id);  // kicks everyone out of that shulker
+api.save(id);          // flush it to the database now
+api.delete(id);        // remove the row
+
+ItemStack held = api.findByUUID(player, id); // locate the item in an inventory
+
+api.getStats(stats -> {
+    stats.total;
+    stats.withItems;
+    stats.empty;
+    stats.totalItems;
+    stats.unindexed;
+});
+```
+
+## Events
+
+All extend `AquaShulkEvent`, which carries `getShulkerId()`.
+
+| Event | Cancellable | Also gives you |
+| --- | --- | --- |
+| `AquaShulkOpenEvent` | Yes | `getPlayer()`, `getItem()`, `getInventory()`, `getTitle()` |
+| `AquaShulkCloseEvent` | No | the same plus `getContents()` |
+| `AquaShulkCreateEvent` | No | `getItem()`, `getInventory()` |
+| `AquaShulkDeleteEvent` | No | `getCause()`: `RELEASE`, `COMMAND` or `API` |
+
+```java
+@EventHandler
+public void onOpen(AquaShulkOpenEvent event) {
+    if (event.getPlayer().getWorld().getName().equals("arena")) {
+        event.setCancelled(true);
+    }
+}
+```
+
+`AquaShulkCreateEvent` fires the first time an id is written to a shulker, so it is the hook for
+tagging or logging brand new ones.
+
+<Callout type="warning">
+  Never call `.join()` or block on a contents callback from the main thread. Reads go to SQLite or
+  H2 and will freeze the server.
+</Callout>

@@ -1,0 +1,41 @@
+---
+title: AquaShulk
+description: Open shulker boxes anywhere, with contents stored in a database instead of the item.
+asIndexPage: true
+---
+
+import { Callout } from 'nextra/components'
+
+# AquaShulk
+
+Open a shulker box from your hand, an inventory or your ender chest, without placing it.
+
+Contents are **not** kept in the item. Each shulker gets a UUID written to its NBT, and the items
+live in a database under that id. Two players can never see the same shulker at once, and copying
+the item does not copy the contents.
+
+| | |
+| --- | --- |
+| **Minecraft** | `1.11` to `26.2` |
+| **Folia** | Supported |
+| **Storage** | SQLite or H2 |
+| **Download** | [SpigotMC](https://www.spigotmc.org/resources/aquashulk-open-shulker-boxes-anywhere-1-11-26-2.137568/) |
+
+## How it works
+
+1. A player opens a shulker for the first time. AquaShulk writes a UUID into its NBT and creates a
+   row in the database.
+2. The items are read from the database, not from the item, so the shulker in hand looks empty to
+   other plugins unless `hide-contents-on-item` is off.
+3. On close the contents are saved. Cached shulkers are also flushed every
+   `save-interval-minutes`.
+
+<Callout type="warning">
+  Hold a shulker and run `/aquashulk clear` before putting it in a kit, crate or anything shared, or
+  enable `behaviour.release-on-close`. Otherwise every copy of that item points at the same row.
+</Callout>
+
+<Callout type="error">
+  Never change `nbt-tag` while the server is running. Existing shulkers lose their id and get a new
+  one, which duplicates contents.
+</Callout>

@@ -1,0 +1,164 @@
+---
+title: Configuration
+description: Every key in the AquaShulk config.yml.
+---
+
+import { Callout } from 'nextra/components'
+
+# Configuration
+
+Most keys apply with `/aquashulk reload`. The ones that do not are marked **restart**.
+
+## storage
+
+```yaml filename="config.yml"
+storage:
+  type: SQLITE
+  cleanup-after-days: 0
+  cleanup-interval-hours: 24
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `type` | `SQLITE` | `SQLITE` or `H2`. The driver downloads on startup. **Restart**, and existing data is not migrated |
+| `cleanup-after-days` | `0` | Auto deletes shulkers nobody has touched in that many days. `0` never deletes |
+| `cleanup-interval-hours` | `24` | How often that cleanup runs |
+
+<Callout type="warning">
+  Touched means opened, saved, or carried by a player who logs in. A shulker sitting in a base chest
+  that nobody opens counts as untouched, so use a long value. Rows with no recorded timestamp are
+  never deleted.
+</Callout>
+
+## Root keys
+
+```yaml filename="config.yml"
+nbt-tag: "AquaShulk-UUID"
+save-interval-minutes: 5
+cache-expire-minutes: 30
+preload-on-join: true
+purge-orphan-contents: true
+update-notify: true
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `nbt-tag` | `AquaShulk-UUID` | Id tag written on shulkers. **Never change it while the server is running** |
+| `save-interval-minutes` | `5` | How often cached shulkers are flushed to the database. Also saved on every close. **Restart** |
+| `cache-expire-minutes` | `30` | How long an unused shulker stays in RAM |
+| `preload-on-join` | `true` | Loads the shulkers a player carries on join, so opening never hits the database on the main thread |
+| `purge-orphan-contents` | `true` | Wipes contents of a shulker whose database row is gone. Keep this on |
+| `update-notify` | `true` | Checks SpigotMC on startup and tells staff with `aquashulk.update` on join |
+
+## restrictions
+
+```yaml filename="config.yml"
+restrictions:
+  allow-placing: true
+  allow-dispensing: true
+  allow-commands-while-open: false
+  allowed-commands:
+    - msg
+    - r
+    - reply
+  allow-movement-while-open: true
+  fireproof-drops: false
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `allow-placing` | `true` | Place shulkers as blocks |
+| `allow-dispensing` | `true` | Dispensers and droppers can place or shoot them |
+| `allow-commands-while-open` | `false` | Run commands with a shulker open |
+| `allowed-commands` | `msg`, `r`, `reply` | Still allowed when the option above is off. No slash |
+| `allow-movement-while-open` | `true` | `false` closes the GUI when the player moves |
+| `fireproof-drops` | `false` | Dropped shulkers survive lava, fire, cactus and explosions |
+
+<Callout type="error">
+  Keep `allow-commands-while-open` off. With it on, the item looks empty while the GUI is open and
+  players can be scammed in a trade.
+</Callout>
+
+## access
+
+```yaml filename="config.yml"
+access:
+  open-from-hand: true
+  open-from-inventory: true
+  open-from-enderchest: true
+  require-sneak: false
+  click-type: RIGHT
+  cooldown-millis: 500
+  open-from-containers:
+    - PLAYER
+    - CHEST
+    - ENDER_CHEST
+  world-mode: BLACKLIST
+  worlds:
+    - example_world
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `open-from-hand` | `true` | Right click while holding it |
+| `open-from-inventory` | `true` | Click it inside an inventory |
+| `open-from-enderchest` | `true` | Same, inside the ender chest |
+| `require-sneak` | `false` | Sneak to open from the hand, stops accidental opens |
+| `click-type` | `RIGHT` | `LEFT`, `RIGHT`, `SHIFT_LEFT`, `SHIFT_RIGHT`, `MIDDLE` |
+| `cooldown-millis` | `500` | Minimum time between opens. `0` disables it |
+| `open-from-containers` | list | Which containers a shulker opens from. Unknown types are ignored |
+| `world-mode` | `BLACKLIST` | `BLACKLIST` works everywhere except `worlds`, `WHITELIST` only in `worlds` |
+
+## behaviour
+
+```yaml filename="config.yml"
+behaviour:
+  hide-contents-on-item: false
+  release-on-close: false
+  release-in-creative: true
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `hide-contents-on-item` | `false` | Does not write contents into the item so nobody can peek. Breaks previews in other plugins |
+| `release-on-close` | `false` | Drops the id on close, turning it back into a normal shareable shulker |
+| `release-in-creative` | `true` | Same, but only in creative mode |
+
+<Callout type="info">
+  `release-on-close` is the fix for kits and crates: every shulker handed out becomes a plain one
+  again as soon as it is closed.
+</Callout>
+
+## sounds
+
+```yaml filename="config.yml"
+sounds:
+  open: "block.shulker_box.open"
+  close: "block.shulker_box.close"
+  volume: 1.0
+  pitch: 1.0
+```
+
+Use `""` to disable one. These are namespaced keys, not the old enum names.
+
+## denied-section
+
+Items that cannot be put inside a shulker. Bypass with `aquashulk.bypass.denied-items`.
+
+```yaml filename="config.yml"
+denied-section:
+  names:
+    - "&6Gapple"
+    - "&aExample"
+  items:
+    - BEDROCK
+    - BARRIER
+```
+
+`names` matches if the display name **contains** the text. Colors are optional and every format
+works: `&6`, `§6`, `&#FFAA00`, `<gold>`.
+
+<Callout type="warning">
+  Do not touch the `version` key at the bottom of `config.yml` and `messages.yml`. It is how
+  AquaShulk knows whether it has to migrate your file.
+</Callout>

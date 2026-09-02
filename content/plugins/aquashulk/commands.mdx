@@ -1,0 +1,55 @@
+---
+title: Commands
+description: AquaShulk commands and permissions.
+---
+
+import { Callout } from 'nextra/components'
+
+# Commands
+
+Base command `/aquashulk`. Aliases: `/ashulk`, `/ashulker`.
+
+| Command | Permission | What it does |
+| --- | --- | --- |
+| `/aquashulk help` | | Command list |
+| `/aquashulk clear` | `aquashulk.clear` | Removes the id from the shulker in your hand, turning it back into a normal one |
+| `/aquashulk debug` | `aquashulk.debug` | NBT of the held shulker: id, item count, cached and open state |
+| `/aquashulk storage` | `aquashulk.storage` | Backend, total shulkers, how many hold items, cache size and save backlog |
+| `/aquashulk purge` | `aquashulk.purge` | Deletes empty shulkers from the database |
+| `/aquashulk cleanup [days]` | `aquashulk.cleanup` | Deletes shulkers untouched for that many days |
+| `/aquashulk reset` | `aquashulk.reset` | Wipes every stored shulker. Needs `/aquashulk reset confirm` within 30 s |
+| `/aquashulk reload` | `aquashulk.reload` | Reloads `config.yml` and `messages.yml` |
+
+<Callout type="error">
+  `/aquashulk reset` deletes all stored contents and cannot be undone.
+</Callout>
+
+## Permissions
+
+| Node | Default | Grants |
+| --- | --- | --- |
+| `aquashulk.use` | everyone | Open shulkers |
+| `aquashulk.modify` | everyone | Edit their contents |
+| `aquashulk.clear` | op | `/aquashulk clear` |
+| `aquashulk.debug` | op | `/aquashulk debug` |
+| `aquashulk.storage` | op | `/aquashulk storage` |
+| `aquashulk.purge` | op | `/aquashulk purge` |
+| `aquashulk.cleanup` | op | `/aquashulk cleanup` |
+| `aquashulk.reset` | op | `/aquashulk reset` |
+| `aquashulk.reload` | op | `/aquashulk reload` |
+| `aquashulk.update` | op | Update notice on join |
+| `aquashulk.admin` | op | Everything above, bypasses included |
+
+### Bypasses
+
+| Node | Ignores |
+| --- | --- |
+| `aquashulk.bypass.cooldown` | `access.cooldown-millis` |
+| `aquashulk.bypass.worlds` | `access.world-mode` and `access.worlds` |
+| `aquashulk.bypass.denied-items` | `denied-section` |
+| `aquashulk.bypass.*` | All three |
+
+<Callout type="info">
+  Taking `aquashulk.use` away stops a player from opening shulkers entirely. They can still carry
+  them.
+</Callout>
