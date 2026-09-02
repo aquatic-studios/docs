@@ -1,0 +1,95 @@
+---
+title: Placeholders
+description: The AquaClan PlaceholderAPI expansion.
+---
+
+import { Callout } from 'nextra/components'
+
+# Placeholders
+
+Registered under `aquaclan` when PlaceholderAPI is installed. Every one is
+`%aquaclan_<name>%`.
+
+## Clan
+
+| Placeholder | Value |
+| --- | --- |
+| `name` | Clan name |
+| `tag` | Tag |
+| `nickname` | Display name |
+| `description` | Description |
+| `leader` | Leader |
+| `created` | Creation date |
+| `level` | Level |
+| `points` | Points |
+| `points_next` | Points needed for the next level |
+| `members` | Member count |
+| `online` | Members online |
+| `slots` | Member limit |
+| `max_members` | Same, including level rewards |
+| `kills` | Clan kills |
+| `deaths` | Clan deaths |
+| `kdr` | Ratio |
+| `allies` | Ally count |
+| `rivals` | Rival count |
+| `bank` | Bank balance |
+| `friendly_fire` | Friendly fire state |
+| `verified` | Verified state |
+| `has_banner` | Whether it has a custom banner |
+| `count` | Total clans on the server |
+
+## Player
+
+| Placeholder | Value |
+| --- | --- |
+| `role` | `LEADER`, `CO_LEADER` or `MEMBER` |
+| `has_clan` | Configurable yes or no |
+| `balance` | The player's money |
+| `mail_unread` | Unread clan mail |
+| `pending_invites` | Invitations they hold |
+| `sent_invites` | Invitations they sent |
+| `profile_kills` | Their kills |
+| `profile_deaths` | Their deaths |
+| `profile_kdr` | Their ratio |
+| `profile_first_seen` | First join |
+
+## Rankings
+
+| Placeholder | Value |
+| --- | --- |
+| `rank_points` | Position by points |
+| `rank_kills` | Position by kills |
+| `rank_level` | Position by level |
+
+## Costs and limits
+
+| Placeholder | Value |
+| --- | --- |
+| `create_cost` | Cost of creating a clan |
+| `invite_cost` | Cost of sending an invitation |
+| `name_min` | Minimum name length |
+| `name_max` | Maximum |
+
+## No clan fallbacks
+
+What the placeholders show for a player without a clan.
+
+```yaml filename="config.yml"
+placeholders:
+  has-clan:
+    with-clan: '&#56FF00Yes'
+    without-clan: '&#FF2D2DNo'
+
+  no-clan:
+    name: '&7No clan'
+    tag: '&7No clan'
+    nickname: '&7No clan'
+    description: '&7No description'
+    role: '&7None'
+    leader: '&7None'
+    created: '&7-'
+```
+
+<Callout type="info">
+  Leave a value empty to show nothing at all instead of a placeholder text.
+</Callout>

@@ -1,0 +1,156 @@
+---
+title: Commands
+description: Every AquaClan command and permission.
+---
+
+import { Callout } from 'nextra/components'
+
+# Commands
+
+Base `/clan`. Aliases: `/aquaclan`, `/aqclan`, `/aqc`.
+
+## Menus
+
+| Command | Permission | What it does |
+| --- | --- | --- |
+| `/clan` | `aquaclan.command` | Opens the main menu |
+| `/clan short` | `aquaclan.short` | Quick menu: create, invitations, all clans, profile |
+| `/clan open <menu> [clan]` | `aquaclan.open` | Opens any menu, optionally for another clan |
+
+```
+/clan open levels ClanMuerte
+```
+
+## Clan
+
+| Command | Permission | What it does |
+| --- | --- | --- |
+| `/clan create [tag]` | `aquaclan.create` | Creates a clan. Without a tag it asks in chat |
+| `/clan disband` | `aquaclan.disband` | Deletes it. Asks for `confirm` when enabled |
+| `/clan leave` | `aquaclan.leave` | Leaves your clan |
+| `/clan info [tag]` | `aquaclan.info` | Clan info |
+| `/clan list` | `aquaclan.list` | All clans |
+| `/clan top` | `aquaclan.top` | Leaderboard menu |
+| `/clan chat` | `aquaclan.chat` | Toggles clan chat |
+| `/clan description <text>` | `aquaclan.description` | Sets the description |
+| `/clan modtag <tag>` | `aquaclan.rename` | Changes the tag |
+| `/clan nickname <name>` | `aquaclan.rename` | Changes the display name |
+
+## Invitations
+
+Invitations are saved to `invites.json`, survive restarts and reach offline players.
+
+| Command | Permission | What it does |
+| --- | --- | --- |
+| `/clan invite [player]` | `aquaclan.invite` | Invites someone |
+| `/clan invites` | `aquaclan.invites` | Your pending invitations |
+| `/clan revoke <player>` | `aquaclan.invite` | Cancels one you sent |
+| `/clan accept` | `aquaclan.accept` | Accepts |
+| `/clan deny` | `aquaclan.deny` | Rejects |
+| `/clan cancel` | `aquaclan.invite` | Cancels a pending request |
+
+In the invitations menu, left click accepts and right click denies.
+
+## Members
+
+| Command | Permission | What it does |
+| --- | --- | --- |
+| `/clan member invite/kick/list/search` | `aquaclan.kick` | Member management |
+| `/clan kick <player>` | `aquaclan.kick` | Removes a member |
+| `/clan promote <player>` | `aquaclan.promote` | Raises their rank |
+| `/clan demote <player>` | `aquaclan.demote` | Lowers it |
+| `/clan transfer <player>` | `aquaclan.transfer` | Hands over leadership |
+| `/clan role view/set/sync` | `aquaclan.promote` | Inspect and set roles directly |
+
+## Homes
+
+| Command | Permission | What it does |
+| --- | --- | --- |
+| `/clan home create <name>` | `aquaclan.sethome` | Saves your position |
+| `/clan home teleport <name>` | `aquaclan.home` | Teleports, with warmup |
+| `/clan home list` | `aquaclan.home` | Lists them |
+| `/clan home view` | `aquaclan.home` | Home menu |
+| `/clan home delete <name>` | `aquaclan.delhome` | Deletes one |
+
+How many homes a clan gets comes from `clan.max-homes` plus level rewards.
+
+## Bank and mail
+
+| Command | Permission | What it does |
+| --- | --- | --- |
+| `/clan bank deposit <amount>` | `aquaclan.bank` | Puts money in |
+| `/clan bank withdraw <amount>` | `aquaclan.bank` | Takes money out |
+| `/clan bank balance` | `aquaclan.bank` | Current balance |
+| `/clan mail send <text>` | `aquaclan.command` | Message to the whole clan |
+| `/clan mail read` | `aquaclan.command` | Reads your mail |
+| `/clan mail clear` | `aquaclan.command` | Clears it |
+
+## Relations
+
+| Command | Permission | What it does |
+| --- | --- | --- |
+| `/clan ally add/remove/accept/deny/list` | `aquaclan.ally` | Alliances |
+| `/clan rival add/remove/accept/deny/list` | `aquaclan.rival` | Rivalries |
+
+Alliances need the other clan to accept. `clan.max-allies` caps them, `0` means unlimited.
+
+<Callout type="warning">
+  Killing a member of an allied clan **costs** your clan points, set by `ally-kill-penalty`.
+</Callout>
+
+## Banner
+
+| Command | Permission | What it does |
+| --- | --- | --- |
+| `/clan banner edit` | `aquaclan.clan.leader.custom.banner` | Opens the designer |
+| `/clan banner upload` | | Uploads the banner you are holding |
+| `/clan banner view` | | Shows it |
+| `/clan banner delete` | | Removes it |
+
+`clan.banner.max-layers` limits the pattern layers, hard capped at 16.
+
+## Other
+
+| Command | Permission | What it does |
+| --- | --- | --- |
+| `/clan settings view/set` | `aquaclan.command` | Clan settings |
+| `/clan profile view/set` | `aquaclan.command` | Your profile and toggles |
+| `/clan regroup send/accept` | `aquaclan.command` | Rallies the clan to your position |
+| `/clan ff` | `aquaclan.ff` | Toggles friendly fire |
+| `/clan ban <player>` | `aquaclan.ban` | Bans someone from the clan |
+| `/clan unban <player>` | `aquaclan.ban` | Unbans |
+| `/clan logger` | `aquaclan.command` | Clan action log |
+| `/clan help` | `aquaclan.command` | Command list |
+
+## Profile toggles
+
+`/clan profile` lets each player switch clan invitations, invitation alerts, combat alerts and mail
+alerts on or off, so notifications are per player and not forced by the server.
+
+## Member limits
+
+```yaml filename="config.yml"
+clan:
+  member-limits:
+    default: 4
+    permissions:
+      aquaclan.limit.vip: 8
+      aquaclan.limit.mvp: 12
+      aquaclan.limit.legend: 20
+```
+
+The **highest** value a player holds wins, and level rewards add on top.
+
+## Custom tag
+
+```yaml filename="config.yml"
+  tag:
+    custom:
+      enabled: true
+      permission: aquaclan.clan.tag.custom
+      min-length: 3
+      max-length: 16
+```
+
+Length limits count only visible characters, so color codes do not eat into them. Legacy, hex and
+MiniMessage all work.

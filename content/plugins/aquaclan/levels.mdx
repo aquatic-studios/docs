@@ -1,0 +1,71 @@
+---
+title: Levels
+description: The clan leveling curve and the rewards per level.
+---
+
+import { Callout } from 'nextra/components'
+
+# Levels
+
+Clans earn points in combat and level up. Everything lives in `level.yml`.
+
+## The curve
+
+```yaml filename="level.yml"
+points:
+  base: 50.0
+  exponent: 1.0
+  max-level: 21
+```
+
+Points needed for a level are `base * (level - 1) * exponent`. Clans stop leveling at `max-level`.
+
+## Earning points
+
+```yaml filename="config.yml"
+points:
+  per-kill: 10
+  per-death: 0
+  rival-kill-bonus: 5
+  ally-kill-penalty: 15
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `per-kill` | `10` | Points for a kill |
+| `per-death` | `0` | Points lost on death |
+| `rival-kill-bonus` | `5` | Extra for killing a rival |
+| `ally-kill-penalty` | `15` | Lost for killing an ally |
+
+## Rewards
+
+Granted once, the first time a clan reaches that level.
+
+```yaml filename="level.yml"
+rewards:
+  '10':
+    broadcast: '&#FFEE00&l%clan% &#54ADF4hit level &#FFEE00&l10&#56FF00!'
+    commands:
+      - 'give %leader% netherite_ingot 2'
+    benefits:
+      extra-homes: 1
+      extra-slots: 3
+      extra-allies: 2
+```
+
+| Key | What it does |
+| --- | --- |
+| `broadcast` | Announced to the server |
+| `commands` | Run as console |
+| `benefits.extra-homes` | Extra clan homes |
+| `benefits.extra-slots` | Extra member slots |
+| `benefits.extra-allies` | Extra allies |
+
+Placeholders: `%clan%`, `%leader%`, `%level%`.
+
+<Callout type="info">
+  Benefits **stack** across levels. A clan at level 15 has the extra homes, slots and allies from
+  levels 2, 5, 10 and 15 added together, on top of the base values in `config.yml`.
+</Callout>
+
+You do not need an entry for every level. Only the ones you define grant anything.

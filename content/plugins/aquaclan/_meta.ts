@@ -1,0 +1,10 @@
+import type { MetaRecord } from 'nextra'
+
+export default {
+  commands: 'Commands',
+  admin: 'Admin',
+  configuration: 'Configuration',
+  levels: 'Levels',
+  menus: 'Menus',
+  placeholders: 'Placeholders'
+} satisfies MetaRecord

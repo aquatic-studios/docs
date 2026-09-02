@@ -1,0 +1,156 @@
+---
+title: Menus
+description: Edit any of the 35 menus, their items, buttons and actions.
+---
+
+import { Callout } from 'nextra/components'
+
+# Menus
+
+Every menu is one file in `menus/`. Same shape in all of them, so learning one is learning all 35.
+
+```
+main · short · create · clans · clanlist · clan_info · clan_members
+clan_allies · clan_rivals · clan_settings · clan_stats · members
+members_top · allies · allylist · rivals · rivallist · invites
+invites_sent · invite_players · profile · settings · bank · mail
+banner_editor · banner_colors · banner_patterns · bans · logger
+levels · leaderboard · tops · points · kills · deaths · kdr
+```
+
+Open any of them with `/clan open <menu> [clan]`.
+
+## Structure
+
+```yaml filename="menus/main.yml"
+menu_title: '&8AquaClan'
+size: 36
+
+items:
+  profile:
+    material: PLAYER_HEAD
+    slot: 4
+    display_name: '&#FFEE00&lYour Clan'
+    lore:
+      - '&#54ADF4Name: &f%aquaclan_name%'
+      - '&#54ADF4Level: &f%aquaclan_level%'
+    left_click_commands:
+      - '[player] clan info'
+      - '[close]'
+```
+
+| Key | What it does |
+| --- | --- |
+| `menu_title` | GUI title |
+| `size` | Slots, a multiple of 9 |
+| `material` | Any material of your version |
+| `slot` | Position, zero indexed |
+| `display_name` / `lore` | Item text, placeholders work |
+| `left_click_commands` | Actions on left click |
+| `right_click_commands` | Actions on right click |
+
+## Item options
+
+| Option | What it does |
+| --- | --- |
+| `requires-clan` | Hides the item from players with no clan |
+| `hide-with-clan` | Hides it from players who **have** one |
+| `hide-without-clan` | Hides it from players who do not |
+| `permission` | Node needed to see it |
+| `head` | Renders a player head |
+| `clan-banner` | Renders the clan's banner as the item |
+| `no-clan` | A whole replacement item for players with no clan |
+
+```yaml filename="menus/main.yml"
+    no-clan:
+      material: BARRIER
+      display_name: '&#FF2D2D&lYou have no clan'
+      lore:
+        - '&#FFEE00Create one: &f/clan create <name>'
+      left_click_commands:
+        - '[close]'
+```
+
+## Actions
+
+| Action | What it does |
+| --- | --- |
+| `[menu] <name>` | Opens another menu |
+| `[close]` | Closes the GUI |
+| `[player] <command>` | Runs a command as the player |
+| `[console] <command>` | Runs it as console |
+| `[message] <text>` | Sends a message |
+| `[sound] <SOUND>` | Plays a sound |
+| `[input]` | Asks for an answer in chat |
+| `[refresh]` | Redraws the menu without closing it |
+| `[invite-send]` | Sends an invitation |
+| `[invite-accept]` | Accepts one |
+| `[invite-deny]` | Denies one |
+| `[invite-revoke]` | Cancels one you sent |
+| `[profile-toggle]` | Flips a profile setting |
+
+## Chat input
+
+`[input]` asks the player to type the answer in chat, which is how clans get created without a
+command.
+
+```yaml filename="config.yml"
+chat-input:
+  timeout-seconds: 60
+  cancel-words:
+    - cancel
+    - cancelar
+  bossbar:
+    enabled: true
+    color: BLUE
+    style: PROGRESS
+  title:
+    enabled: true
+    fade-in: 5
+    stay: 60
+    fade-out: 10
+  sounds:
+    open: BLOCK_NOTE_BLOCK_PLING
+    success: ENTITY_PLAYER_LEVELUP
+    cancel: BLOCK_NOTE_BLOCK_BASS
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `timeout-seconds` | `60` | Time to answer before it cancels |
+| `cancel-words` | `cancel`, `cancelar` | Words that abort it |
+| `bossbar` | on | Countdown bar. `PINK`, `BLUE`, `RED`, `GREEN`, `YELLOW`, `PURPLE`, `WHITE` |
+| `title` | on | Countdown title, timings in ticks |
+| `sounds` | | Played on open, success and cancel |
+
+## Clan context
+
+A menu opened for another clan shows **that** clan's placeholders, including its position in every
+ranking.
+
+```
+/clan open levels ClanMuerte
+```
+
+<Callout type="warning">
+  A menu opened without a clan falls back to your own. Commands that end up with an unresolved
+  `%aquaclan_name%` are skipped instead of running broken.
+</Callout>
+
+## Rankings
+
+```yaml filename="config.yml"
+menu:
+  top-limit: 200
+  block-not-have-clan:
+    enabled: true
+    material: RED_STAINED_GLASS_PANE
+    display_name: '&#FF2D2D&lI need to create a clan'
+    lore:
+      - '&7You are not in a clan yet.'
+```
+
+`top-limit` caps how many clans the ranking menus list. `block-not-have-clan` is the item shown on
+buttons that need a clan when the viewer has none.
+
+Lists show 45 entries per page with the navigation on the bottom row.

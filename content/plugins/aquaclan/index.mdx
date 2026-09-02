@@ -1,0 +1,63 @@
+---
+title: AquaClan
+description: Clans with ranks, homes, bank, mail, alliances, levels and a full menu system.
+asIndexPage: true
+---
+
+import { Callout } from 'nextra/components'
+
+# AquaClan
+
+Clans with three ranks, invitations that survive restarts, homes, a shared bank, mail, alliances and
+rivalries, a leveling curve with rewards, custom banners and 35 editable menus.
+
+| | |
+| --- | --- |
+| **Base command** | `/clan` |
+| **Aliases** | `/aquaclan`, `/aqclan`, `/aqc` |
+| **Minecraft** | `1.16+` |
+| **Folia** | Supported |
+| **Storage** | SQLite, MySQL, MariaDB or JSON |
+| **Soft-depend** | PlaceholderAPI, Vault |
+| **Download** | [SpigotMC](https://www.spigotmc.org/resources/aquaclan-advanced-clan-system-1-8-1-26-2.136918/) |
+
+## Ranks
+
+| Rank | Can |
+| --- | --- |
+| `LEADER` | Everything, including disband and transfer |
+| `CO_LEADER` | Manage members, homes and relations |
+| `MEMBER` | Use the clan, chat, bank and homes |
+
+`/clan promote` and `/clan demote` move a player between them. `/clan transfer` hands leadership
+over.
+
+## Points and levels
+
+Points come from combat and raise the clan level. Each level can grant extra homes, member slots and
+allies, and those benefits stack.
+
+```yaml filename="config.yml"
+points:
+  per-kill: 10
+  per-death: 0
+  rival-kill-bonus: 5
+  ally-kill-penalty: 15
+```
+
+Killing a rival is worth more. Killing an ally **costs** points.
+
+## Files
+
+| File | Holds |
+| --- | --- |
+| `config.yml` | Names, limits, economy, invites, chat input |
+| `level.yml` | The curve and the reward per level |
+| `webhook.yml` | Discord notice on create and disband |
+| `messages.yml` | Every string |
+| `menus/*.yml` | 35 menus, one file each |
+
+<Callout type="info">
+  Almost everything is reachable from a menu. `/clan` opens the main one and `/clan short` a quick
+  four button version.
+</Callout>

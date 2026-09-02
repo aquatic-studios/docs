@@ -1,0 +1,157 @@
+---
+title: Configuration
+description: Names, limits, homes, invitations and the economy.
+---
+
+import { Callout } from 'nextra/components'
+
+# Configuration
+
+## Names and tags
+
+```yaml filename="config.yml"
+clan:
+  name:
+    min-length: 3
+    max-length: 10
+    pattern: '^[a-zA-Z0-9]+$'
+    blacklist:
+      - admin
+      - staff
+      - owner
+      - mod
+      - server
+  tag:
+    default-color: '&#54ADF4'
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `min-length` / `max-length` | `3` / `10` | Name length |
+| `pattern` | letters and digits | A name must match this regex |
+| `blacklist` | 5 words | Names nobody can use |
+| `tag.default-color` | `&#54ADF4` | Color when a clan has no custom tag |
+
+## Limits
+
+```yaml filename="config.yml"
+  member-limits:
+    default: 4
+    permissions:
+      aquaclan.limit.vip: 8
+      aquaclan.limit.mvp: 12
+      aquaclan.limit.legend: 20
+  max-homes: 1
+  max-allies: 5
+  friendly-fire: false
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `member-limits.default` | `4` | Base member limit |
+| `member-limits.permissions` | 3 nodes | Overrides. The **highest** the player holds wins |
+| `max-homes` | `1` | Clan homes. Level rewards raise it |
+| `max-allies` | `5` | Allies. `0` is unlimited, level rewards raise it |
+| `friendly-fire` | `false` | Default friendly fire inside a clan |
+
+## Chat
+
+```yaml filename="config.yml"
+  chat:
+    enabled: true
+    format: '&#54ADF4&lCLAN &7» %clan% &8• &f%player%&7: &f%message%'
+```
+
+Placeholders: `%clan%`, `%player%`, `%message%`.
+
+## Homes
+
+```yaml filename="config.yml"
+  home:
+    cooldown-seconds: 5
+    warmup-seconds: 3
+    cancel-on-move: true
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `cooldown-seconds` | `5` | Between teleports |
+| `warmup-seconds` | `3` | Delay before teleporting |
+| `cancel-on-move` | `true` | Moving during the warmup cancels it |
+
+## Create and disband
+
+```yaml filename="config.yml"
+  create:
+    cooldown-seconds: 60
+  disband:
+    confirm: true
+    cooldown-seconds: 300
+```
+
+Disbanding starts the create cooldown, which is what stops create and disband abuse.
+
+## Invitations
+
+```yaml filename="config.yml"
+invites:
+  expire-seconds: 604800
+  max-pending: 15
+  max-per-clan: 20
+  notify-on-join: true
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `expire-seconds` | `604800` | How long one stays valid. `0` never expires |
+| `max-pending` | `15` | How many a player can hold. `0` unlimited |
+| `max-per-clan` | `20` | How many a clan can have waiting. `0` unlimited |
+| `notify-on-join` | `true` | Tells a player about pending invitations on join |
+
+Invitations are stored in `invites.json`, survive restarts, reach offline players and are remapped
+or removed when a clan is renamed or disbanded.
+
+## Economy
+
+Needs Vault. Money is only removed, never created.
+
+```yaml filename="config.yml"
+economy:
+  enabled: false
+  create-cost: 500.0
+  costs:
+    custom-tag: 1000.0
+    rename: 750.0
+    sethome: 250.0
+    banner-give: 250.0
+    invite: 0.0
+```
+
+| Key | Charged when |
+| --- | --- |
+| `create-cost` | Creating a clan, from the command or the menu |
+| `custom-tag` | Setting a custom tag |
+| `rename` | Renaming |
+| `sethome` | Creating a home |
+| `banner-give` | Taking a copy of the clan banner |
+| `invite` | Sending an invitation |
+
+<Callout type="warning">
+  With `enabled: false` nothing is charged, whatever the costs say.
+</Callout>
+
+## Worlds
+
+```yaml filename="config.yml"
+worlds: []
+```
+
+Worlds where the plugin works. Empty means every world.
+
+## Updates
+
+```yaml filename="config.yml"
+update-notification: true
+```
+
+Checks Spigot once on startup and tells the console. Players with `aquaclan.admin` get a chat notice.

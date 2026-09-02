@@ -1,0 +1,80 @@
+---
+title: Admin
+description: Staff commands for points, slots, migration and moderation.
+---
+
+import { Callout } from 'nextra/components'
+
+# Admin
+
+Everything under `/clan admin` needs `aquaclan.admin`.
+
+| Command | What it does |
+| --- | --- |
+| `/clan admin reload` | Reloads every file |
+| `/clan admin delete <clan>` | Deletes a clan |
+| `/clan admin addpoints <clan> <n>` | Adds points |
+| `/clan admin setpoints <clan> <n>` | Sets them |
+| `/clan admin removepoints <clan> <n>` | Removes them |
+| `/clan admin addslot <clan> <n>` | Adds member slots |
+| `/clan admin setslot <clan> <n>` | Sets them |
+| `/clan admin removeslot <clan> <n>` | Removes them |
+| `/clan admin forcejoin <player> <clan>` | Puts a player in a clan |
+| `/clan admin resetclankdr <clan>` | Resets a clan's kills and deaths |
+| `/clan admin resetplayerkdr <player>` | Resets a player's |
+| `/clan admin verify <clan>` | Marks a clan verified |
+| `/clan admin changetag <clan> <tag>` | Changes a tag |
+| `/clan admin chatspy` | Reads every clan chat |
+| `/clan admin globalff` | Toggles friendly fire server wide |
+| `/clan admin migrate <type>` | Moves the data to another storage backend |
+
+`/clan reload` also exists on its own with `aquaclan.reload`.
+
+<Callout type="warning">
+  Points change the clan level, so `setpoints` can push a clan across a level and fire its rewards.
+</Callout>
+
+## Changing storage
+
+```
+/clan admin migrate MYSQL
+```
+
+Then set the same type in `config.yml` and restart.
+
+```yaml filename="config.yml"
+storage:
+  type: SQLITE
+  mysql:
+    host: localhost
+    port: 3306
+    database: aquaclan
+    username: root
+    password: ''
+    ssl: false
+```
+
+`type` is `SQLITE`, `MYSQL`, `MARIADB` or `JSON`.
+
+<Callout type="error">
+  Migrate first, then change the config, then restart. Changing `type` without migrating leaves the
+  plugin pointing at an empty database.
+</Callout>
+
+## Discord notice
+
+`webhook.yml` posts to Discord when a clan is created or disbanded.
+
+```yaml filename="webhook.yml"
+enabled: false
+url: ''
+username: 'AquaClan'
+avatar: ''
+embed-color: 5549556
+```
+
+`embed-color` is decimal, not hex. `5549556` is `#54ADF4`.
+
+<Callout type="error">
+  Never commit a real webhook URL to a public repository.
+</Callout>
