@@ -9,7 +9,7 @@ import { Callout } from 'nextra/components'
 
 Most keys apply with `/aquashulk reload`. The ones that do not are marked **restart**.
 
-## storage
+## Storage
 
 ```yaml filename="config.yml"
 storage:
@@ -30,7 +30,7 @@ storage:
   never deleted.
 </Callout>
 
-## Root keys
+## Root Keys
 
 ```yaml filename="config.yml"
 nbt-tag: "AquaShulk-UUID"
@@ -50,7 +50,7 @@ update-notify: true
 | `purge-orphan-contents` | `true` | Wipes contents of a shulker whose database row is gone. Keep this on |
 | `update-notify` | `true` | Checks SpigotMC on startup and tells staff with `aquashulk.update` on join |
 
-## restrictions
+## Restrictions
 
 ```yaml filename="config.yml"
 restrictions:
@@ -79,7 +79,7 @@ restrictions:
   players can be scammed in a trade.
 </Callout>
 
-## access
+## Access
 
 ```yaml filename="config.yml"
 access:
@@ -109,7 +109,7 @@ access:
 | `open-from-containers` | list | Which containers a shulker opens from. Unknown types are ignored |
 | `world-mode` | `BLACKLIST` | `BLACKLIST` works everywhere except `worlds`, `WHITELIST` only in `worlds` |
 
-## behaviour
+## Behaviour
 
 ```yaml filename="config.yml"
 behaviour:
@@ -129,7 +129,7 @@ behaviour:
   again as soon as it is closed.
 </Callout>
 
-## sounds
+## Sounds
 
 ```yaml filename="config.yml"
 sounds:
@@ -141,7 +141,7 @@ sounds:
 
 Use `""` to disable one. These are namespaced keys, not the old enum names.
 
-## denied-section
+## Denied Items
 
 Items that cannot be put inside a shulker. Bypass with `aquashulk.bypass.denied-items`.
 

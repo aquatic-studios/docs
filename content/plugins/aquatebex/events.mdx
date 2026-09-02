@@ -1,0 +1,199 @@
+---
+title: Events
+description: Live events that fire on a purchase, on a timer or by command.
+---
+
+import { Callout } from 'nextra/components'
+
+# Events
+
+A purchase can start a minigame or a reward for everyone online. Events live in `events.yml` and are
+picked from a weighted pool.
+
+```yaml filename="events.yml"
+events:
+  enabled: false
+```
+
+## Triggers
+
+```yaml filename="events.yml"
+  triggers:
+    on-purchase:
+      enabled: true
+      chance: 25
+      if: "price_raw >= 1"
+    scheduled:
+      enabled: false
+      every-minutes: 120
+      chance: 100
+      min-players: 5
+    command:
+      enabled: true
+```
+
+| Trigger | Fires when |
+| --- | --- |
+| `on-purchase` | A template with `random-event: true` runs. `chance` is a percentage |
+| `scheduled` | Every `every-minutes`, if `min-players` are online |
+| `command` | `/aquatebex event run` |
+
+`if` is a condition on the purchase. `price_raw >= 10` only rolls on purchases of ten or more.
+
+## Roll rules
+
+```yaml filename="events.yml"
+  roll:
+    no-repeat: 3
+    global-cooldown-seconds: 300
+    min-players: 1
+```
+
+| Key | What it does |
+| --- | --- |
+| `no-repeat` | How many rolls an event waits before it can repeat |
+| `global-cooldown-seconds` | Minimum gap between any two events |
+| `min-players` | Players needed for any event to start |
+
+## Event types
+
+Each entry under `pool` has a `type`, a `weight` and its own `settings`.
+
+| Type | What happens |
+| --- | --- |
+| `chat-word` | First players to type a word win |
+| `trivia` | A question, first correct answers win |
+| `unscramble` | A scrambled word to solve |
+| `math` | A generated sum to answer |
+| `reaction` | Type a random code as fast as possible |
+| `raffle` | Random winners among online players |
+| `everyone` | Reward for everyone, no competition |
+| `roulette` | Spins a weighted prize table |
+| `effects` | Potion effects for everyone |
+| `fireworks` | Fireworks around players |
+| `world` | Changes weather and time |
+| `commands` | Runs commands at start and end, for timed boosts |
+| `tebex-coupon` | Creates a real discount coupon in your store |
+| `tebex-giftcard` | Creates a real gift card |
+
+`weight` is relative: an event with `30` is three times more likely than one with `10`.
+
+## Shared keys
+
+```yaml filename="events.yml"
+    gg-race:
+      type: chat-word
+      weight: 30
+      cooldown-minutes: 10
+      min-players: 3
+      settings:
+        words: [gg, ggs]
+        max-winners: 20
+        seconds: 15
+        ignore-case: true
+        hide-attempts: false
+      bossbar:
+        enabled: true
+        text: "&#FFE264Type &fGG &7({joined}/{needed}) &8- &f{time_left}s"
+        color: YELLOW
+        style: SEGMENTED_10
+      actionbar:
+        enabled: false
+        text: "&e{joined}/{needed}"
+      announce:
+        start:
+          - "<center>&#1BFF7E&lEVENT &7- &fType &#FFE264GG</center>"
+        end:
+          - "<center>&#1BFF7E&lWINNERS &7({winner_count})</center>"
+          - "<center>&f{winners}</center>"
+        none:
+          - "<center>&cNobody joined</center>"
+      rewards:
+        commands:
+          - "give {winner} minecraft:diamond 1"
+        message: "&aYou won!"
+```
+
+| Key | What it does |
+| --- | --- |
+| `cooldown-minutes` | Per event cooldown |
+| `min-players` | Players needed for this one |
+| `if` | Condition on the purchase, same syntax as the trigger |
+| `seconds` | How long it stays open |
+| `max-winners` | How many players can win |
+| `hide-attempts` | Hides wrong answers from chat |
+| `announce.start` | Printed when it opens |
+| `announce.end` | Printed when it closes with winners |
+| `announce.none` | Printed when nobody won |
+| `rewards.commands` | Run once per winner |
+| `rewards.message` | Sent to each winner |
+
+## Placeholders
+
+| Placeholder | Available in |
+| --- | --- |
+| `{winner}` | `rewards.commands`, run once per winner |
+| `{winners}` | `announce.end`, the full list |
+| `{winner_count}` | `announce.end` |
+| `{answer}` | trivia, unscramble, math |
+| `{prompt}` | The question, scrambled word or code |
+| `{joined}` / `{needed}` | Progress in a bossbar or actionbar |
+| `{time_left}` | Seconds remaining |
+| `{prize}` | roulette |
+| `{player}` | The buyer who triggered it |
+
+## Tebex coupons and gift cards
+
+These two create real objects in your store through the API.
+
+```yaml filename="events.yml"
+    flash-coupon:
+      type: tebex-coupon
+      weight: 8
+      cooldown-minutes: 180
+      if: "price_raw >= 10"
+      settings:
+        code: "FLASH-{random:6}"
+        discount-type: percentage
+        amount: 15
+        effective-on: cart
+        expires-hours: 6
+        redeem-limit: 10
+        minimum: 0
+        basket-type: both
+      announce:
+        end:
+          - "<center>&#FFD41B&lDISCOUNT COUPON</center>"
+          - "<center>&#FFE264{coupon_code}</center>"
+        discord-end: coupon
+```
+
+| Key | What it does |
+| --- | --- |
+| `code` | Coupon code. `{random:6}` inserts six random characters |
+| `discount-type` | `percentage` or `value` |
+| `effective-on` | `cart` or `package` |
+| `redeem-limit` | How many players can use it |
+| `basket-type` | `single`, `subscription` or `both` |
+
+Coupon placeholders: `{coupon_code}`, `{coupon_amount}`, `{coupon_uses}`, `{coupon_hours}`.
+Gift card placeholders: `{giftcard_code}`, `{giftcard_amount}`, `{giftcard_expires}`.
+
+<Callout type="error">
+  These cost real money. A `tebex-giftcard` with `amount: 5` creates a five unit gift card in your
+  store every time the event rolls. Keep `weight` low and `cooldown-minutes` high.
+</Callout>
+
+<Callout type="info">
+  `discord-end` names a template in `discord.yml`, so an event can post its own embed instead of the
+  purchase one.
+</Callout>
+
+## Testing
+
+```
+/aquatebex event list
+/aquatebex event run gg-race
+/aquatebex event run random
+/aquatebex event stop
+```

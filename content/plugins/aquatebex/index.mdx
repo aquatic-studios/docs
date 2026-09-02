@@ -1,0 +1,46 @@
+---
+title: AquaTebex
+description: Turn Tebex store purchases into in-game broadcasts, Discord embeds and live events.
+asIndexPage: true
+---
+
+import { Callout } from 'nextra/components'
+
+# AquaTebex
+
+Announces store purchases in-game. A purchase fires a **template**, which can send a chat message,
+title, sound, actionbar and bossbar at once, post a Discord embed and start a live event for
+everyone on the server.
+
+| | |
+| --- | --- |
+| **Base command** | `/aquatebex` |
+| **Platforms** | Bukkit, BungeeCord, Velocity |
+| **Minecraft** | `1.16+` |
+| **Folia** | Supported |
+| **Soft-depend** | PlaceholderAPI |
+
+## Two ways to announce
+
+**Tebex API.** Give AquaTebex your store secret and it polls Tebex for new payments and announces
+them on its own. Refunds and chargebacks included.
+
+**Console command.** Hook your store's command sender to a broadcast command. Nothing is polled.
+
+```
+/aquatebex one player(Senkex) package(VIP) price($10)
+```
+
+## Files
+
+| File | Holds |
+| --- | --- |
+| `config.yml` | Custom arguments, Tebex API, templates, buttons |
+| `events.yml` | The live event system |
+| `discord.yml` | Webhook, routing, themes |
+| `messages.yml` | Every string the plugin prints |
+
+<Callout type="info">
+  On BungeeCord and Velocity the file is `config-proxy.yml` instead of `config.yml`. The keys are the
+  same minus `head-precache-on-join`, which is Bukkit only.
+</Callout>

@@ -1,0 +1,255 @@
+---
+title: Discord Webhook
+description: Post purchases to Discord as a classic embed or a Components V2 layout.
+---
+
+import { Callout } from 'nextra/components'
+
+# Discord Webhook
+
+Everything Discord lives in `discord.yml`. A template can post its embed by setting
+`discord-webhook: true`.
+
+```yaml filename="discord.yml"
+webhook:
+  enabled: false
+  channels:
+    default: "INSERT-WEBHOOK-URL"
+    staff: ""
+    highlight: ""
+  username: "Aquatic Studios"
+  avatar: "https://i.imgur.com/ip1xV13.png"
+```
+
+<Callout type="error">
+  Never commit a real webhook URL to a public repository. Anyone who finds it can post to your
+  channel until you revoke it.
+</Callout>
+
+## Routing
+
+Send some purchases to a different channel.
+
+```yaml filename="discord.yml"
+  routing:
+    - if: "status is Refund or status is Chargeback"
+      channel: staff
+    - if: "price_raw >= 100"
+      channel: highlight
+```
+
+Rules are read top to bottom and the first match wins. No match means `default`.
+
+## Delivery
+
+```yaml filename="discord.yml"
+  delivery:
+    queue-size: 200
+    min-interval-ms: 600
+    max-retries: 3
+    timeout-seconds: 10
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `queue-size` | `200` | Pending messages held in memory |
+| `min-interval-ms` | `600` | Gap between posts, keeps you under Discord's rate limit |
+| `max-retries` | `3` | Retries on a failed post |
+| `timeout-seconds` | `10` | Request timeout |
+
+## Themes
+
+A theme is the color and emoji of an embed. They resolve from most to least specific: package, then
+category, then default.
+
+```yaml filename="discord.yml"
+  themes:
+    default:
+      color: "#00FFAA"
+      emoji: "🛒"
+
+    categories:
+      Ranks:
+        color: "#FFD700"
+        emoji: "👑"
+
+    packages:
+      VIP:
+        color: "#FFD700"
+        emoji: "👑"
+        tier: 1
+      "MVP*":
+        color: "#FF4FD8"
+        emoji: "💎"
+        tier: 2
+      "re:.*(ELITE|GOD).*":
+        color: "#FF2D2D"
+        emoji: "🔥"
+        tier: 3
+```
+
+Package keys match three ways: exact name, `*` wildcard, or `re:` followed by a regular expression.
+
+```yaml filename="discord.yml"
+    multi-package:
+      color-strategy: highest
+```
+
+With several packages in one payment, `highest` uses the theme of the highest `tier`.
+
+```yaml filename="discord.yml"
+    auto:
+      enabled: false
+      public-token: ""
+      refresh-minutes: 120
+      color-from-image: true
+```
+
+`auto` pulls package names, categories and images from your store with the **public** token, and can
+take the embed color straight from the package image.
+
+## Text
+
+```yaml filename="discord.yml"
+  text:
+    strip-words: [kit, rank, package]
+    replace:
+      vip: "VIP"
+      mvp: "MVP"
+    multi-package:
+      multiline: true
+      bullet: "- "
+      inline-separator: " - "
+```
+
+`strip-words` removes noise from package names, `replace` fixes capitalisation.
+
+## Layout modes
+
+```yaml filename="discord.yml"
+  templates:
+    default:
+      mode: components-v2
+```
+
+`classic` is a normal embed with fields. `components-v2` is Discord's newer layout with containers,
+sections and buttons.
+
+### Classic
+
+```yaml filename="discord.yml"
+      classic:
+        embed:
+          enabled: true
+          title: "{package_emoji} New purchase"
+          color: "auto"
+          description:
+            - "**{player}** bought **{package_list}**"
+          fields:
+            - name: "Price"
+              value: "{price}"
+              inline: true
+          thumbnail: "{head}"
+          footer:
+            text: "{store}"
+        buttons:
+          - label: "Open store"
+            url: "https://shop.yourserver.com/"
+            emoji: "🛒"
+```
+
+`color: "auto"` takes the color from the resolved theme.
+
+### Components V2
+
+```yaml filename="discord.yml"
+      components-v2:
+        accent: "auto"
+        layout:
+          - type: section
+            text:
+              - "## {package_emoji} New purchase"
+              - "**{player}** bought **{package_list}**"
+            thumbnail: "{head}"
+
+          - type: separator
+
+          - type: text
+            if: "first_purchase == true"
+            content: "{emoji_star} First purchase from this player!"
+
+          - type: buttons
+            items:
+              - label: "Open store"
+                url: "https://shop.yourserver.com/"
+```
+
+| Block | What it is |
+| --- | --- |
+| `section` | Text with an optional thumbnail |
+| `text` | Plain block |
+| `separator` | Divider, `spacing` sets its size |
+| `container` | Groups blocks under one accent color |
+| `buttons` | A row of links |
+| `for-each` | Repeats a block per package, `source: packages`, capped by `max` |
+
+Any block takes `if`, so it only renders when the condition holds.
+
+### Inheritance
+
+```yaml filename="discord.yml"
+    one:
+      extends: default
+
+    multiple:
+      extends: default
+      components-v2:
+        layout:
+          - type: container
+            accent: "auto"
+```
+
+`extends` copies another template and overrides only what you redefine.
+
+## Mentions
+
+```yaml filename="discord.yml"
+      mention:
+        if: "price_raw >= 100"
+        content: ""
+        ping-everyone: false
+```
+
+Pings only when the condition passes.
+
+## Placeholders
+
+| Placeholder | Value |
+| --- | --- |
+| `{player}` | Buyer name |
+| `{price}` | Formatted price |
+| `{price_raw}` | Numeric price, for conditions |
+| `{package_list}` | Every package bought |
+| `{package_count}` | How many |
+| `{package_emoji}` | Emoji from the theme |
+| `{package_color}` | Color from the theme |
+| `{package_name}` | Inside `for-each` |
+| `{package_category}` | Inside `for-each` |
+| `{package_logo}` | Inside `for-each` |
+| `{head}`, `{bust}`, `{body}`, `{skin}` | Skin renders, sources set under `skins` |
+| `{timestamp_relative}` | Discord relative time |
+| `{status}` | `Complete`, `Refund`, `Chargeback` |
+| `{first_purchase}` | `true` on a player's first ever purchase |
+| `{store}` | Store name |
+| `{emoji_cart}`, `{emoji_star}`, and the rest of `emojis` | Your configured emojis |
+
+## Testing
+
+```
+/aquatebex webhook status
+/aquatebex webhook test
+/aquatebex webhook dump
+/aquatebex webhook themes
+```
+
+`dump` prints the raw JSON, which is the fastest way to find a broken `components-v2` layout.

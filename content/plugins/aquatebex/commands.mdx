@@ -1,0 +1,85 @@
+---
+title: Commands
+description: AquaTebex commands and permissions.
+---
+
+import { Callout } from 'nextra/components'
+
+# Commands
+
+Base command `/aquatebex`. Aliases: `/aqtebex`, `/ntb`, `/ntebex`, `/tbxm`, `/tebexmessage`,
+`/tbmsg`, `/tb`.
+
+| Command | Permission | What it does |
+| --- | --- | --- |
+| `/aquatebex` | | Plugin info. Console also gets the usage block |
+| `/aquatebex help` | `aquatebex.help` | Command list |
+| `/aquatebex reload` | `aquatebex.reload` | Reloads every file |
+| `/aquatebex args` | `aquatebex.args` | Lists the configured custom arguments |
+| `/aquatebex preview <template>` | `aquatebex.preview` | Renders a template to you with sample data |
+| `/aquatebex api …` | `aquatebex.api` | Tebex API subcommands |
+| `/aquatebex webhook …` | `aquatebex.webhook` | Discord subcommands |
+| `/aquatebex event …` | `aquatebex.event` | Event subcommands |
+| `/aquatebex <template> key(value)…` | console only | Fires a broadcast |
+
+`aquatebex.admin` grants every node above.
+
+## Broadcast
+
+Console only. Any first argument that is not a known subcommand is treated as a template name.
+
+```
+/aquatebex one player(Senkex) package(VIP) price($10)
+```
+
+Argument order does not matter. Every key declared in `customs-args` must be present, and a key that
+is **not** declared rejects the broadcast.
+
+Join several values with `;` to use the multi purchase template. They are printed with
+`separator-symbol`.
+
+```
+/aquatebex multiple player(Senkex) package(VIP;MVP;ELITE) price($45)
+```
+
+| Situation | Reply |
+| --- | --- |
+| No parentheses in the arguments | `console.missing-parenthesis` |
+| Nothing matched the `key(value)` pattern | `console.invalid-format` |
+| Key not in `customs-args` | `console.unknown-arg` |
+| A declared key is missing | `missing-arg` |
+| A player runs it | `console-only` |
+
+## Tebex API
+
+| Command | What it shows |
+| --- | --- |
+| `/aquatebex api status` | Connection state and poll timer |
+| `/aquatebex api stats` | Revenue and sales for a window |
+| `/aquatebex api history` | Recent payments |
+| `/aquatebex api top [spenders\|buyers\|packages]` | Leaderboards, defaults to `spenders` |
+| `/aquatebex api totals` | Lifetime totals |
+
+## Discord
+
+| Command | What it does |
+| --- | --- |
+| `/aquatebex webhook status` | Whether the webhook is configured and reachable |
+| `/aquatebex webhook test` | Sends a sample embed |
+| `/aquatebex webhook dump` | Same, but prints the raw JSON payload |
+| `/aquatebex webhook recap` | Posts the recap now |
+| `/aquatebex webhook themes` | Lists the resolved themes |
+
+## Events
+
+| Command | What it does |
+| --- | --- |
+| `/aquatebex event list` | Every event in the pool with its weight |
+| `/aquatebex event status` | The running event, if any |
+| `/aquatebex event run <id\|random>` | Starts one by hand |
+| `/aquatebex event stop` | Stops the running event |
+
+<Callout type="warning">
+  `/aquatebex preview` renders to you only and never posts to Discord. Use it to check a template
+  before wiring it to your store.
+</Callout>

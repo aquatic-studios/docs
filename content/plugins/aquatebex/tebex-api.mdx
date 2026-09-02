@@ -1,0 +1,140 @@
+---
+title: Tebex API
+description: Poll Tebex for payments and announce them automatically.
+---
+
+import { Callout } from 'nextra/components'
+
+# Tebex API
+
+With your store secret, AquaTebex asks Tebex for new payments and announces them by itself. No
+command sender, no command queue.
+
+```yaml filename="config.yml"
+tebex-api:
+  enabled: false
+  secret: "YOUR_TEBEX_SERVER_SECRET"
+  poll-interval-seconds: 60
+  backfill-on-start: true
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `enabled` | `false` | Turns the polling on |
+| `secret` | | Your Tebex **server** secret |
+| `poll-interval-seconds` | `60` | How often Tebex is asked for new payments |
+| `backfill-on-start` | `true` | Reads payments made while the server was down |
+
+<Callout type="error">
+  The secret grants full access to your store data. Never commit it to a public repository and never
+  paste it in a screenshot.
+</Callout>
+
+## Auto broadcast
+
+```yaml filename="config.yml"
+  auto-broadcast:
+    enabled: true
+    template: one
+    template-multiple: multiple
+    dedup-window-ms: 8000
+    announce-refunds: true
+    template-refund: refund
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `template` | `one` | Template for a single package |
+| `template-multiple` | `multiple` | Template when the payment holds several |
+| `dedup-window-ms` | `8000` | Ignores an identical purchase seen again inside this window |
+| `announce-refunds` | `true` | Also announces refunds and chargebacks |
+| `template-refund` | `refund` | Template used for those |
+
+`dedup-window-ms` is what stops a double announcement when the API and your command sender both
+report the same purchase.
+
+## Goal
+
+A revenue bar you can print with placeholders.
+
+```yaml filename="config.yml"
+  goal:
+    monthly-revenue: 0
+    bar-width: 10
+    bar-full: "#"
+    bar-empty: "-"
+```
+
+`monthly-revenue: 0` disables the goal. `bar-width` is how many characters the bar uses.
+
+## Milestones
+
+Announces automatically when the store crosses a round number.
+
+```yaml filename="config.yml"
+  milestones:
+    enabled: false
+    template: milestone
+    revenue:
+      window: month
+      every: 500
+    sales:
+      window: month
+      every: 50
+```
+
+`window` is `day`, `week`, `month` or `all`. `every` is the step: with `500`, it fires at 500, 1000,
+1500 and so on.
+
+## Recap
+
+A periodic summary posted to Discord.
+
+```yaml filename="config.yml"
+  recap:
+    enabled: false
+    template: recap
+    every-hours: 24
+    window: day
+    top-count: 5
+    line-spender: "**{rank}.** {name} - {value}"
+    line-buyer: "**{rank}.** {name} - {value} purchases"
+    line-package: "**{rank}.** {name} - {value} sales"
+    empty: "-# nothing yet"
+```
+
+| Key | What it does |
+| --- | --- |
+| `every-hours` | How often it posts |
+| `window` | Period it summarizes |
+| `top-count` | How many rows per leaderboard |
+| `line-spender` | Row format for top spenders |
+| `line-buyer` | Row format for most purchases |
+| `line-package` | Row format for best selling packages |
+| `empty` | Shown when a leaderboard has no data |
+
+Post it on demand with `/aquatebex webhook recap`.
+
+## Placeholder fallbacks
+
+What a placeholder shows when the API cannot answer.
+
+```yaml filename="config.yml"
+  placeholders:
+    no-secret: "&#FF5555Key secret not found"
+    loading: "&#FFB020Loading.."
+    no-data: "&#FF5555N/A"
+```
+
+## Checking it
+
+```
+/aquatebex api status
+/aquatebex api totals
+/aquatebex api top spenders
+```
+
+<Callout type="warning">
+  With `enabled: false` every API placeholder returns `no-secret`, and `api` subcommands have nothing
+  to report. The console broadcast keeps working regardless.
+</Callout>

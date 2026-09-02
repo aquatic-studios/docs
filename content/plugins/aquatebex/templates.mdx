@@ -1,0 +1,142 @@
+---
+title: Templates
+description: Broadcast templates, message tags and clickable buttons.
+---
+
+import { Callout } from 'nextra/components'
+
+# Templates
+
+A template is one broadcast. It lives under `broadcast.templates` in `config.yml` and its name is
+what you pass to the command.
+
+## Custom arguments
+
+Arguments are not hardcoded. Declare them once and use them as `{key}` anywhere.
+
+```yaml filename="config.yml"
+customs-args:
+  - player
+  - package
+  - price
+
+separator-symbol: "&7•"
+```
+
+`separator-symbol` sits between values when an argument carries several, like
+`package(VIP;MVP;ELITE)`.
+
+<Callout type="error">
+  Every declared key is required on every broadcast, and an undeclared key rejects it. Add the key
+  first, then reload.
+</Callout>
+
+## Structure
+
+```yaml filename="config.yml"
+broadcast:
+  templates:
+    one:
+      events:
+        random-event: true
+        discord-webhook: true
+
+        title:
+          enabled: true
+          up: "&#FFD700{player}"
+          down: "&fPurchased &#38FF35{package} &7({price})"
+
+        sound:
+          enabled: true
+          id: ENTITY_PLAYER_LEVELUP
+
+        actionbar:
+          enabled: true
+          message: "&#7CFF5A{player} &fpurchased &#00FFAA{package}"
+
+        bossbar:
+          enabled: false
+          text: "&fPurchased &#38FF35{package}"
+          color: GREEN
+          style: SOLID
+          duration: 5
+          animated: false
+
+      message:
+        - ""
+        - "<center>&#1BFF3D&lNew purchase</center>"
+        - "<empty>"
+        - "<center>&#E9FF1B{player} &fjust purchased!</center>"
+        - "%buttons%"
+        - ""
+```
+
+| Key | What it does |
+| --- | --- |
+| `random-event` | Rolls a live event from `events.yml` when this template fires |
+| `discord-webhook` | Posts the embed from `discord.yml` |
+| `title.up` / `title.down` | Title and subtitle |
+| `sound.id` | Any sound key of your server version |
+| `bossbar.color` | `PINK`, `BLUE`, `RED`, `GREEN`, `YELLOW`, `PURPLE`, `WHITE` |
+| `bossbar.style` | `SOLID`, `SEGMENTED_6`, `SEGMENTED_10`, `SEGMENTED_12`, `SEGMENTED_20` |
+| `bossbar.duration` | Seconds on screen |
+| `message` | The chat lines |
+
+A section with `enabled: false` is skipped, so you can leave half finished settings in place.
+
+## Message tags
+
+Usable inside any `message` line.
+
+| Tag | Result |
+| --- | --- |
+| `<center>text</center>` | Centers the line in chat |
+| `<empty>` | A blank line |
+| `<hd>` | Renders the buyer's head as pixel art. One `<hd>` per line, 8 lines total |
+| `%buttons%` | Inserts the clickable buttons |
+
+```yaml filename="config.yml"
+message:
+  - ""
+  - "<hd>"
+  - "<hd>  &#1BFF20&lNEW PURCHASE"
+  - "<hd>"
+  - "<hd>  &#1BFF3D@{player}"
+  - "<hd>  &fpurchased &#00FFAA{package}"
+  - "<hd>  &7{price}"
+  - "<hd>"
+```
+
+<Callout type="info">
+  A head is 8 rows tall, so a `<hd>` block needs 8 lines. Text after `<hd>` on the same line is
+  printed beside that row.
+</Callout>
+
+On Bukkit, `head-precache-on-join: true` fetches a player's skin when they join, so a purchase
+broadcast never waits on Mojang.
+
+## Buttons
+
+```yaml filename="config.yml"
+buttons:
+  center: 20
+  list:
+    shop:
+      text: "<gradient:#72FF76:#17EA25>[ Open Shop ]</gradient>"
+      hover: "<gradient:#72FF76:#17EA25>Click to open the store</gradient>"
+      open_url: "https://shop.yourserver.com/"
+
+    discord:
+      text: "<gradient:#72C0FF:#1750EA>[ Join Discord ]</gradient>"
+      hover: "<gradient:#72C0FF:#1750EA>Click to join the community</gradient>"
+      open_url: "https://discord.gg/cdT5g5xsVq"
+```
+
+| Key | What it does |
+| --- | --- |
+| `center` | Padding used to center the whole button row |
+| `text` | What the button shows |
+| `hover` | Tooltip |
+| `open_url` | Link opened on click |
+
+Every button in `list` is rendered wherever you put `%buttons%`.
