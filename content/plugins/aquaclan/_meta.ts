@@ -6,5 +6,6 @@ export default {
   configuration: 'Configuration',
   levels: 'Levels',
   menus: 'Menus',
-  placeholders: 'Placeholders'
+  placeholders: 'Placeholders',
+  api: 'Developer API'
 } satisfies MetaRecord

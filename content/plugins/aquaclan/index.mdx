@@ -8,7 +8,7 @@ import { Callout } from 'nextra/components'
 
 # AquaClan
 
-Clans with three ranks, invitations that survive restarts, homes, a shared bank, mail, alliances and
+Clans with four ranks, invitations that survive restarts, homes, a shared bank, mail, alliances and
 rivalries, a leveling curve with rewards, custom banners and 35 editable menus.
 
 | | |
@@ -27,7 +27,11 @@ rivalries, a leveling curve with rewards, custom banners and 35 editable menus.
 | --- | --- |
 | `LEADER` | Everything, including disband and transfer |
 | `CO_LEADER` | Manage members, homes and relations |
+| `MODERATOR` | Whatever the leader grants it |
 | `MEMBER` | Use the clan, chat, bank and homes |
+
+What each rank can do is not fixed. `/clan role set` toggles individual permissions per rank, so a
+`MODERATOR` can be anything from a glorified member to almost a co leader.
 
 `/clan promote` and `/clan demote` move a player between them. `/clan transfer` hands leadership
 over.

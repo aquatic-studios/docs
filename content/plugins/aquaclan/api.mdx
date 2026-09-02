@@ -1,0 +1,243 @@
+---
+title: Developer API
+description: Read and modify clans, listen to events, and add your own commands, menus and placeholders.
+---
+
+import { Callout, Tabs } from 'nextra/components'
+
+# Developer API
+
+Build add ons that read and modify clans, listen to clan events, and register their own `/clan`
+subcommands, menus and menu actions.
+
+```yaml filename="plugin.yml"
+softdepend: [AquaClan]
+```
+
+<Callout type="warning">
+  Depend on the API at compile time only. The plugin ships the implementation at runtime, so shading
+  it will break your add on.
+</Callout>
+
+## Install
+
+<Tabs items={['Gradle (Kotlin)', 'Maven']}>
+  <Tabs.Tab>
+```kotlin filename="build.gradle.kts"
+repositories {
+    maven("https://jitpack.io")
+}
+
+dependencies {
+    compileOnly("com.github.aquatic-studios:AquaClan:VERSION")
+}
+```
+  </Tabs.Tab>
+  <Tabs.Tab>
+```xml filename="pom.xml"
+<repository>
+    <id>jitpack.io</id>
+    <url>https://jitpack.io</url>
+</repository>
+
+<dependency>
+    <groupId>com.github.aquatic-studios</groupId>
+    <artifactId>AquaClan</artifactId>
+    <version>VERSION</version>
+    <scope>provided</scope>
+</dependency>
+```
+  </Tabs.Tab>
+</Tabs>
+
+## Getting the API
+
+```java
+import com.aquaticstudios.aquaclan.api.AquaClanAPI;
+import com.aquaticstudios.aquaclan.api.AquaClanProvider;
+import com.aquaticstudios.aquaclan.api.Clan;
+
+AquaClanAPI api = AquaClanProvider.get();
+```
+
+It is also registered as a Bukkit service.
+
+<Callout type="error">
+  Every write method, create, members, points, bank, relations, metadata, must run on the **main
+  server thread**. Reads come from the cache and are safe anywhere.
+</Callout>
+
+## Reading
+
+```java
+api.getClan("Warriors");
+api.getClanByPlayer(player.getUniqueId());
+api.getClanByPlayer(offlinePlayer);
+api.getClans();
+api.getTopClans(10);
+
+api.hasClan(uuid);
+api.clanExists("Warriors");
+api.getClanCount();
+api.getVersion();
+```
+
+Every lookup returns an `Optional<Clan>`.
+
+## The Clan object
+
+```java
+clan.name();
+clan.level();
+clan.points();
+clan.kills();
+clan.deaths();
+clan.kdr();
+clan.bank();
+clan.size();
+clan.slots(configDefault);
+clan.rawSlots();
+clan.friendlyFire();
+clan.createdAt();
+clan.unreadMail();
+
+clan.isMember(uuid);
+clan.isBanned(uuid);
+clan.isAlly(clanKey);
+clan.isRival(clanKey);
+clan.hasTag();
+clan.hasBanner();
+clan.setting("open", false);
+clan.hasPermission(ClanRole.MODERATOR, RolePermission.KICK);
+```
+
+## Writing
+
+```java
+api.createClan("Warriors", leader.getUniqueId()).ifPresent(clan -> {
+    api.setTag(clan, "<gradient:#54ADF4:#56FF00>WAR</gradient>");
+    api.setHome(clan, "base", leader.getLocation());
+    api.setSetting(clan, "open", true);
+    api.sendMail(clan, leader.getUniqueId(), leader.getName(), "Welcome!");
+});
+```
+
+| Area | Methods |
+| --- | --- |
+| Clan | `createClan`, `disbandClan`, `setDescription`, `setNickname`, `setTag`, `setBanner` |
+| Members | `addMember`, `removeMember`, `setRole`, `ban`, `unban`, `setSlots` |
+| Points | `addPoints`, `setPoints` |
+| Bank | `deposit`, `withdraw` |
+| Relations | `addAlly`, `removeAlly`, `addRival`, `removeRival` |
+| Homes | `setHome`, `deleteHome` |
+| Settings | `getSetting`, `setSetting`, `setPermission` |
+| Mail and log | `sendMail`, `clearMail`, `addLog` |
+| Combat | `getPlayerKills`, `getPlayerDeaths`, `getPlayerKdr`, `setPlayerKills`, `setPlayerDeaths`, `addPlayerKill`, `addPlayerDeath` |
+| Friendly fire | `setFriendlyFire` |
+
+Call `api.save(clan)` to persist your changes.
+
+## Levels
+
+```java
+api.getMaxLevel();
+api.getLevelThreshold(level);
+api.getPointsToNext(clan);
+api.getLevelExtraHomes(level);
+api.getLevelExtraSlots(level);
+api.getLevelExtraAllies(level);
+```
+
+## Module data
+
+Store your own typed data per clan under a namespace. It is saved inside the clan, with no extra
+files or database, and survives restarts.
+
+```java
+ClanData data = api.getData(clan, "quests");
+int done = data.getInt("completed", 0);
+data.setInt("completed", done + 1);
+api.save(clan);
+```
+
+Supported types: `String`, `int`, `long`, `double`, `boolean`. Plus `has`, `remove` and `clear`.
+
+For a single loose value there is also `api.setMetadata(clan, "kills_today", "42")`.
+
+## Events
+
+All extend `ClanEvent`.
+
+| Event | Cancellable | Fired when |
+| --- | --- | --- |
+| `ClanCreateEvent` | Yes | A clan is created |
+| `ClanDisbandEvent` | Yes | A clan is disbanded |
+| `ClanJoinEvent` | Yes | A player joins |
+| `ClanKickEvent` | Yes | A member is kicked |
+| `ClanRenameEvent` | Yes | A clan is renamed |
+| `ClanBankTransactionEvent` | Yes | A deposit or withdraw |
+| `ClanChatEvent` | Yes | A clan chat message is sent |
+| `ClanTagChangeEvent` | Yes | A tag is set or cleared |
+| `ClanBannerChangeEvent` | Yes | The banner changes |
+| `ClanHomeCreateEvent` | Yes | A home is set |
+| `ClanSettingChangeEvent` | Yes | A toggle changes |
+| `ClanMailSendEvent` | Yes | Mail is sent |
+| `ClanLeaveEvent` | No | A player leaves |
+| `ClanRoleChangeEvent` | No | A member's role changes |
+| `ClanRelationEvent` | No | An ally or rival is added or removed |
+| `ClanPointsChangeEvent` | No | Points change |
+| `ClanLevelUpEvent` | No | A clan levels up |
+
+```java
+@EventHandler
+public void onLevelUp(ClanLevelUpEvent event) {
+    Clan clan = event.getClan();
+    getLogger().info(clan.name() + " reached level " + event.getNewLevel());
+}
+```
+
+## Extending /clan
+
+```java
+api.registerCommand(new MySubCommand());        // adds /clan <yours>
+api.registerMenuSource("my_source", provider);  // custom paginated menu content
+api.registerMenuAction("mytoken", action);      // [mytoken] arg in a menu button
+api.openMenu(player, "levels");
+api.sendMessage(sender, "&aDone");
+```
+
+Combine `getData` with `registerMenuSource` and a menu button to give your module its own tab
+inside AquaClan.
+
+## Custom placeholders
+
+```java
+// %aquaclan_progress% -> "1200 / 1500 (300 to go)"
+api.registerPlaceholder("progress", (viewer, clan) -> {
+    if (clan == null) return "No clan";
+    long next = api.getLevelThreshold(clan.level() + 1);
+    return clan.points() + " / " + next + " (" + api.getPointsToNext(clan) + " to go)";
+});
+```
+
+## Role permissions
+
+`setPermission(clan, role, permission, value)` toggles what a rank can do.
+
+| `RolePermission` | Controls |
+| --- | --- |
+| `INVITE` | Sending invitations |
+| `KICK` | Kicking members |
+| `PROMOTE` / `DEMOTE` | Changing ranks |
+| `MANAGE_ROLES` | Editing role permissions |
+| `MANAGE_HOMES` | Creating and deleting homes |
+| `MANAGE_RELATIONS` | Allies and rivals |
+| `MANAGE_SETTINGS` | Clan toggles |
+| `MANAGE_BANK` | Deposits and withdrawals |
+| `SEND_MAIL` | Clan mail |
+| `BAN` | Banning players |
+| `DESCRIPTION` | Editing the description |
+| `FRIENDLY_FIRE` | Toggling friendly fire |
+| `REGROUP` | Rallying the clan |
+
+Roles are `LEADER`, `CO_LEADER`, `MODERATOR` and `MEMBER`.

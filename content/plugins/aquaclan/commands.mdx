@@ -34,6 +34,7 @@ Base `/clan`. Aliases: `/aquaclan`, `/aqclan`, `/aqc`.
 | `/clan chat` | `aquaclan.chat` | Toggles clan chat |
 | `/clan description <text>` | `aquaclan.description` | Sets the description |
 | `/clan modtag <tag>` | `aquaclan.rename` | Changes the tag |
+| `/clan custom tag <text>` | `aquaclan.clan.tag.custom` | Sets a colored custom tag |
 | `/clan nickname <name>` | `aquaclan.rename` | Changes the display name |
 
 ## Invitations
@@ -45,7 +46,7 @@ Invitations are saved to `invites.json`, survive restarts and reach offline play
 | `/clan invite [player]` | `aquaclan.invite` | Invites someone |
 | `/clan invites` | `aquaclan.invites` | Your pending invitations |
 | `/clan revoke <player>` | `aquaclan.invite` | Cancels one you sent |
-| `/clan accept` | `aquaclan.accept` | Accepts |
+| `/clan accept` | `aquaclan.accept` | Accepts. `join` is an alias |
 | `/clan deny` | `aquaclan.deny` | Rejects |
 | `/clan cancel` | `aquaclan.invite` | Cancels a pending request |
 
@@ -113,7 +114,7 @@ Alliances need the other clan to accept. `clan.max-allies` caps them, `0` means 
 
 | Command | Permission | What it does |
 | --- | --- | --- |
-| `/clan settings view/set` | `aquaclan.command` | Clan settings |
+| `/clan settings view/set/toggle` | `aquaclan.command` | Clan settings |
 | `/clan profile view/set` | `aquaclan.command` | Your profile and toggles |
 | `/clan regroup send/accept` | `aquaclan.command` | Rallies the clan to your position |
 | `/clan ff` | `aquaclan.ff` | Toggles friendly fire |
