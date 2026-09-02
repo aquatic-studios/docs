@@ -1,0 +1,169 @@
+---
+title: Placeholders
+description: Read a translation from any plugin that supports PlaceholderAPI, and create your own files.
+---
+
+import { Callout } from 'nextra/components'
+
+# Placeholders
+
+AquaLang registers **two** PlaceholderAPI expansions.
+
+| Identifier | What it does |
+| --- | --- |
+| `aqlang` | Returns a translated string from a language file |
+| `aqualang` | Returns information about the player's language |
+
+The first one is the interesting one: any plugin that supports PlaceholderAPI can print text in each
+player's own language, without any code.
+
+<Callout type="info">
+  PlaceholderAPI is optional. Without it the plugin works fully, only `%placeholders%` written
+  **inside** translations stop being replaced.
+</Callout>
+
+## Reading a translation
+
+```
+%aqlang_(file)_(key.path)%
+```
+
+Two parts, each in parentheses, joined by `_`:
+
+| Part | Is |
+| --- | --- |
+| `file` | The file inside the player's language folder, without `.yml` |
+| `key.path` | The key inside that file |
+
+The language is **not** in the placeholder. AquaLang resolves it from the player, so the same
+placeholder gives a different string to each one.
+
+```
+%aqlang_(english)_(help)%
+%aqlang_(myplugin)_(menu.title)%
+%aqlang_(myplugin)_(shop.bought)%
+```
+
+<Callout type="info">
+  Writing `.yml` is allowed and ignored: `%aqlang_(myplugin.yml)_(menu.title)%` works the same.
+</Callout>
+
+### Subfolders
+
+`:` becomes a folder separator, so a file in a subfolder is reachable too.
+
+```
+%aqlang_(gui:main)_(title)%
+```
+
+Reads `languages/<player language>/gui/main.yml`, key `title`.
+
+### Lists
+
+A key holding a list is joined with line breaks, so a multi line help block works as one
+placeholder.
+
+### When it fails
+
+| Situation | Returns |
+| --- | --- |
+| No `)_(` in the placeholder | `invalid_placeholder_format` |
+| File or key empty | `invalid_placeholder_format` |
+| The file is not loaded | `file_not_found` with the name |
+| The key does not exist | `not_found_path` |
+| The file is broken | `invalid_lang_format` |
+
+Each of those is itself a translatable key, so the error the player sees is in their language. Turn
+on `performance.debug` to get the failing placeholder printed in the console.
+
+## Information
+
+| Placeholder | Returns |
+| --- | --- |
+| `%aqualang_language%` | The player's language, like `spanish` |
+| `%aqualang_language_name%` | Same, capitalized |
+| `%aqualang_locale%` | Its locale code, like `es_ES` |
+| `%aqualang_is_default%` | `true` or `false` |
+| `%aqualang_default%` | The server default language |
+| `%aqualang_registered%` | How many languages are registered |
+| `%aqualang_cached%` | How many players are cached |
+
+`default`, `registered` and `cached` do not need a player, so they work on the console and in
+server wide displays.
+
+## Creating your own file
+
+You do not need a plugin to add translations. Any file you drop in a language folder is readable
+through `%aqlang_(...)_(...)%`.
+
+**1.** Create the file in every language folder, with the same name.
+
+```
+plugins/AquaLang/languages/
+├── english/
+│   ├── english.yml
+│   └── myserver.yml
+└── spanish/
+    ├── spanish.yml
+    └── myserver.yml
+```
+
+**2.** Write the same keys in both.
+
+```yaml filename="languages/english/myserver.yml"
+welcome:
+  title: "&#35ADFFWelcome"
+  subtitle: "&fEnjoy your stay"
+
+rules:
+  - "&#8DFF871. &fBe respectful"
+  - "&#8DFF872. &fNo cheating"
+```
+
+```yaml filename="languages/spanish/myserver.yml"
+welcome:
+  title: "&#35ADFFBienvenido"
+  subtitle: "&fQue la pases bien"
+
+rules:
+  - "&#8DFF871. &fRespetá a los demás"
+  - "&#8DFF872. &fNo hagas trampa"
+```
+
+**3.** Use it anywhere PlaceholderAPI works.
+
+```yaml filename="another-plugin/config.yml"
+join-title: "%aqlang_(myserver)_(welcome.title)%"
+join-subtitle: "%aqlang_(myserver)_(welcome.subtitle)%"
+rules-book: "%aqlang_(myserver)_(rules)%"
+```
+
+**4.** Reload.
+
+```
+/aqualang reload
+```
+
+<Callout type="warning">
+  A file that exists in one language and not another returns `file_not_found` for the players using
+  the missing one. Run `/aqualang validate` to list every key missing in every language.
+</Callout>
+
+## Colors
+
+Language files take every color syntax at once: legacy `&a`, short hex `&#35ADFF`, BungeeCord hex
+`&x&3&5&A&D&F&F` and MiniMessage, including `<gradient>`, `<hover>` and `<click>`.
+
+Unknown tags like `<player>` or `<empty>` are passed through untouched, so your own message tokens
+keep working. Below `1.16` hex colors are downsampled to the nearest named color instead of printing
+garbage, so one file stays readable on `1.8` and exact on `1.21`.
+
+## Checking a key
+
+```
+/aqualang debug spanish myserver.welcome.title
+/aqualang validate
+```
+
+`debug` shows which file a key resolves through and which fallback it lands on. `validate` compares
+every language against the default and lists what is missing.
