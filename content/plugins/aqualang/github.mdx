@@ -1,0 +1,97 @@
+---
+title: GitHub Sync
+description: Pull translation files from a repository, or push your local ones back.
+---
+
+import { Callout } from 'nextra/components'
+
+# GitHub Sync
+
+Keep translations in a repository instead of editing files on every server.
+
+```yaml filename="config.yml"
+github:
+  repository:
+    name: "owner/repo"
+    branch: "main"
+
+  authentication:
+    type: "none"
+    token: ""
+
+  paths:
+    remote-root: "languages"
+    local-root: "languages"
+```
+
+| Key | What it does |
+| --- | --- |
+| `repository.name` | `owner/repo` |
+| `repository.branch` | Branch to read |
+| `authentication.type` | `none` or `token` |
+| `authentication.token` | Personal access token. Needed for private repos and for push |
+| `paths.remote-root` | Folder inside the repo. `.` for the root |
+| `paths.local-root` | Folder inside `plugins/AquaLang` |
+
+<Callout type="error">
+  A token grants write access to the repository. Never commit it and never paste it in a screenshot.
+</Callout>
+
+## Pulling
+
+```yaml filename="config.yml"
+  sync:
+    create-missing: true
+    overwrite-existing: true
+    delete-missing: false
+    backup-before-delete: true
+    reload-after-sync: true
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `create-missing` | `true` | Downloads files you do not have |
+| `overwrite-existing` | `true` | Replaces your local files with the repo ones |
+| `delete-missing` | `false` | Deletes local files that are not in the repo |
+| `backup-before-delete` | `true` | Zips `languages/` into `backups/` before deleting anything |
+| `reload-after-sync` | `true` | Reloads the languages when it finishes |
+
+```
+/aqualang github sync
+/aqualang github status
+```
+
+<Callout type="warning">
+  `overwrite-existing: true` discards local edits on every sync. If you translate in game, turn it
+  off or push first.
+</Callout>
+
+## Pushing
+
+```yaml filename="config.yml"
+  push:
+    commit-message: "Update AquaLang translations"
+    committer-name: "AquaLang"
+    committer-email: "aqualang@localhost"
+```
+
+```
+/aqualang github push
+```
+
+Needs `authentication.type: token` and `aqualang.github.push`.
+
+## Limits
+
+```yaml filename="config.yml"
+  limits:
+    max-archive-mb: 64
+    max-entries: 20000
+    commits-to-show: 5
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `max-archive-mb` | `64` | Aborts a download larger than this |
+| `max-entries` | `20000` | Aborts an archive with more files than this |
+| `commits-to-show` | `5` | Recent commits printed in the console report |

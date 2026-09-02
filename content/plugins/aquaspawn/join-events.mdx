@@ -1,0 +1,163 @@
+---
+title: Join Events
+description: What a player sees when they join, and a separate block for their first join ever.
+---
+
+import { Callout } from 'nextra/components'
+
+# Join Events
+
+```yaml filename="config.yml"
+custom-events:
+  enabled: true
+  delay-ticks: 20
+
+  join: { }
+  first-join: { }
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `enabled` | `true` | Master switch for join, first join and actions |
+| `delay-ticks` | `20` | Ticks to wait before titles, actionbars and bossbars |
+
+<Callout type="warning">
+  A title sent too early is dropped by the client. If your welcome does not show, raise
+  `delay-ticks`.
+</Callout>
+
+## join and first-join
+
+`join` runs on **every** join. `first-join` runs only on a player's very first join ever, tracked
+forever.
+
+```yaml filename="config.yml"
+  first-join:
+    enabled: true
+    override: true
+```
+
+`override: true` shows only the first join block and skips `join`. With `false` both run on a first
+join.
+
+Both blocks take the same seven channels, each with its own `enabled`.
+
+## Chat
+
+```yaml filename="config.yml"
+    chat:
+      enabled: true
+      message:
+        - "<empty>"
+        - "<center>&fWelcome back &#54ADF4%player_name%</center>"
+        - "<empty>"
+```
+
+| Tag | Result |
+| --- | --- |
+| `<empty>` | A blank line |
+| `<center>text</center>` | Centers the line |
+| `<hd>` | One head row. Use eight for a full head |
+| `<head>name</head>` | An inline head |
+
+```yaml filename="config.yml"
+      message:
+        - "<hd>"
+        - "<hd> &#54ADF4&lWELCOME"
+        - "<hd>"
+        - "<hd> &fWelcome &#54ADF4%player_name% &fto the server"
+        - "<hd> &7You are player &#54ADF4#%aquaspawn_total_players%"
+        - "<hd>"
+        - "<hd> &fYou playing in &#6AB7FFplay.yourserver.net"
+        - "<hd>"
+```
+
+## Title, actionbar and bossbar
+
+```yaml filename="config.yml"
+    actionbar:
+      enabled: true
+      text: "&#54ADF4Welcome back, %player_name%!"
+      stay: 3
+
+    title:
+      enabled: true
+      fade-in: 10
+      stay: 40
+      fade-out: 10
+      title: "&#54ADF4Welcome"
+      subtitle: "&f%player_name%"
+
+    bossbar:
+      enabled: true
+      text: "&aWelcome to the server"
+      color: BLUE
+      overlay: PROGRESS
+      progress: 1.0
+      stay: 5
+```
+
+| Key | Unit | Notes |
+| --- | --- | --- |
+| `actionbar.stay` | seconds | |
+| `title.fade-in`, `stay`, `fade-out` | ticks | 20 ticks is one second |
+| `bossbar.color` | | `PINK`, `BLUE`, `RED`, `GREEN`, `YELLOW`, `PURPLE`, `WHITE` |
+| `bossbar.overlay` | | `PROGRESS`, `NOTCHED_6`, `NOTCHED_10`, `NOTCHED_12`, `NOTCHED_20` |
+| `bossbar.progress` | `0.0` to `1.0` | How full the bar starts |
+| `bossbar.stay` | seconds | `0` keeps it for the whole session |
+
+## Sound
+
+```yaml filename="config.yml"
+    sound:
+      enabled: true
+      value: "BLOCK_NOTE_BLOCK_PLING:1:1"
+```
+
+Format is `SOUND:volume:pitch`. Volume and pitch are optional.
+
+## Firework
+
+```yaml filename="config.yml"
+    firework:
+      enabled: true
+      power: 1
+      type: BALL
+      colors:
+        - "#54ADF4"
+      fade-colors:
+        - "#FFFFFF"
+      flicker: false
+      trail: true
+```
+
+| Key | What it does |
+| --- | --- |
+| `power` | Flight height |
+| `type` | `BALL`, `BALL_LARGE`, `STAR`, `BURST`, `CREEPER` |
+| `colors` / `fade-colors` | Hex, several allowed |
+| `flicker` / `trail` | Twinkle and trail |
+
+## Actions
+
+Run on join, in order.
+
+```yaml filename="config.yml"
+    actions:
+      - "[CONSOLE] give %player% diamond 1"
+      - "[PLAYER] kit claim default"
+      - "[EFFECT] SPEED:2"
+      - "[EFFECT] SPEED:0:30"
+```
+
+| Prefix | What it does |
+| --- | --- |
+| `[CONSOLE]` | Runs the command as console |
+| `[PLAYER]` | Runs it as the player |
+| `[EFFECT]` | `TYPE:amplifier` or `TYPE:amplifier:seconds` |
+
+`%player%` is the joining player.
+
+<Callout type="info">
+  In chat and other text, the placeholder is `%player_name%`. In `actions` it is `%player%`.
+</Callout>

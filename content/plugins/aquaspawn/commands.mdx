@@ -1,0 +1,61 @@
+---
+title: Commands
+description: AquaSpawn commands and permissions.
+---
+
+import { Callout } from 'nextra/components'
+
+# Commands
+
+| Command | Permission | What it does |
+| --- | --- | --- |
+| `/spawn` | `aquaspawn.spawn` | Teleports to the join spawn |
+| `/aquaspawn help` | `aquaspawn.help` | Command list |
+| `/aquaspawn menu` | `aquaspawn.menu` | Opens the spawn menu |
+| `/aquaspawn create <name>` | `aquaspawn.create` | Saves your position as a new spawn |
+| `/aquaspawn set <name> <first\|force>` | `aquaspawn.set` | Sets the join spawn and its mode |
+| `/aquaspawn custom first:<name> force:<name>` | `aquaspawn.set` | Different spawns for first join and every join |
+| `/aquaspawn reset` | `aquaspawn.reset` | Clears the join spawn |
+| `/aquaspawn reload` | `aquaspawn.reload` | Reloads every file |
+
+`aquaspawn.admin` grants all of them.
+
+```
+/aquaspawn create lobby
+/aquaspawn set lobby force
+/aquaspawn custom first:welcome force:lobby
+```
+
+## Permissions
+
+| Node | What it grants |
+| --- | --- |
+| `aquaspawn.spawn` | `/spawn`, only checked when `require-permission` is on |
+| `aquaspawn.spawn.bypass` | Skips the `/spawn` cooldown |
+| `aquaspawn.help` | The help menu |
+| `aquaspawn.menu` | The spawn menu |
+| `aquaspawn.create` | Create spawns |
+| `aquaspawn.set` | Set the join spawn |
+| `aquaspawn.reset` | Clear it |
+| `aquaspawn.reload` | Reload |
+| `aquaspawn.update` | Update notice on join |
+| `aquaspawn.admin` | Everything above |
+
+## The /spawn command
+
+```yaml filename="config.yml"
+spawn:
+  require-permission: false
+  permission: "aquaspawn.spawn"
+  cooldown: 3
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `require-permission` | `false` | `false` lets anyone use `/spawn` |
+| `permission` | `aquaspawn.spawn` | Node checked when the above is on |
+| `cooldown` | `3` | Seconds between uses. `0` disables it |
+
+<Callout type="info">
+  `aquaspawn.admin` always works, even with `require-permission` on.
+</Callout>

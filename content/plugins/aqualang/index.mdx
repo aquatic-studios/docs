@@ -1,0 +1,56 @@
+---
+title: AquaLang
+description: Per player languages with an API, PlaceholderAPI support and GitHub sync.
+asIndexPage: true
+---
+
+import { Callout } from 'nextra/components'
+
+# AquaLang
+
+Every player picks a language and your plugins answer in it. AquaLang holds the translation files,
+remembers each player's choice and hands the right string to any plugin that asks.
+
+| | |
+| --- | --- |
+| **Base command** | `/aqualang` |
+| **Minecraft** | `1.13+` |
+| **Folia** | Supported |
+| **Storage** | SQLite, MySQL or MariaDB |
+| **Soft-depend** | PlaceholderAPI |
+
+## What ships
+
+21 languages registered out of the box, from English and Spanish to Japanese, Polish and Slovenian.
+Each one is a folder under `languages/` with its own `.yml`.
+
+A player changes theirs with a shortcut command in their own language:
+
+```
+/lang english
+/idioma spanish
+/sprache german
+```
+
+## Add on menu
+
+`AquaLangAddon` is a separate plugin that adds `/aquaaddon`, a GUI to pick a language by clicking a
+flag. It is also the worked example of the API.
+
+| Command | Permission |
+| --- | --- |
+| `/aquaaddon` | `aquaaddon.menu` |
+
+Aliases: `/langmenu`, `/languagemenu`.
+
+## Files
+
+| File | Holds |
+| --- | --- |
+| `config.yml` | Database, registered languages, shortcut commands, GitHub |
+| `languages/<name>/<name>.yml` | One file per language |
+
+<Callout type="info">
+  A first time player can get the language their Minecraft client is set to, so most never touch a
+  command. See `auto-detect-client-locale`.
+</Callout>

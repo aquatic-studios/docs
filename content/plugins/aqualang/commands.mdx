@@ -1,0 +1,80 @@
+---
+title: Commands
+description: AquaLang commands and permissions.
+---
+
+import { Callout } from 'nextra/components'
+
+# Commands
+
+Base `/aqualang`, alias `/aqlang`.
+
+| Command | Permission | What it does |
+| --- | --- | --- |
+| `/aqualang help` | | Command list |
+| `/aqualang list` | `aqualang.list` | Registered languages |
+| `/aqualang aliases` | `aqualang.aliases` | The shortcut commands |
+| `/aqualang set <player> <lang>` | `aqualang.set` | Changes someone else's language |
+| `/aqualang reset <player>` | `aqualang.reset` | Back to the default |
+| `/aqualang info <player>` | `aqualang.info` | Their current language |
+| `/aqualang reload` | `aqualang.reload` | Reloads config and language files |
+| `/aqualang status` | `aqualang.status` | Diagnostics |
+| `/aqualang debug <lang> <key>` | `aqualang.debug` | Shows how a key resolves |
+| `/aqualang validate` | `aqualang.validate` | Lists missing keys in every language |
+| `/aqualang github sync` | `aqualang.github` | Pulls files from the repository |
+| `/aqualang github push` | `aqualang.github.push` | Uploads your local files |
+| `/aqualang github status` | `aqualang.github` | Sync state |
+
+`aqualang.admin` grants everything.
+
+## Shortcuts
+
+Players change their own language with a shortcut, not with `/aqualang`. Each entry in `commands`
+becomes its own command.
+
+```yaml filename="config.yml"
+commands:
+  - lang
+  - language
+  - idioma
+  - lenguaje
+  - sprache
+  - jezyk
+```
+
+All of them need `aqualang.use`, which everyone has by default.
+
+<Callout type="warning">
+  Adding or removing a shortcut needs a **restart**, not a reload. On `1.13+` the client command tree
+  only accepts `a-z`, `0-9`, `.`, `_` and `-`, so a non ASCII name is skipped with a warning instead
+  of breaking tab completion.
+</Callout>
+
+## Permissions
+
+| Node | Default | What it grants |
+| --- | --- | --- |
+| `aqualang.use` | everyone | Change your own language |
+| `aqualang.list` | op | `/aqualang list` |
+| `aqualang.aliases` | op | `/aqualang aliases` |
+| `aqualang.set` | op | Change another player's |
+| `aqualang.reset` | op | Reset another player's |
+| `aqualang.info` | op | See another player's |
+| `aqualang.reload` | op | Reload |
+| `aqualang.status` | op | Diagnostics |
+| `aqualang.debug` | op | Key inspection |
+| `aqualang.validate` | op | Missing key check |
+| `aqualang.github` | op | Sync and status |
+| `aqualang.github.push` | op | Push to the repository |
+| `aqualang.language.*` | op | Any language when `per-language-permissions` is on |
+| `aqualang.admin` | op | Everything |
+
+## Finding a missing key
+
+```
+/aqualang validate
+/aqualang debug spanish menu.title
+```
+
+`validate` compares every language against the default and lists what is missing. `debug` shows
+which file and which fallback a single key ends up using.

@@ -1,0 +1,98 @@
+---
+title: Developer API
+description: Answer every player in their own language from your plugin.
+---
+
+import { Callout } from 'nextra/components'
+
+# Developer API
+
+```yaml filename="plugin.yml"
+depend: [AquaLang]
+```
+
+```java
+if (!AquaLangProvider.isRegistered()) return;
+AquaLangAPI lang = AquaLangProvider.get();
+```
+
+## Sending
+
+```java
+lang.send(player, "join.welcome");
+lang.send(player, "shop.bought", "%item%", "Diamond Sword", "%price%", "500");
+```
+
+Placeholders are passed in pairs: key, value, key, value.
+
+## Namespaces
+
+A namespace keeps your plugin's keys separate from everyone else's.
+
+```java
+lang.sendIn(player, "myplugin", "join.welcome");
+lang.broadcast("myplugin", "event.started");
+```
+
+`broadcast` sends to every online player **in their own language** and returns how many received it.
+
+## Reading a string
+
+```java
+String msg = AquaLang.message(player, "join.welcome");
+String other = AquaLang.message(uuid, "myplugin", "join.welcome");
+String fixed = AquaLang.messageInLang("spanish", "join.welcome");
+String safe = AquaLang.messageOrDefault(uuid, "myplugin", "join.welcome", "Welcome!");
+```
+
+## Player language
+
+```java
+String current = AquaLang.getPlayerLanguage(player);
+
+lang.setPlayerLanguage(player, "spanish");
+lang.setPlayerLanguageAsync(uuid, "spanish");
+```
+
+The async form returns a future and never touches the database on the main thread.
+
+## Checks
+
+```java
+lang.has("spanish", "join.welcome");
+lang.has("spanish", "myplugin", "join.welcome");
+lang.isLanguageRegistered("spanish");
+lang.supports("es_ES");
+lang.canUseLanguage(player, "spanish");
+lang.getApiVersion();
+```
+
+`canUseLanguage` respects `per-language-permissions`.
+
+## Colors
+
+```java
+String colored = AquaLang.colorize("&aHello &#FF55AA world");
+String plain = AquaLang.stripColor(colored);
+```
+
+## Event
+
+```java
+@EventHandler
+public void onChange(PlayerLanguageChangeEvent event) {
+    event.getUniqueId();
+    event.getPreviousLanguage();
+    event.getNewLanguage();
+
+    event.setNewLanguage("english"); // redirect the choice
+    event.setCancelled(true);        // or block it
+}
+```
+
+Cancellable, and `setNewLanguage` lets you override what the player picked.
+
+<Callout type="info">
+  `AquaLangAddon` in the same repository is a working plugin built entirely on this API. It is the
+  fastest way to see the calls in context.
+</Callout>

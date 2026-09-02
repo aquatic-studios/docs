@@ -1,0 +1,113 @@
+---
+title: Configuration
+description: Database, registered languages, detection and performance.
+---
+
+import { Callout } from 'nextra/components'
+
+# Configuration
+
+## Database
+
+```yaml filename="config.yml"
+database:
+  type: "sqlite"
+  address: "localhost"
+  port: 3306
+  database: "aqualang"
+  username: "root"
+  password: "password"
+  use-ssl: false
+
+  pool:
+    maximum-pool-size: 10
+    minimum-idle: 10
+    maximum-lifetime: 1800000
+    keepalive-time: 0
+    connection-timeout: 5000
+```
+
+`type` is `sqlite`, `mysql` or `mariadb`. Everything below `address` is only read by the last two.
+
+The JDBC driver is downloaded on first start and cached in `plugins/AquaLang/libraries`. Only the
+driver for your type is fetched, so the jar stays small.
+
+<Callout type="info">
+  On a network, point every server at the same MySQL or MariaDB database so a player keeps their
+  language across servers.
+</Callout>
+
+## Languages
+
+```yaml filename="config.yml"
+default: "english"
+
+register:
+  languages:
+    - "en_US:english:english.yml"
+    - "es_ES:spanish:spanish.yml"
+    - "ja_JP:japanese:japanese.yml"
+```
+
+The format is `locale:name:file`. The folder and file are created automatically if missing, and this
+order is what `/aqualang list` and the addon menu use.
+
+`default` is used when a player has none set or a translation is missing. It must be one of the
+registered names, otherwise the first one is used.
+
+## Detection
+
+```yaml filename="config.yml"
+languages:
+  auto-detect-client-locale: true
+  auto-detect-delay-ticks: 40
+  validate-on-startup: true
+  per-language-permissions: false
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `auto-detect-client-locale` | `true` | Gives a first time player the language their client is set to |
+| `auto-detect-delay-ticks` | `40` | The client sends its locale shortly after login, so the read is delayed |
+| `validate-on-startup` | `true` | Compares every language against the default and lists missing keys |
+| `per-language-permissions` | `false` | Requires `aqualang.language.<name>` to select one |
+
+<Callout type="info">
+  A player who already picked a language is never overwritten by detection.
+</Callout>
+
+## Performance
+
+```yaml filename="config.yml"
+performance:
+  auto-reload-languages: false
+  reload-debounce-ms: 250
+  preload-on-join: true
+  cache-ttl-seconds: 900
+  debug: false
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `auto-reload-languages` | `false` | Reloads a language file when you edit it on disk |
+| `reload-debounce-ms` | `250` | Waits this long after the last edit, so quick saves count as one. `50` to `5000` |
+| `preload-on-join` | `true` | Loads the language during login so gameplay never waits on the database |
+| `cache-ttl-seconds` | `900` | How long an offline player's entry stays cached. `60` to `86400` |
+| `debug` | `false` | Extra console output. Only turn it on if asked |
+
+## Cross server messaging
+
+```yaml filename="config.yml"
+messaging:
+  enabled: false
+  host: "127.0.0.1"
+  port: 6379
+  password: ""
+  channel: "aqualang"
+  server-id: ""
+```
+
+Shares language changes live between servers on the same database. Without it, a change made on the
+lobby is not seen by the survival server until the player reconnects.
+
+`server-id` must be unique per server. Leave it empty to generate a random one on each start.

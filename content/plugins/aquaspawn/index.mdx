@@ -1,0 +1,40 @@
+---
+title: AquaSpawn
+description: Spawn management with a menu, plus a full join and first join event system.
+asIndexPage: true
+---
+
+import { Callout } from 'nextra/components'
+
+# AquaSpawn
+
+Create named spawns, send players to one on join, and fire a welcome made of chat, title, actionbar,
+bossbar, sound, fireworks and commands.
+
+| | |
+| --- | --- |
+| **Base command** | `/aquaspawn` |
+| **Minecraft** | `1.16+` |
+| **Folia** | Supported |
+| **Soft-depend** | PlaceholderAPI |
+
+## Two halves
+
+**Spawns.** Named locations you create in game, browsable in a paginated menu. One of them can be
+the join spawn.
+
+**Join events.** What a player sees when they connect. There is a block for every join and a
+separate one for a player's very first join ever, tracked forever.
+
+## Files
+
+| File | Holds |
+| --- | --- |
+| `config.yml` | Join spawn, spawn command, join and first join events |
+| `menu.yml` | The spawn menu and every spawn you create |
+| `messages.yml` | Every string the plugin prints |
+
+<Callout type="info">
+  Spawns are stored in `menu.yml` under `items`, so creating one with `/aquaspawn create` also adds
+  it to the menu.
+</Callout>

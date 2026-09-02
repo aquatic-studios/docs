@@ -1,0 +1,122 @@
+---
+title: Spawns
+description: Create spawns, choose where players land and customize the menu.
+---
+
+import { Callout } from 'nextra/components'
+
+# Spawns
+
+## Creating one
+
+Stand where you want it and run:
+
+```
+/aquaspawn create lobby
+```
+
+The location is saved into `menu.yml` under `items`, so it also becomes an entry in the spawn menu.
+Names are unique.
+
+## Join spawn
+
+```yaml filename="config.yml"
+settings:
+  join-spawn: "none"
+  type-spawn: force
+  custom:
+    first: "none"
+    force: "none"
+```
+
+| Key | Values | What it does |
+| --- | --- | --- |
+| `join-spawn` | a spawn name or `none` | Where players land on join. `none` never teleports |
+| `type-spawn` | `first`, `force`, `custom` | When to teleport |
+| `custom.first` | a spawn name or `none` | Only read when `type-spawn` is `custom` |
+| `custom.force` | a spawn name or `none` | Same |
+
+| `type-spawn` | Teleports |
+| --- | --- |
+| `first` | Only on a player's first join ever |
+| `force` | Every join |
+| `custom` | Uses the `custom` block: one spawn for the first join, another for the rest |
+
+```
+/aquaspawn set lobby force
+/aquaspawn custom first:welcome force:lobby
+```
+
+## Join and quit messages
+
+These replace the vanilla lines, which are always hidden when enabled.
+
+```yaml filename="config.yml"
+  join-message:
+    enabled: true
+    text:
+      - "&#6AB7FF[+] &f%player% &#6AB7FFjoin the game"
+
+  quit-message:
+    enabled: true
+    text:
+      - "&#FF3131[-] &f%player% &#FF3131left the game"
+```
+
+One entry per line. `%player%` is the player joining or leaving.
+
+## The menu
+
+`/aquaspawn menu` opens a paginated GUI built from `menu.yml`.
+
+```yaml filename="menu.yml"
+menu_title: '&8AquaSpawn'
+size: 45
+
+items:
+  close:
+    material: BARRIER
+    slot: 40
+    display_name: '&#FF5E5E&lClose'
+    lore:
+      - '&7Click to close the menu'
+    left_click_commands:
+      - '[close]'
+    right_click_commands:
+      - '[close]'
+```
+
+| Key | What it does |
+| --- | --- |
+| `menu_title` | GUI title |
+| `size` | Slots, a multiple of 9 |
+| `material` | Any material of your version |
+| `slot` | Position, zero indexed |
+| `display_name` / `lore` | Item text |
+| `left_click_commands` | Run on left click |
+| `right_click_commands` | Run on right click |
+
+`[close]` closes the menu. Spawns created with `/aquaspawn create` are added here automatically with
+their coordinates.
+
+<Callout type="warning">
+  `close` is a reserved key. AquaSpawn skips it when counting spawns, so do not name a spawn `close`.
+</Callout>
+
+## Other settings
+
+```yaml filename="config.yml"
+preload-skins: true
+update-notify: true
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `preload-skins` | `true` | Caches the head on join so a `<hd>` welcome shows instantly |
+| `update-notify` | `true` | Tells console and `aquaspawn.update` holders about a new release |
+
+## Placeholder
+
+| Placeholder | Value |
+| --- | --- |
+| `%aquaspawn_total_players%` | Unique players who have ever joined |
