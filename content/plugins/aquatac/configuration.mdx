@@ -1,0 +1,63 @@
+---
+title: Configuration
+description: Bet limits, challenge expiry and match rules.
+---
+
+import { Callout } from 'nextra/components'
+
+# Configuration
+
+## Bets
+
+```yaml filename="config.yml"
+bet:
+  min: 1.0
+  max: 1000000.0
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `min` | `1.0` | Smallest stake allowed. Stops spam challenges for meaningless amounts |
+| `max` | `1000000.0` | Largest stake. `0` removes the upper limit |
+
+## Requests
+
+```yaml filename="config.yml"
+request:
+  expiry-seconds: 60
+```
+
+How long a challenge stays valid before it expires silently. `0` means challenges never expire.
+
+## Match
+
+```yaml filename="config.yml"
+game:
+  broadcast-win: false
+  broadcast-draw: false
+  spawn-firework-for-winner: true
+  end-delay-ticks: 30
+  turn-timeout-seconds: 0
+  forfeit-on-leave: true
+  refund-on-force-end: true
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `broadcast-win` | `false` | Announces wins to the whole server |
+| `broadcast-draw` | `false` | Announces draws |
+| `spawn-firework-for-winner` | `true` | Launches a firework at the winner |
+| `end-delay-ticks` | `30` | How long the final board stays open. 20 ticks is one second |
+| `turn-timeout-seconds` | `0` | A player who takes longer forfeits. `0` disables the timer |
+| `forfeit-on-leave` | `true` | `true` the leaver forfeits and the opponent takes the pot, `false` cancels and refunds both |
+| `refund-on-force-end` | `true` | Refunds both bets when a match is force ended by a reload or shutdown |
+
+<Callout type="warning">
+  Leave `refund-on-force-end` on. With it off, a reload or restart during a match makes both players
+  lose their stake.
+</Callout>
+
+<Callout type="info">
+  Leaving covers all three cases: closing the board, disconnecting, and running out of time on the
+  turn timer.
+</Callout>

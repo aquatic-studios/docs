@@ -1,0 +1,61 @@
+---
+title: Commands
+description: AquaTac commands and permissions.
+---
+
+import { Callout } from 'nextra/components'
+
+# Commands
+
+Two commands: `/tictactoe` to play, `/aquatac` to administer.
+
+## Playing
+
+Base `/tictactoe`, alias `/ttt`.
+
+| Command | What it does |
+| --- | --- |
+| `/tictactoe invite <player> <bet>` | Challenges someone. `challenge` is an alias |
+| `/tictactoe accept <player>` | Accepts and starts the match |
+| `/tictactoe decline <player>` | Rejects it. `deny` is an alias |
+| `/tictactoe info` | Your current match |
+| `/tictactoe help` | Command list |
+
+All of it needs `tictactoe.play`, which everyone has by default.
+
+```
+/tictactoe invite Senkex 500
+/tictactoe accept Senkex
+```
+
+| A challenge fails when | Reply |
+| --- | --- |
+| Vault or the economy is missing | `economy-unavailable` |
+| The target is offline | `player-not-found` |
+| You challenge yourself | `cant-challenge-self` |
+| The target lacks `tictactoe.play` | `opponent-cant-play` |
+| Either player is already playing | `already-in-match` |
+| The bet is outside `bet.min` or `bet.max` | limit message |
+
+## Admin
+
+Base `/aquatac`, aliases `/atac` and `/aqtac`.
+
+| Command | Permission | What it does |
+| --- | --- | --- |
+| `/aquatac help` | `aquatac.help` | Command list |
+| `/aquatac info` | `aquatac.help` | Plugin info |
+| `/aquatac reload` | `aquatac.admin` | Reloads every file |
+
+## Permissions
+
+| Node | Default | What it grants |
+| --- | --- | --- |
+| `tictactoe.play` | everyone | Challenge, accept and decline |
+| `aquatac.help` | everyone | The help menu |
+| `aquatac.admin` | op | Reload |
+
+<Callout type="info">
+  Taking `tictactoe.play` from a player also stops others from challenging them: the challenger gets
+  `opponent-cant-play`.
+</Callout>

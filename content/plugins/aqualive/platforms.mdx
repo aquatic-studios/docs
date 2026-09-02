@@ -1,0 +1,92 @@
+---
+title: Platforms
+description: Declare a stream site, its domain, cooldown and permission.
+---
+
+import { Callout } from 'nextra/components'
+
+# Platforms
+
+Every stream site is one block in `config.yml`. Kick, Twitch and YouTube ship enabled.
+
+```yaml filename="config.yml"
+platforms:
+  kick:
+    domain: "kick.com"
+    permission: "aqualive.kick"
+    cooldown: 120
+
+  twitch:
+    domain: "twitch.tv"
+    permission: "aqualive.twitch"
+    cooldown: 60
+
+  youtube:
+    domain: "youtube.com"
+    permission: "aqualive.youtube"
+    cooldown: 300
+```
+
+| Key | What it does |
+| --- | --- |
+| `domain` | Matched against the URL the player sends |
+| `permission` | Node needed to announce there. Delete the line to allow everyone |
+| `cooldown` | Seconds between uses. Bypassed by `aqualive.bypass` |
+
+## Adding one
+
+A platform needs the same id in **three** files.
+
+<Callout type="error">
+  Miss one file and the platform is skipped. Miss the `domain` line and `/live` answers with the
+  syntax message as if the platform did not exist.
+</Callout>
+
+**1. `config.yml`**
+
+```yaml filename="config.yml"
+platforms:
+  facebook:
+    domain: "facebook.com"
+    permission: "aqualive.facebook"
+    cooldown: 300
+```
+
+**2. `platforms.yml`** copy an existing block under `advertisement`, rename it `facebook` and change
+the colors. Add a matching button under `buttons`:
+
+```yaml filename="platforms.yml"
+buttons:
+  facebook:
+    text: "&#1877F2[ WATCH ON FACEBOOK ]"
+    hover:
+      - "&fOpen the live stream"
+      - "&#1877F2Facebook &7» &f%url%"
+    click:
+      type: "url"
+      value: "%url%"
+```
+
+**3. `webhook.yml`** copy a block under `platforms` and rename it.
+
+Then run `/aqualive reload` and check `/aqualive platforms`.
+
+<Callout type="info">
+  All three files ship with a commented `facebook` example. Uncomment it to see the shape.
+</Callout>
+
+## Server settings
+
+```yaml filename="config.yml"
+server-name: "ServerName"
+preload-skins: true
+
+permissions:
+  bypass-cooldown: "aqualive.bypass"
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `server-name` | `ServerName` | Shown as `%server%`. Leave `""` to detect it automatically |
+| `preload-skins` | `true` | Caches the head on join so a `<hd>` broadcast shows instantly |
+| `permissions.bypass-cooldown` | `aqualive.bypass` | Node that skips every cooldown |

@@ -1,0 +1,38 @@
+---
+title: AquaTac
+description: Tic tac toe in a chest GUI, with bets paid through Vault.
+asIndexPage: true
+---
+
+import { Callout } from 'nextra/components'
+
+# AquaTac
+
+Two players bet money and play tic tac toe on a chest board. The winner takes the pot.
+
+| | |
+| --- | --- |
+| **Base command** | `/tictactoe` |
+| **Minecraft** | `1.16+` |
+| **Folia** | Supported |
+| **Depends** | Vault, plus an economy plugin |
+
+## A match
+
+1. A player runs `/tictactoe invite <player> <bet>`.
+2. The other accepts with `/tictactoe accept <player>`. Both stakes are taken.
+3. The board opens as a chest GUI. Players click a cell on their turn.
+4. The winner gets the whole pot. On a draw both bets come back.
+
+<Callout type="warning">
+  Vault and an economy plugin are required. Without them every command answers
+  `economy-unavailable` and no match can start.
+</Callout>
+
+## Files
+
+| File | Holds |
+| --- | --- |
+| `config.yml` | Bet limits, expiry, match rules |
+| `menu.yml` | Board titles, markers and sounds |
+| `messages.yml` | Every string the plugin prints |

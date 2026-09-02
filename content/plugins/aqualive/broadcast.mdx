@@ -1,0 +1,151 @@
+---
+title: Broadcast
+description: What each platform sends when a player goes live.
+---
+
+import { Callout } from 'nextra/components'
+
+# Broadcast
+
+`platforms.yml` decides what a platform sends. Every block is independent, so Twitch can show a
+bossbar while YouTube does not.
+
+```yaml filename="platforms.yml"
+advertisement:
+  twitch:
+    enabled: true
+    broadcast:
+      chat: { }
+      sound: { }
+      title: { }
+      actionbar: { }
+      bossbar: { }
+```
+
+Any section with `enabled: false` is skipped.
+
+## Chat
+
+Two layouts. `layout: "head"` renders the streamer's head beside the text, anything else uses
+`lines`.
+
+```yaml filename="platforms.yml"
+      chat:
+        enabled: true
+        layout: "head"
+        head:
+          skin: "%player%"
+          fallback-skin: "c06f8906-4c8a-4911-9c29-ea1dbd1aab82"
+          rows:
+            - "<hd>"
+            - "<hd>  &#9146FF&lTWITCH"
+            - "<hd>"
+            - "<hd>  &#9146FFStreamer &7» &f%player%"
+            - "<hd>  &#9146FFLink &7» %button_link%"
+            - "<hd>  &#9146FFServer &7» %button_server%"
+            - "<hd>  &#9146FFOnline &7» &#54ADF4%server_online%/%server_max_players%"
+            - "<hd>"
+        lines:
+          - " "
+          - "<center>&#9146FF&lTWITCH</center>"
+          - "<center>&#54ADF4%player% &fis now &#9146FFLIVE</center>"
+          - "<center>%button_twitch%</center>"
+          - " "
+```
+
+| Key | What it does |
+| --- | --- |
+| `layout` | `head` uses `rows`, anything else uses `lines` |
+| `head.skin` | Whose skin to render |
+| `head.fallback-skin` | UUID used when the skin cannot be fetched |
+| `head.rows` | Eight lines, one per head row |
+
+<Callout type="info">
+  A head is eight pixels tall, so `rows` needs eight entries. Text after `<hd>` prints beside that
+  row. `<center>` centers a line in chat.
+</Callout>
+
+## Title, actionbar, bossbar and sound
+
+```yaml filename="platforms.yml"
+      sound:
+        enabled: true
+        id: "ENTITY_PLAYER_LEVELUP"
+        volume: 1
+        pitch: 1
+      title:
+        enabled: true
+        up: "&#9146FF&lTWITCH"
+        down: "&#54ADF4%player% &fis live on &#9146FF&lTWITCH"
+        fade-in: 500
+        stay: 3000
+        fade-out: 500
+      actionbar:
+        enabled: true
+        text: "&#9146FF&lTWITCH &7» &#54ADF4%player% &fis now live"
+        duration: 5
+      bossbar:
+        enabled: true
+        text: "&#9146FF&lTWITCH &7» &#54ADF4%player% &fis now live"
+        color: "PURPLE"
+        style: "PROGRESS"
+        progress: 1.0
+        duration: 8
+```
+
+| Key | Unit | Notes |
+| --- | --- | --- |
+| `title.fade-in`, `stay`, `fade-out` | milliseconds | |
+| `actionbar.duration` | seconds | |
+| `bossbar.color` | | `PINK`, `BLUE`, `RED`, `GREEN`, `YELLOW`, `PURPLE`, `WHITE` |
+| `bossbar.progress` | `0.0` to `1.0` | How full the bar starts |
+| `bossbar.duration` | seconds | |
+
+## Buttons
+
+Buttons are shared and inserted with `%button_<id>%`.
+
+```yaml filename="platforms.yml"
+buttons:
+  link:
+    text: "&#54ADF4(Click to Open)"
+    hover:
+      - "&fOpen the live stream"
+      - "&#54ADF4%url%"
+    click:
+      type: "url"
+      value: "%url%"
+
+  server:
+    text: "&#54ADF4%server% &7(Click to join)"
+    hover:
+      - "&fClick to join this server"
+    click:
+      type: "server"
+      value: "%server%"
+```
+
+| `click.type` | What it does |
+| --- | --- |
+| `url` | Opens the link |
+| `server` | Sends the player to that server, proxy only |
+
+`link` and `server` are generic. `kick`, `twitch` and `youtube` are the branded ones.
+
+<Callout type="warning">
+  `%button_<platform>%` falls back to the `link` button when that platform has no block of its own,
+  so a new platform still gets a clickable announcement.
+</Callout>
+
+## Placeholders
+
+| Placeholder | Value |
+| --- | --- |
+| `%player%` | Streamer |
+| `%url%` | The link they sent |
+| `%server%` | `server-name`, or the proxy server they are on |
+| `%server_online%` | Players online |
+| `%server_max_players%` | Slots |
+| `%button_<id>%` | A button from `buttons` |
+
+PlaceholderAPI placeholders work too when it is installed.

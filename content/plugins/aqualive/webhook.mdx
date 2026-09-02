@@ -1,0 +1,90 @@
+---
+title: Discord Webhook
+description: Post a Discord embed when a player goes live.
+---
+
+import { Callout } from 'nextra/components'
+
+# Discord Webhook
+
+`webhook.yml` posts an embed per platform. Off by default.
+
+```yaml filename="webhook.yml"
+enabled: false
+
+defaults:
+  url: "INSERT-URL-HERE"
+  username: "AquaLive"
+  avatar-url: "https://mc-heads.net/avatar/%player%/128"
+  content: "%mention% **%player%** is now live!"
+  mention: "@everyone"
+```
+
+`defaults` applies to every platform. Any key can be overridden inside a platform block.
+
+| Key | What it does |
+| --- | --- |
+| `url` | Your Discord webhook URL |
+| `username` | Webhook name. `""` keeps the one set on Discord |
+| `avatar-url` | Webhook avatar |
+| `content` | Text above the embed, where pings live |
+| `mention` | Replaces `%mention%`. `@everyone`, `@here`, `<@&ROLE_ID>`, or `""` for none |
+
+<Callout type="error">
+  Never commit a real webhook URL to a public repository. Anyone who finds it can post to your
+  channel until you revoke it.
+</Callout>
+
+## Per platform
+
+```yaml filename="webhook.yml"
+platforms:
+  twitch:
+    enabled: true
+    color: "#9146FF"
+    embed:
+      author:
+        name: "%player% • TWITCH"
+        icon-url: "https://mc-heads.net/avatar/%player%/64"
+        url: "%url%"
+      title: "🔴 %player% is now LIVE on Twitch!"
+      url: "%url%"
+      description: "Come hang out!\n\n**Server** » %server%"
+      image: ""
+      thumbnail: "https://mc-heads.net/avatar/%player%/128"
+      fields:
+        - name: "Watch here"
+          value: "[Click to open](%url%)"
+          inline: true
+        - name: "Server"
+          value: "%server%"
+          inline: true
+      footer:
+        text: "Twitch • %player%"
+        icon-url: ""
+      timestamp: true
+```
+
+| Key | What it does |
+| --- | --- |
+| `color` | Embed side color, hex or decimal |
+| `author` | Small line above the title, with icon and link |
+| `title` / `url` | Title and where clicking it goes |
+| `description` | Body. `\n` makes a line break |
+| `image` | Big image under the embed, `""` hides it |
+| `thumbnail` | Small image top right, `""` hides it |
+| `fields` | Extra rows. `inline: true` puts them side by side |
+| `footer` | Bottom line |
+| `timestamp` | Stamps the current time |
+
+Delete the `fields` list for none.
+
+<Callout type="warning">
+  A platform with no block here, or with the url still `INSERT-URL-HERE`, is skipped. Both cases are
+  reported in the console on reload instead of failing in silence.
+</Callout>
+
+## Placeholders
+
+`%player%`, `%url%`, `%server%`, `%server_online%`, `%server_max_players%` and `%mention%` work in
+every field.

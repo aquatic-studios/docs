@@ -1,0 +1,59 @@
+---
+title: Commands
+description: AquaLive commands, aliases and permissions.
+---
+
+import { Callout } from 'nextra/components'
+
+# Commands
+
+| Command | Permission | What it does |
+| --- | --- | --- |
+| `/live <url>` | `aqualive.use` | Announces your stream |
+| `/aqualive help` | `aqualive.admin` | Command list |
+| `/aqualive reload` | `aqualive.admin` | Reloads every file and re-registers aliases |
+| `/aqualive platforms` | `aqualive.admin` | Lists each platform with its domain, permission and cooldown |
+
+## Announce aliases
+
+The announce command has no fixed name. Every entry in `commands.aliases` becomes a command, and the
+first one is the main label.
+
+```yaml filename="config.yml"
+commands:
+  permission: "aqualive.use"
+  admin-permission: "aqualive.admin"
+  aliases:
+    - "live"
+    - "stream"
+    - "directo"
+    - "envivo"
+```
+
+Aliases apply on `/aqualive reload`, no restart needed. Blank and duplicated entries are dropped.
+
+<Callout type="info">
+  On BungeeCord and Velocity a new alias works the moment it is typed, but the client side command
+  list only refreshes on reconnect. On Bukkit it refreshes right away.
+</Callout>
+
+## Permissions
+
+| Node | What it grants |
+| --- | --- |
+| `aqualive.use` | Run the announce command |
+| `aqualive.admin` | `help`, `reload` and `platforms` |
+| `aqualive.bypass` | Skip every platform cooldown |
+| `aqualive.<platform>` | Announce on that platform, set per block |
+
+Per platform nodes are whatever you write in `config.yml`. Delete the `permission` line from a block
+to let everyone use it.
+
+## Blocking servers
+
+On a proxy, streams sent from these servers are refused. Useful for auth or limbo.
+
+```yaml filename="config.yml"
+blacklist-server-send:
+  - "auth"
+```

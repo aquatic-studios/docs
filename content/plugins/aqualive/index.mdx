@@ -1,0 +1,43 @@
+---
+title: AquaLive
+description: Let players announce their live stream in game, with a broadcast per platform.
+asIndexPage: true
+---
+
+import { Callout } from 'nextra/components'
+
+# AquaLive
+
+A player runs `/live <url>` and the server announces it: chat with the streamer's head, title,
+actionbar, bossbar, sound and a Discord embed.
+
+Each platform is its own block, so Twitch, Kick and YouTube get their own colors, cooldown,
+permission and layout.
+
+| | |
+| --- | --- |
+| **Command** | `/live <url>` |
+| **Platforms** | Bukkit, BungeeCord, Velocity |
+| **Minecraft** | `1.16+` |
+| **Folia** | Supported |
+| **Soft-depend** | PlaceholderAPI |
+
+## How a link is matched
+
+The URL a player sends is matched against the `domain` of each platform in `config.yml`. A link to
+`twitch.tv/senkex` fires the `twitch` block. A domain nobody declared is rejected with the syntax
+message.
+
+## Files
+
+| File | Holds |
+| --- | --- |
+| `config.yml` | Platforms, domains, cooldowns, permissions, command aliases |
+| `platforms.yml` | What each platform broadcasts, and the buttons |
+| `webhook.yml` | Discord embed per platform |
+| `messages.yml` | Every string the plugin prints |
+
+<Callout type="warning">
+  A platform only works when its id exists in **all three** files: `config.yml`, `platforms.yml` and
+  `webhook.yml`. `/aqualive reload` cross checks them and reports any block that does not line up.
+</Callout>
