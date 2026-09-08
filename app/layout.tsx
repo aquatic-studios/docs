@@ -64,7 +64,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="en" dir="ltr" suppressHydrationWarning>
       <Head
         color={{ hue: 211, saturation: 100, lightness: { light: 48, dark: 56 } }}
-        backgroundColor={{ light: '#ffffff', dark: '#131316' }}
+        backgroundColor={{ light: '#ffffff', dark: '#0a0d14' }}
       />
       <body>
         <Layout
@@ -72,7 +72,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           pageMap={await getPageMap()}
           docsRepositoryBase="https://github.com/aquatic-studios/docs/tree/main"
           footer={footer}
-          sidebar={{ defaultMenuCollapseLevel: 1, toggleButton: true }}
+          sidebar={{ defaultMenuCollapseLevel: 6, toggleButton: true, autoCollapse: false }}
           lastUpdated={<LastUpdated />}
           toc={{ backToTop: 'Back to top' }}
           nextThemes={{ defaultTheme: 'dark' }}

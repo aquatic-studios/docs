@@ -32,25 +32,25 @@
 }
 
 .dark {
-  --as-bg: #131316;
-  --as-surface: #1e1e22;
-  --as-surface-hover: #2a2a2f;
-  --as-separator: #2e2e33;
-  --as-text: #f7f7f9;
-  --as-text-secondary: #b4b4bd;
-  --as-nav: #d2d2d9;
-  --as-accent: #0a84ff;
-  --as-accent-tint: rgba(10, 132, 255, 0.14);
-  --as-accent-tint-strong: rgba(10, 132, 255, 0.22);
+  --as-bg: #0a0d14;
+  --as-surface: #141926;
+  --as-surface-hover: #1c2233;
+  --as-separator: #1e2536;
+  --as-text: #f2f4f8;
+  --as-text-secondary: #9aa4ba;
+  --as-nav: #c3cad9;
+  --as-accent: #3b9eff;
+  --as-accent-tint: rgba(59, 158, 255, 0.14);
+  --as-accent-tint-strong: rgba(59, 158, 255, 0.24);
 
   --as-green: #30d158;
   --as-orange: #ff9f0a;
   --as-red: #ff453a;
 
-  --as-line: rgba(255, 255, 255, 0.13);
-  --as-hairline: rgba(255, 255, 255, 0.07);
-  --as-chip: rgba(255, 255, 255, 0.08);
-  --as-tint: rgba(255, 255, 255, 0.03);
+  --as-line: rgba(150, 180, 255, 0.14);
+  --as-hairline: rgba(150, 180, 255, 0.08);
+  --as-chip: rgba(150, 180, 255, 0.09);
+  --as-tint: rgba(150, 180, 255, 0.04);
 }
 
 html {
@@ -146,7 +146,7 @@ samp {
 .nextra-sidebar li > a,
 .nextra-sidebar li > button {
   border-radius: var(--as-r-sm) !important;
-  padding: 0.4rem 0.65rem !important;
+  padding: 0.42rem 0.65rem !important;
   color: var(--as-nav) !important;
   font-weight: 450;
   transition: background 0.15s ease, color 0.15s ease;
@@ -162,6 +162,42 @@ samp {
   background: var(--as-accent-tint) !important;
   color: var(--as-accent) !important;
   font-weight: 600 !important;
+  box-shadow: inset 2px 0 0 0 var(--as-accent);
+}
+
+.nextra-sidebar li:has(> ul) > a,
+.nextra-sidebar li:has(> ul) > button,
+.nextra-sidebar li:has(> div) > a,
+.nextra-sidebar li:has(> div) > button {
+  color: var(--as-text) !important;
+  font-weight: 550;
+}
+
+.nextra-sidebar ul::before,
+.nextra-toc ul::before {
+  background: var(--as-separator) !important;
+}
+
+.as-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+}
+
+.as-nav__icon {
+  flex: none;
+  opacity: 0.55;
+  transition: opacity 0.15s ease, color 0.15s ease;
+}
+
+.nextra-sidebar li > a:hover .as-nav__icon {
+  opacity: 0.85;
+}
+
+.nextra-sidebar li.active > a .as-nav__icon {
+  opacity: 1;
+  color: var(--as-accent);
 }
 
 .nextra-sidebar-footer {
