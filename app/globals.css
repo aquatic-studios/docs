@@ -32,10 +32,10 @@
 }
 
 .dark {
-  --as-bg: #0a0d14;
-  --as-surface: #141926;
-  --as-surface-hover: #1c2233;
-  --as-separator: #1e2536;
+  --as-bg: #05070d;
+  --as-surface: #0f1420;
+  --as-surface-hover: #171d2c;
+  --as-separator: #1a2130;
   --as-text: #f2f4f8;
   --as-text-secondary: #9aa4ba;
   --as-nav: #c3cad9;
@@ -51,6 +51,19 @@
   --as-hairline: rgba(150, 180, 255, 0.08);
   --as-chip: rgba(150, 180, 255, 0.09);
   --as-tint: rgba(150, 180, 255, 0.04);
+
+  --x-color-primary-400: #3b9eff;
+  --x-color-primary-500: #3b9eff;
+  --x-color-primary-600: #3b9eff;
+  --x-color-primary-800: #3b9eff;
+}
+
+:root {
+  --x-color-primary-100: rgba(0, 122, 255, 0.1);
+  --x-color-primary-400: #007aff;
+  --x-color-primary-500: #007aff;
+  --x-color-primary-600: #007aff;
+  --x-color-primary-800: #0062cc;
 }
 
 html {
@@ -215,23 +228,60 @@ samp {
 }
 
 .nextra-toc {
-  font-size: 0.82rem;
+  font-size: 0.8rem;
 }
 
 .nextra-toc > div > p {
   color: var(--as-text) !important;
   font-weight: 600;
-  letter-spacing: -0.01em;
+  font-size: 0.78rem;
+  letter-spacing: 0.01em;
+  padding-bottom: 0.35rem !important;
 }
 
-.nextra-toc a {
+.nextra-toc > div > ul {
+  padding-top: 0 !important;
+  padding-bottom: 0.75rem !important;
+}
+
+.nextra-toc ul li {
+  margin: 0 !important;
+}
+
+.nextra-toc ul li > a {
+  display: block;
+  border-left: 1px solid var(--as-separator);
+  padding: 0.32rem 0 0.32rem 0.8rem;
+  font-weight: 450 !important;
+  line-height: 1.45;
+  color: var(--as-text-secondary) !important;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.nextra-toc ul li > a[class*="font-semibold"] {
+  font-weight: 520 !important;
   color: var(--as-nav) !important;
-  border-radius: 6px;
-  transition: color 0.15s ease;
 }
 
-.nextra-toc a:hover {
+.nextra-toc ul li > a:hover {
   color: var(--as-text) !important;
+  border-left-color: var(--as-nav);
+}
+
+.nextra-toc ul li > a[class*="text-primary"] {
+  color: var(--as-accent) !important;
+  border-left-color: var(--as-accent);
+  font-weight: 600 !important;
+}
+
+.as-toc-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.as-toc-title svg {
+  opacity: 0.6;
 }
 
 .nextra-breadcrumb {

@@ -44,6 +44,15 @@ const navbar = (
   <Navbar logo={logo} logoLink="/" projectLink="https://github.com/aquatic-studios" />
 )
 
+const tocTitle = (
+  <span className="as-toc-title">
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+      <path d="M4 6h16M4 12h10M4 18h13" />
+    </svg>
+    On this page
+  </span>
+)
+
 const footer = (
   <Footer>
     <div className="as-footer">
@@ -74,7 +83,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           footer={footer}
           sidebar={{ defaultMenuCollapseLevel: 6, toggleButton: true, autoCollapse: false }}
           lastUpdated={<LastUpdated />}
-          toc={{ backToTop: 'Back to top' }}
+          toc={{ title: tocTitle, backToTop: 'Scroll to top' }}
           nextThemes={{ defaultTheme: 'dark' }}
         >
           {children}
