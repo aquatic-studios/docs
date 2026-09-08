@@ -19,6 +19,9 @@
   --as-chip: rgba(0, 0, 0, 0.06);
   --as-tint: rgba(0, 0, 0, 0.03);
 
+  --as-scroll: rgba(0, 0, 0, 0.22);
+  --as-scroll-hover: rgba(0, 0, 0, 0.36);
+
   --as-r-sm: 6px;
   --as-r-md: 0px;
   --as-r-lg: 0px;
@@ -32,10 +35,10 @@
 }
 
 .dark {
-  --as-bg: #06080c;
-  --as-surface: #0c1017;
-  --as-surface-hover: #141924;
-  --as-separator: #161b25;
+  --as-bg: #050609;
+  --as-surface: #0a0c11;
+  --as-surface-hover: #11141b;
+  --as-separator: #12161d;
   --as-text: #f2f4f8;
   --as-text-secondary: #9aa4ba;
   --as-nav: #c3cad9;
@@ -47,10 +50,13 @@
   --as-orange: #ff9f0a;
   --as-red: #ff453a;
 
-  --as-line: rgba(150, 180, 255, 0.14);
-  --as-hairline: rgba(150, 180, 255, 0.08);
-  --as-chip: rgba(150, 180, 255, 0.09);
-  --as-tint: rgba(150, 180, 255, 0.04);
+  --as-line: rgba(172, 190, 225, 0.13);
+  --as-hairline: rgba(172, 190, 225, 0.075);
+  --as-chip: rgba(172, 190, 225, 0.085);
+  --as-tint: rgba(172, 190, 225, 0.038);
+
+  --as-scroll: #202634;
+  --as-scroll-hover: #323b4c;
 
   --x-color-primary-400: #3b9eff;
   --x-color-primary-500: #3b9eff;
@@ -679,6 +685,11 @@ article kbd {
   color: var(--as-text);
 }
 
+body > div:has(> footer) {
+  background: var(--as-bg);
+  border-top: 1px solid var(--as-separator);
+}
+
 .as-footer {
   width: 100%;
   text-align: center;
@@ -747,14 +758,48 @@ article kbd {
   border-radius: var(--as-r-sm);
 }
 
-.nextra-scrollbar::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+/* Nextra sets scrollbar-width, and Chromium drops every ::-webkit-scrollbar
+   rule as soon as that property is set, so the theme has to hand control back
+   before any of this applies. */
+.nextra-scrollbar,
+html {
+  scrollbar-width: auto !important;
 }
 
-.nextra-scrollbar::-webkit-scrollbar-thumb {
-  background: var(--as-separator);
+::-webkit-scrollbar {
+  width: 11px;
+  height: 11px;
+  background: transparent;
+}
+
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--as-scroll);
+  background-clip: content-box;
+  border: 3px solid transparent;
   border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--as-scroll-hover);
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-button {
+  display: none;
+}
+
+/* Firefox has no ::-webkit-scrollbar, so it keeps the standard properties. */
+@supports (-moz-orient: inline) {
+  .nextra-scrollbar,
+  html {
+    scrollbar-width: thin !important;
+    scrollbar-color: var(--as-scroll) transparent;
+  }
 }
 
 
