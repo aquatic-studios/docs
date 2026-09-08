@@ -287,6 +287,10 @@ samp {
   stroke-width: 1.6;
 }
 
+.as-toc-rail--ready .as-toc-rail__active {
+  transition: stroke-dasharray 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 .nextra-toc ul li > a[class*="font-semibold"] {
   font-weight: 450 !important;
   color: var(--as-nav) !important;

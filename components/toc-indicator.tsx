@@ -30,20 +30,47 @@ export function TocIndicator() {
     }
     if (!pairs.length) return
 
-    // One continuous stroke: each item contributes a vertical run at its own
-    // indent, and the jump between two runs is horizontal because the items
-    // touch, which is what turns a level change into an elbow.
-    const trace = (from: number, to: number) => {
-      if (from < 0 || to < from) return ''
+    // Both strokes follow the exact same path. The active one is revealed with
+    // a dash window, which is what lets it slide and grow smoothly instead of
+    // snapping from one section to the next.
+    let total = 0
+    let starts: number[] = []
+    let ends: number[] = []
 
+    const measure = () => {
       let d = ''
-      for (let i = from; i <= to; i++) {
-        const el = pairs[i].link
-        const x = el.offsetLeft + 0.5
-        const top = el.offsetTop
-        d += `${i === from ? 'M' : 'L'} ${x} ${top} L ${x} ${top + el.offsetHeight}`
-      }
-      return d
+      let length = 0
+      let prevX = 0
+      let prevY = 0
+
+      starts = []
+      ends = []
+
+      pairs.forEach(({ link }, index) => {
+        const x = link.offsetLeft + 0.5
+        const top = link.offsetTop
+        const bottom = top + link.offsetHeight
+
+        if (index === 0) {
+          d += `M ${x} ${top}`
+        } else {
+          d += ` L ${x} ${top}`
+          length += Math.hypot(x - prevX, top - prevY)
+        }
+
+        starts[index] = length
+        d += ` L ${x} ${bottom}`
+        length += bottom - top
+        ends[index] = length
+
+        prevX = x
+        prevY = bottom
+      })
+
+      total = length
+      svg.style.height = `${list.scrollHeight}px`
+      basePath.setAttribute('d', d)
+      activePath.setAttribute('d', d)
     }
 
     let ticking = false
@@ -53,6 +80,8 @@ export function TocIndicator() {
 
       const top = 72
       const bottom = Math.max(top + 40, window.innerHeight * 0.55)
+      const atEnd =
+        window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4
 
       let current = -1
       let frontier = -1
@@ -63,6 +92,13 @@ export function TocIndicator() {
         if (rect.top < bottom) frontier = index
       })
 
+      // A short final section never reaches the top of the viewport, so without
+      // this the indicator stops before the last entry.
+      if (atEnd) {
+        current = pairs.length - 1
+        frontier = pairs.length - 1
+      }
+
       const last = Math.max(current, frontier)
       const first = current >= 0 ? current : frontier
 
@@ -70,14 +106,17 @@ export function TocIndicator() {
         link.classList.toggle('as-toc-on', last >= 0 && index >= first && index <= last)
       })
 
-      svg.style.height = `${list.scrollHeight}px`
-      basePath.setAttribute('d', trace(0, pairs.length - 1))
-      activePath.setAttribute('d', trace(first, last))
-
       if (last < 0) {
+        activePath.style.strokeDasharray = `0 ${total + 1000}`
         node.style.opacity = '0'
         return
       }
+
+      const from = starts[first]
+      const to = ends[last]
+
+      activePath.style.strokeDasharray = `0 ${from} ${to - from} ${total + 1000}`
+      activePath.style.strokeDashoffset = '0'
 
       const el = pairs[last].link
       node.style.opacity = '1'
@@ -91,13 +130,24 @@ export function TocIndicator() {
       update()
     }
 
+    const remeasure = () => {
+      measure()
+      update()
+    }
+
+    measure()
     update()
+
+    // Skip the opening animation, then let every later change transition.
+    const timer = setTimeout(() => svg.classList.add('as-toc-rail--ready'), 60)
+
     window.addEventListener('scroll', schedule, { passive: true })
-    window.addEventListener('resize', schedule)
+    window.addEventListener('resize', remeasure)
 
     return () => {
+      clearTimeout(timer)
       window.removeEventListener('scroll', schedule)
-      window.removeEventListener('resize', schedule)
+      window.removeEventListener('resize', remeasure)
       for (const { link } of pairs) link.classList.remove('as-toc-on')
     }
   }, [])
