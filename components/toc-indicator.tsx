@@ -35,7 +35,9 @@ export function TocIndicator() {
     // snapping from one section to the next.
     let total = 0
     let starts: number[] = []
-    let ends: number[] = []
+    let mids: number[] = []
+    let dotX: number[] = []
+    let dotY: number[] = []
 
     const measure = () => {
       let d = ''
@@ -44,12 +46,15 @@ export function TocIndicator() {
       let prevY = 0
 
       starts = []
-      ends = []
+      mids = []
+      dotX = []
+      dotY = []
 
       pairs.forEach(({ link }, index) => {
         const x = link.offsetLeft + 0.5
         const top = link.offsetTop
-        const bottom = top + link.offsetHeight
+        const height = link.offsetHeight
+        const bottom = top + height
 
         if (index === 0) {
           d += `M ${x} ${top}`
@@ -59,9 +64,13 @@ export function TocIndicator() {
         }
 
         starts[index] = length
+        // The stroke stops where the dot sits, never past it.
+        mids[index] = length + height / 2
+        dotX[index] = x
+        dotY[index] = top + height / 2
+
         d += ` L ${x} ${bottom}`
-        length += bottom - top
-        ends[index] = length
+        length += height
 
         prevX = x
         prevY = bottom
@@ -108,20 +117,20 @@ export function TocIndicator() {
 
       if (last < 0) {
         activePath.style.strokeDasharray = `0 ${total + 1000}`
+        activePath.style.strokeDashoffset = '0'
         node.style.opacity = '0'
         return
       }
 
       const from = starts[first]
-      const to = ends[last]
+      const to = mids[last]
 
-      activePath.style.strokeDasharray = `0 ${from} ${to - from} ${total + 1000}`
-      activePath.style.strokeDashoffset = '0'
+      activePath.style.strokeDasharray = `${to - from} ${total + 1000}`
+      activePath.style.strokeDashoffset = `${-from}`
 
-      const el = pairs[last].link
       node.style.opacity = '1'
-      node.style.top = `${el.offsetTop + el.offsetHeight / 2}px`
-      node.style.left = `${el.offsetLeft}px`
+      node.style.top = `${dotY[last]}px`
+      node.style.left = `${dotX[last]}px`
     }
 
     const schedule = () => {

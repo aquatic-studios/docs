@@ -288,7 +288,8 @@ samp {
 }
 
 .as-toc-rail--ready .as-toc-rail__active {
-  transition: stroke-dasharray 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: stroke-dasharray 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    stroke-dashoffset 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .nextra-toc ul li > a[class*="font-semibold"] {
@@ -308,15 +309,15 @@ samp {
 
 .as-toc-dot {
   position: absolute;
+  z-index: 1;
   width: 7px;
   height: 7px;
-  margin-top: -3.5px;
-  margin-left: -4px;
   border-radius: 999px;
   background: var(--as-accent);
+  transform: translate(-50%, -50%);
   opacity: 0;
   pointer-events: none;
-  transition: top 0.35s cubic-bezier(0.4, 0, 0.2, 1), left 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+  transition: top 0.4s cubic-bezier(0.4, 0, 0.2, 1), left 0.4s cubic-bezier(0.4, 0, 0.2, 1),
     opacity 0.25s ease;
 }
 
