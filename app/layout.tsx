@@ -3,6 +3,7 @@ import { Head } from 'nextra/components'
 import { getPageMap } from 'nextra/page-map'
 
 import { LastUpdated } from '../components/last-updated'
+import { TocIndicator } from '../components/toc-indicator'
 
 import '@fontsource-variable/inter'
 import 'nextra-theme-docs/style.css'
@@ -73,7 +74,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="en" dir="ltr" suppressHydrationWarning>
       <Head
         color={{ hue: 211, saturation: 100, lightness: { light: 48, dark: 56 } }}
-        backgroundColor={{ light: '#ffffff', dark: '#0a0d14' }}
+        backgroundColor={{ light: '#ffffff', dark: '#080b12' }}
       />
       <body>
         <Layout
@@ -83,7 +84,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           footer={footer}
           sidebar={{ defaultMenuCollapseLevel: 6, toggleButton: true, autoCollapse: false }}
           lastUpdated={<LastUpdated />}
-          toc={{ title: tocTitle, backToTop: 'Scroll to top' }}
+          toc={{ title: tocTitle, backToTop: 'Scroll to top', extraContent: <TocIndicator /> }}
           nextThemes={{ defaultTheme: 'dark' }}
         >
           {children}
