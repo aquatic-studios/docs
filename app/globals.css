@@ -32,10 +32,10 @@
 }
 
 .dark {
-  --as-bg: #080b12;
-  --as-surface: #0f1420;
-  --as-surface-hover: #171d2c;
-  --as-separator: #1a2130;
+  --as-bg: #06080c;
+  --as-surface: #0c1017;
+  --as-surface-hover: #141924;
+  --as-separator: #161b25;
   --as-text: #f2f4f8;
   --as-text-secondary: #9aa4ba;
   --as-nav: #c3cad9;
@@ -250,13 +250,41 @@ samp {
 }
 
 .nextra-toc ul li > a {
+  position: relative;
+  z-index: 1;
   display: block;
-  border-left: 1px solid var(--as-separator);
   padding: 0.34rem 0 0.34rem 0.85rem;
   font-weight: 450 !important;
   line-height: 1.45;
   color: var(--as-text-secondary) !important;
-  transition: color 0.25s ease, border-color 0.25s ease;
+  transition: color 0.25s ease;
+}
+
+.as-toc-rail {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  width: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.as-toc-rail__base,
+.as-toc-rail__active {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.as-toc-rail__base {
+  stroke: var(--as-separator);
+  stroke-width: 1;
+}
+
+.as-toc-rail__active {
+  stroke: var(--as-accent);
+  stroke-width: 1.6;
 }
 
 .nextra-toc ul li > a[class*="font-semibold"] {
@@ -271,7 +299,6 @@ samp {
 .nextra-toc ul li > a.as-toc-on,
 .nextra-toc ul li > a[class*="text-primary"] {
   color: var(--as-accent) !important;
-  border-left-color: var(--as-accent);
   font-weight: 500 !important;
 }
 
