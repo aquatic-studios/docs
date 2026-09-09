@@ -1,0 +1,76 @@
+---
+title: Categories
+description: The themes warps are filed under.
+---
+
+import { Callout } from 'nextra/components'
+
+# Categories
+
+Every warp belongs to one category. They live in `categories.yml`, one block each, and the file is
+free: add, remove or rename whatever you want.
+
+```yaml filename="categories.yml"
+categories:
+  shops:
+    display: '&#56FF00Shops'
+    material: EMERALD
+    slot: 11
+    priority: 1
+    description:
+      - 'Player shops, markets and auctions.'
+```
+
+| Key | What it does |
+| --- | --- |
+| `display` | Name shown everywhere. Colours allowed |
+| `material` | Icon in the categories menu |
+| `slot` | Where it sits in that menu |
+| `priority` | Order in listings and filters |
+| `description` | Lore lines |
+| `fallback` | Marks the category new warps start in |
+| `permission` | Only players with this node can file a warp here |
+
+The key (`shops` above) is the id used in `/aquawarps category <warp> shops` and in
+`%aquawarps_top_*_category%`.
+
+## The fallback
+
+One category must carry `fallback: true`. It is where a new warp lands before its owner picks
+anything, and where a warp falls back to if its category is deleted from the file.
+
+```yaml filename="categories.yml"
+  general:
+    display: '&#54ADF4General'
+    material: COMPASS
+    slot: 10
+    priority: 0
+    fallback: true
+    description:
+      - 'Warps that do not fit anywhere else.'
+```
+
+## Locked categories
+
+```yaml filename="categories.yml"
+  premium:
+    display: '&#FFEE00&lPremium'
+    material: NETHER_STAR
+    slot: 22
+    priority: 10
+    permission: 'aquawarps.category.premium'
+    description:
+      - 'Exclusive category for donator ranks.'
+```
+
+The node is whatever you write there, it does not have to start with `aquawarps.category`.
+
+<Callout type="info">
+  The eleven categories shipped by default are shops, farms, builds, minigames, redstone, adventure,
+  social, bases, ocean, premium and general. Delete the ones you do not want.
+</Callout>
+
+## Filtering
+
+`/aquawarps list <category>` opens the browse menu already filtered. The chest button in that menu
+does the same, and right clicking it clears the filter.

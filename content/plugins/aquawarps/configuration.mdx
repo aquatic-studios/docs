@@ -1,0 +1,215 @@
+---
+title: Configuration
+description: Names, limits, teleport, listings, notifications and chat input.
+---
+
+import { Callout } from 'nextra/components'
+
+# Configuration
+
+Most options apply with `/aquawarps reload`. Storage is the exception and needs a restart.
+
+## Names
+
+```yaml filename="config.yml"
+warp:
+  name:
+    min-length: 3
+    max-length: 16
+    pattern: '^[a-zA-Z0-9_]+$'
+    blacklist:
+      - spawn
+      - admin
+      - staff
+      - server
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `min-length` / `max-length` | `3` / `16` | Name length |
+| `pattern` | letters, digits, `_` | A name must match this regex |
+| `blacklist` | 4 words | Names nobody can take, case insensitive |
+
+Names are typed in commands, so keep the pattern strict.
+
+## Description and tags
+
+```yaml filename="config.yml"
+  description:
+    max-lines: 4
+    max-length: 64
+
+  tags:
+    enabled: true
+    max: 5
+    max-length: 12
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `description.max-lines` | `4` | Lines every warp gets. The `DESCRIPTION_LINE` perk adds more |
+| `description.max-length` | `64` | Characters per line |
+| `tags.enabled` | `true` | Off removes tags and tag search |
+| `tags.max` | `5` | Tags every warp gets. The `TAG_SLOT` perk adds more |
+| `tags.max-length` | `12` | Characters per tag |
+
+## Limits
+
+```yaml filename="config.yml"
+  limits:
+    default: 3
+    permissions:
+      aquawarps.limit.vip: 5
+      aquawarps.limit.mvp: 8
+      aquawarps.limit.legend: 12
+```
+
+The **highest** node the player holds wins, they do not add up. `aquawarps.limit.<number>` works
+without being listed here, and `aquawarps.limit.*` is unlimited. Slots bought with pearls are added
+on top.
+
+## Placement
+
+```yaml filename="config.yml"
+  blocked-worlds: []
+  min-distance: 0
+  safe-teleport: true
+  require-owner-online: false
+  delete-after-inactive-days: 0
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `blocked-worlds` | empty | Worlds where warps cannot be created. Existing ones keep working |
+| `min-distance` | `0` | Blocks a new warp too close to another in the same world. `0` disables it |
+| `safe-teleport` | `true` | Looks for solid ground and air above. Off uses the exact coordinates |
+| `require-owner-online` | `false` | Only allows travel while the owner is connected |
+| `delete-after-inactive-days` | `0` | Deletes warps of long absent owners. `0` disables it |
+
+`blocked-worlds` is bypassed with `aquawarps.bypass.world`, `min-distance` with `aquawarps.admin`.
+
+## Teleport
+
+```yaml filename="config.yml"
+teleport:
+  warmup-seconds: 3
+  cancel-on-move: true
+  cancel-on-damage: true
+  cooldown-seconds: 10
+  countdown-actionbar: true
+  countdown-title: true
+  warmup-particle: WATER_WAKE
+  warmup-sound: BLOCK_NOTE_BLOCK_BIT
+  arrive-particle: WATER_SPLASH
+  arrive-sound: ENTITY_DOLPHIN_SPLASH
+  enable-back: true
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `warmup-seconds` | `3` | Seconds standing still. `0` teleports instantly |
+| `cancel-on-move` / `cancel-on-damage` | `true` | What interrupts the countdown |
+| `cooldown-seconds` | `10` | Wait between one travel and the next |
+| `countdown-actionbar` / `countdown-title` | `true` | Where the countdown is drawn |
+| `warmup-*` / `arrive-*` | — | Effects. `NONE` or `""` disables one |
+| `enable-back` | `true` | Whether `/aquawarps back` works |
+
+The order of checks is ban, privacy, password, cooldown, fee, then the countdown. Each step has its
+own bypass permission.
+
+## Listings
+
+```yaml filename="config.yml"
+listing:
+  default-sort: TRENDING
+  promoted-first: true
+  hide-private: true
+  show-world: true
+  show-coordinates: false
+  tags-in-lore: 3
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `default-sort` | `TRENDING` | Order a menu opens with |
+| `promoted-first` | `true` | Promoted warps sit on top whatever the sort is |
+| `hide-private` | `true` | Keeps private warps out. Trusted players still see them |
+| `show-world` / `show-coordinates` | `true` / `false` | Extra lines on the icon |
+| `tags-in-lore` | `3` | Tags printed on the icon, the rest are cut |
+
+Sorts: `TRENDING`, `RATING`, `VISITS`, `NEWEST`, `OLDEST`, `ALPHABETICAL`, `FAVORITES`, `LEVEL`.
+Players change it from the hopper in any listing.
+
+## Trending
+
+```yaml filename="config.yml"
+trending:
+  window-days: 7
+  visit-weight: 1.0
+  unique-weight: 2.5
+  rating-weight: 8.0
+  favorite-weight: 4.0
+  decay-per-day: 0.82
+  recalculate-minutes: 5
+```
+
+Only visits from the last `window-days` count, and each one is worth `decay-per-day` of its value
+for every day that passes. At `0.82` a visit keeps 82% each day. `1.0` never fades.
+
+<Callout type="info">
+  `recalculate-minutes` is the only heavy option here. Lowering it on a big server means recomputing
+  every warp more often.
+</Callout>
+
+## Notifications
+
+```yaml filename="config.yml"
+notifications:
+  owner-on-visit: true
+  owner-on-rating: true
+  broadcast-new-warps: false
+  broadcast-level-up: true
+```
+
+The first two message the owner, the last two go to the whole server.
+
+## Chat input
+
+Used whenever the plugin asks a player to write something: a name, a description, a tag, a password,
+a fee, a review.
+
+```yaml filename="config.yml"
+input:
+  timeout-seconds: 60
+  cancel-words:
+    - cancel
+    - exit
+    - quit
+  bossbar: true
+  bossbar-color: BLUE
+  bossbar-style: PROGRESS
+  title: true
+  sound-open: BLOCK_NOTE_BLOCK_PLING
+  sound-success: ENTITY_PLAYER_LEVELUP
+  sound-cancel: BLOCK_NOTE_BLOCK_BASS
+```
+
+Colours: `BLUE`, `GREEN`, `PINK`, `PURPLE`, `RED`, `WHITE`, `YELLOW`.
+Styles: `PROGRESS`, `NOTCHED_6`, `NOTCHED_10`, `NOTCHED_12`, `NOTCHED_20`.
+
+Clicking the message in chat cancels too, and so does `/aquawarps input cancel`.
+
+## Icons and particles
+
+```yaml filename="config.yml"
+menu:
+  icons:
+    - GRASS_BLOCK
+    - EMERALD
+  particles:
+    - NONE
+    - WATER_SPLASH
+```
+
+What owners can pick from. Icons need the `CUSTOM_ICON` perk, particles need `PARTICLE`. Keep `NONE`
+first in `particles` so the effect can be turned off.

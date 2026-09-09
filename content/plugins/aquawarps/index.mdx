@@ -1,0 +1,55 @@
+---
+title: AquaWarps
+description: Player made warps with categories, ratings, promotions, levels and a passport.
+asIndexPage: true
+---
+
+import { Callout } from 'nextra/components'
+
+# AquaWarps
+
+Players publish their own warps. Everyone else browses, rates, saves and visits them from a menu.
+Warps gain levels, owners earn a currency from their visitors, and the busiest ones climb the
+listings on their own.
+
+| | |
+| --- | --- |
+| **Base command** | `/aquawarps` |
+| **Aliases** | `/pwarp`, `/pwarps`, `/playerwarps`, `/aqwarps`, `/aqw`, `/aw` |
+| **Minecraft** | `1.16+` |
+| **Folia** | Supported |
+| **Storage** | SQLite, MySQL, MariaDB or H2 |
+| **Soft-depend** | PlaceholderAPI, Vault |
+| **Source** | [GitHub](https://github.com/aquatic-studios/AquaWarps) |
+
+## A warp
+
+1. `/aquawarps create <name>` saves where the player stands and opens the edit menu.
+2. The owner writes a description and picks a category, tags, an icon and a privacy mode.
+3. It shows up in `/aquawarps` for everyone.
+4. Visits, ratings and favourites give the warp experience and pay the owner in pearls.
+
+## Privacy
+
+| Access | Who can travel |
+| --- | --- |
+| `PUBLIC` | Anyone |
+| `PASSWORD` | Anyone who types the password |
+| `PRIVATE` | The owner and trusted players |
+
+On top of that every warp has a trust list, a ban list and an open toggle that closes it to
+everyone at once.
+
+## Files
+
+| File | Holds |
+| --- | --- |
+| `config.yml` | Storage, limits, teleport, economy, levels, moderation |
+| `categories.yml` | The categories warps are filed under |
+| `messages.yml` | Every string |
+| `menus/*.yml` | 30 menus, one file each |
+
+<Callout type="info">
+  Everything is reachable from a menu. `/aquawarps` opens the main one, the commands are there for
+  players who prefer typing.
+</Callout>

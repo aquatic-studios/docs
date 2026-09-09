@@ -1,0 +1,91 @@
+---
+title: Levels
+description: How a warp earns experience and what each level unlocks.
+---
+
+import { Callout } from 'nextra/components'
+
+# Levels
+
+Warps level up, not players. A busy warp unlocks things its owner cannot buy.
+
+```yaml filename="config.yml"
+level:
+  enabled: true
+  max-level: 25
+  base: 100
+  exponent: 1.45
+  experience:
+    visit: 3
+    unique-visit: 10
+    rating: 25
+    favorite: 15
+```
+
+| Action | Experience |
+| --- | --- |
+| A visit | `3` |
+| A visit from someone new | `10` |
+| A rating | `25` |
+| A save | `15` |
+
+`enabled: false` hides levels everywhere.
+
+## The curve
+
+```
+experience for level N = base * (N - 1) ^ exponent
+```
+
+With the defaults, level 2 needs 100, level 5 needs 746, level 10 needs 2419 and level 25 needs
+10030. Raising `exponent` stretches the late levels much harder than raising `base`.
+
+## Perks
+
+```yaml filename="config.yml"
+  perks:
+    3:
+      - DESCRIPTION_LINE
+    5:
+      - CUSTOM_ICON
+      - TAG_SLOT
+    8:
+      - DESCRIPTION_LINE
+      - PARTICLE
+    12:
+      - TAG_SLOT
+    15:
+      - DESCRIPTION_LINE
+      - GLOW
+    20:
+      - TAG_SLOT
+      - DISCOUNT
+```
+
+| Perk | Unlocks |
+| --- | --- |
+| `DESCRIPTION_LINE` | One more description line |
+| `TAG_SLOT` | One more tag |
+| `CUSTOM_ICON` | Picking the menu icon |
+| `PARTICLE` | An effect played on arrival |
+| `GLOW` | Enchant glint on the icon |
+| `DISCOUNT` | 10% off promotions |
+
+Perks are kept for good once reached. They also **stack**: a warp at level 15 has three
+`DESCRIPTION_LINE` entries behind it, so it gets three extra lines on top of
+`warp.description.max-lines`.
+
+<Callout type="info">
+  `DISCOUNT` stacks the same way, 10% per entry, but never past half price.
+</Callout>
+
+Any level and any perk list works. Levels with no entry simply grant nothing.
+
+## Level up
+
+```yaml filename="config.yml"
+notifications:
+  broadcast-level-up: true
+```
+
+Announces it to the whole server. The owner is told either way.

@@ -1,0 +1,67 @@
+---
+title: Passport
+description: Stamps, ranks and milestone rewards.
+---
+
+import { Callout } from 'nextra/components'
+
+# Passport
+
+Every warp a player visits for the first time leaves a stamp. Stamps raise their rank and pay out at
+milestones.
+
+```yaml filename="config.yml"
+passport:
+  enabled: true
+```
+
+`/aquawarps passport` opens it. `enabled: false` turns the whole thing off, command included.
+
+## Ranks
+
+```yaml filename="config.yml"
+  ranks:
+    0: '&7Drifter'
+    10: '&#54ADF4Navigator'
+    25: '&#00C6FFCorsair'
+    50: '&#FFA42DCaptain'
+    100: '&#FFEE00&lLegend of the Sea'
+```
+
+The key is the number of stamps that earns the title, and it holds until the next entry.
+
+<Callout type="warning">
+  Keep an entry at `0`, otherwise players below the lowest number have no rank at all.
+</Callout>
+
+Add or remove entries freely.
+
+## Milestones
+
+```yaml filename="config.yml"
+  milestones:
+    5:
+      pearls: 25.0
+      commands: []
+    50:
+      pearls: 300.0
+      commands:
+        - 'give %player% heart_of_the_sea 1'
+```
+
+| Key | What it does |
+| --- | --- |
+| `pearls` | Paid to the player |
+| `commands` | Run from the console. `%player%` is the visitor |
+
+Claimed once each. The defaults pay out at 5, 15, 30, 50 and 100 stamps.
+
+## Placeholders
+
+| Placeholder | Returns |
+| --- | --- |
+| `%aquawarps_stamps%` | How many stamps |
+| `%aquawarps_rank%` | The current title, coloured |
+| `%aquawarps_rank_plain%` | Same without colours |
+| `%aquawarps_next_rank%` | The next title, or the max rank text |
+| `%aquawarps_rank_progress%` | A 20 segment bar to the next rank |

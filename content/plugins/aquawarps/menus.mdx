@@ -1,0 +1,181 @@
+---
+title: Menus
+description: Thirty menu files, the buttons inside them and the actions they run.
+---
+
+import { Callout } from 'nextra/components'
+
+# Menus
+
+One file per menu in `menus/`. Same shape in all of them.
+
+```
+main · browse · categories · trending · newest · all_warps · my_warps · favorites
+tops · top_rated · top_visits · top_favorites · top_level · sort
+passport · stamps · admin · reports
+warp_edit · warp_info · warp_icons · warp_particles · warp_categories
+warp_promote · warp_rate · warp_reviews · warp_report · warp_trusted
+warp_bans · warp_delete
+```
+
+Open any of them with `/aquawarps open <menu> [warp]`.
+
+## Structure
+
+```yaml filename="menus/main.yml"
+menu_title: '&8AquaWarps'
+size: 45
+
+items:
+  browse:
+    material: COMPASS
+    slot: 10
+    display_name: '&#FFEE00&lBrowse Warps'
+    lore:
+      - '&7Walk through every warp the'
+      - '&7community has published.'
+      - ''
+      - '&#54ADF4Total warps: &f%aquawarps_total%'
+    left_click_commands:
+      - '[menu] browse'
+```
+
+| Key | What it does |
+| --- | --- |
+| `menu_title` | GUI title |
+| `size` | Slots, a multiple of 9 |
+| `material` | Any material of your version |
+| `slot` | Where it goes |
+| `display_name` | Item name |
+| `lore` | Item lore |
+| `amount` | Stack size |
+| `glow` | Enchant glint |
+| `model_data` | Custom model data |
+| `head` | Player name or `%viewer%`, needs `PLAYER_HEAD` |
+| `permission` | Hides the button from players without it |
+
+Clicks: `left_click_commands`, `right_click_commands`, `shift_left_click_commands`,
+`shift_right_click_commands`.
+
+<Callout type="info">
+  A lore line that renders to `<skip>` is dropped instead of printed. That is how optional lines
+  disappear cleanly, like the description of a category that has none.
+</Callout>
+
+## Lists
+
+A menu that shows warps uses `content` instead of fixed items. One entry is rendered per result and
+paged across the slots you give it.
+
+```yaml filename="menus/browse.yml"
+content:
+  source: warps
+  slots: [0, 1, 2, 3, 4, 5, 6, 7, 8]
+  item:
+    material: GRASS_BLOCK
+    display_name: '%promotion_prefix%&#FFEE00&l%name%'
+    lore:
+      - '&7by &f%owner%'
+      - '&#54ADF4Rating: %stars% &7(%votes%)'
+    left_click_commands:
+      - '[warp] %name%'
+    right_click_commands:
+      - '[menu] warp_info %name%'
+  empty:
+    material: STRUCTURE_VOID
+    display_name: '&#FFA42D&lNo warps'
+  previous:
+    material: ARROW
+    slot: 48
+  next:
+    material: ARROW
+    slot: 50
+```
+
+| Key | What it does |
+| --- | --- |
+| `source` | Where the entries come from |
+| `slots` | Slots they fill, in order |
+| `item` | Template for one entry |
+| `empty` | Shown when there is nothing |
+| `previous` / `next` | Page arrows |
+
+### Sources
+
+| Source | Lists |
+| --- | --- |
+| `warps` | Everything visible, with the player's sort, filter and search applied |
+| `all_warps` | Everything, newest first. Staff also see hidden warps |
+| `trending`, `top_rated`, `top_visits`, `top_favorites`, `top_level`, `newest` | One fixed ranking each |
+| `my_warps` | The viewer's own |
+| `favorites` | The ones they saved |
+| `categories` | The categories |
+| `reviews` | Reviews left on a warp |
+| `trusted` / `banned` | That warp's lists |
+| `promotion_tiers` | The tiers from the config |
+| `icons` / `particles` | The pickers |
+| `report_reasons` | The reasons from the config |
+| `reports` | Pending reports |
+| `milestones` / `stamps` | Passport contents |
+| `sort_modes` | The sort options |
+
+## Actions
+
+Generic:
+
+| Action | Does |
+| --- | --- |
+| `[menu] <name> [warp]` | Opens another menu |
+| `[close]` | Closes |
+| `[refresh]` | Redraws it in place |
+| `[player] <command>` | Runs a command as the player |
+| `[console] <command>` | Runs it from the console |
+| `[message] <text>` | Sends a line |
+| `[sound] <sound>` | Plays a sound |
+
+AquaWarps:
+
+| Action | Does |
+| --- | --- |
+| `[warp] <name>` | Travels there |
+| `[random]` | Travels to a warp never visited |
+| `[favorite] <name>` | Saves or unsaves |
+| `[rate] <name> <1-5>` | Leaves stars |
+| `[unrate]` | Removes the rating |
+| `[reviews]` | Opens the reviews |
+| `[promote] <tier>` | Buys a promotion |
+| `[icon] <material>` / `[hand-icon]` | Sets the icon |
+| `[particle] <particle>` | Sets the arrival effect |
+| `[category] <name> <category>` | Files it |
+| `[access]` | Cycles public, password, private |
+| `[toggle]` | Opens or closes the warp |
+| `[clear-password]` / `[clear-description]` / `[remove-tag]` | Clears one thing |
+| `[relocate]` | Moves it here |
+| `[delete]` | Deletes it |
+| `[trust]` / `[untrust]` / `[ban]` / `[unban]` | Visitor lists |
+| `[report] <reason>` | Reports it |
+| `[sort] next\|previous` | Changes the order |
+| `[filter] <category>\|clear` | Changes the filter |
+| `[clear-search]` | Drops the search |
+| `[buy-slot]` | Buys a warp slot |
+| `[feature]` / `[hide]` | Staff flags |
+| `[resolve]` / `[resolve-delete]` | Closes a report, optionally deleting the warp |
+| `[input] <type> [menu]` | Asks in chat, then reopens that menu |
+
+`[input]` accepts `create`, `search`, `rename`, `description`, `tag`, `password`, `fee`, `comment`,
+`trust`, `ban` and `purge`.
+
+## Placeholders inside a menu
+
+Any `%aquawarps_*%` works everywhere. Inside a `content` item the warp's own values are available
+without a prefix:
+
+```
+%name% %owner% %description% %category% %stars% %rating% %votes%
+%visits% %unique_visits% %favorites% %level% %level_bar% %tags%
+%world% %x% %y% %z% %access% %state% %fee% %created_ago%
+%promotion% %promotion_prefix% %your_rating% %favorite%
+```
+
+Buttons outside the list reach the same values with a `%warp_` prefix, for example `%warp_name%` in
+`warp_edit.yml`. Paged menus also expose `%page%`, `%pages%` and `%total%`.

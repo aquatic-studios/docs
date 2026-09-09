@@ -1,0 +1,99 @@
+---
+title: Placeholders
+description: Server totals, player values and warp rankings through PlaceholderAPI.
+---
+
+import { Callout } from 'nextra/components'
+
+# Placeholders
+
+AquaWarps registers one PlaceholderAPI expansion, `aquawarps`. Every placeholder below also works
+inside menu files without PlaceholderAPI installed.
+
+<Callout type="info">
+  PlaceholderAPI is optional. Without it the plugin works fully, only placeholders from **other**
+  plugins written inside AquaWarps menus stop being replaced.
+</Callout>
+
+## Server
+
+These need no player, so they work on the console and in server wide displays.
+
+| Placeholder | Returns |
+| --- | --- |
+| `%aquawarps_total%` | Warps on the server |
+| `%aquawarps_promoted%` | Promotions active right now |
+| `%aquawarps_hidden%` | Hidden warps |
+| `%aquawarps_categories%` | Categories registered |
+| `%aquawarps_reports%` | Pending reports |
+| `%aquawarps_currency%` | The pearls name from the config |
+| `%aquawarps_create_cost%` | Price of creating a warp |
+
+## Player
+
+| Placeholder | Returns |
+| --- | --- |
+| `%aquawarps_warps%` | Warps they own |
+| `%aquawarps_limit%` | How many they may own |
+| `%aquawarps_pearls%` | Balance, formatted |
+| `%aquawarps_pearls_raw%` | Balance as a whole number |
+| `%aquawarps_extra_slots%` | Slots bought |
+| `%aquawarps_max_extra_slots%` | Slots they may buy |
+| `%aquawarps_slot_cost%` | Price of their next slot |
+| `%aquawarps_visits%` | Visits their warps have received |
+| `%aquawarps_favorites%` | Warps they saved |
+| `%aquawarps_stamps%` | Passport stamps |
+| `%aquawarps_rank%` | Passport title |
+| `%aquawarps_rank_plain%` | Same without colours |
+| `%aquawarps_next_rank%` | The next title |
+| `%aquawarps_rank_progress%` | Progress bar to it |
+| `%aquawarps_sort%` | Their current sort |
+| `%aquawarps_sort_list%` | Every sort, with theirs marked |
+| `%aquawarps_filter%` | Their category filter |
+| `%aquawarps_search%` | Their search text |
+
+`%aquawarps_limit%` prints the unlimited text for anyone holding `aquawarps.limit.*`.
+
+## Rankings
+
+```
+%aquawarps_top_<sort>_<position>_<field>%
+```
+
+Three parts joined by `_`:
+
+| Part | Is |
+| --- | --- |
+| `sort` | `trending`, `rating`, `visits`, `newest`, `oldest`, `alphabetical`, `favorites` or `level` |
+| `position` | `1` for the first place |
+| `field` | What to print |
+
+Fields: `name`, `owner`, `visits`, `rating`, `stars`, `votes`, `favorites`, `level`, `category`.
+
+```
+%aquawarps_top_visits_1_name%
+%aquawarps_top_rating_3_owner%
+%aquawarps_top_level_1_stars%
+```
+
+A position past the end returns `-`. An unknown sort falls back to visits.
+
+## Fallbacks
+
+Printed when a placeholder has no warp behind it, like an empty menu slot.
+
+```yaml filename="config.yml"
+placeholders:
+  no-warp:
+    name: '&7None'
+    owner: '&7Nobody'
+    category: '&7Uncategorised'
+    description: '&7No description'
+
+  stars:
+    full: '&#FFEE00⭐'
+    empty: '&8⭐'
+```
+
+`stars` is what `%stars%` and `%aquawarps_top_*_stars%` are built from. Colours are optional and
+take `&6`, `&#FFAA00` or `<gold>`.

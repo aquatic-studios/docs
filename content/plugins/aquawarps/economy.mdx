@@ -1,0 +1,122 @@
+---
+title: Economy
+description: Vault money, pearls, entry fees, extra slots and promotions.
+---
+
+import { Callout } from 'nextra/components'
+
+# Economy
+
+Two currencies. **Vault** is your server's real money and needs Vault plus an economy plugin.
+**Pearls** is the plugin's own currency, earned by owning warps people actually visit.
+
+```yaml filename="config.yml"
+economy:
+  enabled: true
+  provider: VAULT
+  create-cost: 1000.0
+  rename-cost: 250.0
+  relocate-cost: 100.0
+```
+
+`provider` picks which currency pays for warp actions. `enabled: false` makes everything free and
+ignores every price below.
+
+| Key | Default | Charged when |
+| --- | --- | --- |
+| `create-cost` | `1000` | Creating a warp |
+| `rename-cost` | `250` | Renaming one |
+| `relocate-cost` | `100` | Moving one |
+
+`0` makes that action free.
+
+## Pearls
+
+```yaml filename="config.yml"
+pearls:
+  enabled: true
+  name: 'Pearls'
+  starting-amount: 50.0
+  reward-unique-visit: 2.0
+  reward-rating: 5.0
+  reward-favorite: 3.0
+  reward-visitor-discovery: 1.0
+  daily-cap: 100.0
+```
+
+| Key | Default | Who gets it |
+| --- | --- | --- |
+| `starting-amount` | `50` | Given once, the first time a player is loaded |
+| `reward-unique-visit` | `2` | The owner, per new visitor |
+| `reward-rating` | `5` | The owner, per rating |
+| `reward-favorite` | `3` | The owner, per save |
+| `reward-visitor-discovery` | `1` | The **visitor**, on a warp they had never seen |
+| `daily-cap` | `100` | Most one warp can earn per day. `0` is unlimited |
+
+Only the first visit of each player pays. Staff edit balances with
+`/aquawarps admin pearls <give|take|set> <player> <amount>`.
+
+## Entry fees
+
+An owner can charge visitors with `/aquawarps fee <warp> <amount>` or from the edit menu.
+
+```yaml filename="config.yml"
+  fee:
+    max: 5000.0
+    tax-percent: 5.0
+```
+
+The server keeps `tax-percent` and the owner gets the rest. Fees are ignored for anyone with
+`aquawarps.bypass.fee`, and the money is only taken once the countdown finishes.
+
+## Extra slots
+
+Players buy warp slots on top of their permission limit.
+
+```yaml filename="config.yml"
+  extra-slot:
+    cost: 5000.0
+    multiplier: 1.75
+    max: 5
+```
+
+Each slot already bought multiplies the price of the next one, so with the defaults every slot is
+75% dearer than the last. `multiplier: 1.0` keeps the price flat. `max` is the total a player can
+buy.
+
+## Promotions
+
+Owners pay to push a warp above everything else in the listings.
+
+```yaml filename="config.yml"
+promotion:
+  enabled: true
+  max-active: 12
+  currency: PEARLS
+  tiers:
+    current:
+      display: '&#54ADF4&lCurrent'
+      material: PRISMARINE_SHARD
+      priority: 1
+      duration-hours: 24
+      price: 150.0
+      glow: false
+```
+
+| Key | What it does |
+| --- | --- |
+| `display` | Name on the tier button and the warp prefix |
+| `material` | Icon in the promote menu |
+| `priority` | Higher sits above the other promoted warps |
+| `duration-hours` | How long it lasts |
+| `price` | Cost in the currency above |
+| `glow` | Enchant glint on the warp icon |
+
+`max-active` caps how many warps can be promoted at once. Nobody can buy while it is full. `0` is
+unlimited. Add or remove tiers freely, the key is the id used by `/aquawarps promote <warp> <tier>`.
+
+<Callout type="info">
+  The `DISCOUNT` perk takes 10% off the price for every stack the warp has unlocked, down to half.
+</Callout>
+
+The three tiers shipped by default are `current` (24h), `tide` (72h) and `tsunami` (168h).

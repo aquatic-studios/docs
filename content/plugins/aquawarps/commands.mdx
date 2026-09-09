@@ -1,0 +1,120 @@
+---
+title: Commands
+description: Every AquaWarps command and permission.
+---
+
+import { Callout } from 'nextra/components'
+
+# Commands
+
+Base `/aquawarps`. Aliases: `/pwarp`, `/pwarps`, `/playerwarps`, `/aqwarps`, `/aqw`, `/aw`.
+
+## Browsing
+
+| Command | Permission | What it does |
+| --- | --- | --- |
+| `/aquawarps` | `aquawarps.command` | Opens the main menu |
+| `/aquawarps list [category]` | `aquawarps.list` | Browse menu, filtered to a category if given. Alias `browse` |
+| `/aquawarps search [text]` | `aquawarps.search` | Filters by name, owner or tag. Alias `find` |
+| `/aquawarps top` | `aquawarps.top` | Rankings. Aliases `tops`, `ranking` |
+| `/aquawarps info <warp>` | `aquawarps.info` | Detail card for a warp. Alias `view` |
+| `/aquawarps open <menu> [warp]` | `aquawarps.command` | Opens any menu by name |
+
+Without text, `search` asks for it in chat. Running `/aquawarps open` alone lists every menu name.
+
+## Travelling
+
+| Command | Permission | What it does |
+| --- | --- | --- |
+| `/aquawarps go <warp> [password]` | `aquawarps.teleport` | Travels there. Aliases `tp`, `teleport`, `warp`, `visit` |
+| `/aquawarps random` | `aquawarps.random` | Sends you to a warp you have never visited. Alias `surprise` |
+| `/aquawarps back` | `aquawarps.back` | Returns to where you were before the last travel. Alias `return` |
+
+## Your warps
+
+| Command | Permission | What it does |
+| --- | --- | --- |
+| `/aquawarps create [name]` | `aquawarps.create` | Creates one where you stand. Aliases `add`, `new` |
+| `/aquawarps delete <warp>` | `aquawarps.delete` | Deletes it. Aliases `remove`, `del` |
+| `/aquawarps edit <warp>` | `aquawarps.edit` | Opens the edit menu. Alias `manage` |
+| `/aquawarps mine` | `aquawarps.command` | Your warps. Aliases `my`, `mywarps` |
+| `/aquawarps pearls` | `aquawarps.pearls` | Your balance. Alias `balance` |
+| `/aquawarps passport` | `aquawarps.passport` | Your stamps. Alias `stamps` |
+
+Without a name, `create` asks for it in chat.
+
+## Editing
+
+Every one of these needs you to own the warp.
+
+| Command | Permission | What it does |
+| --- | --- | --- |
+| `/aquawarps rename <warp> <new name>` | `aquawarps.edit` | Renames it |
+| `/aquawarps description <warp> <text\|clear>` | `aquawarps.edit` | Adds a description line, or wipes them all. Alias `desc` |
+| `/aquawarps category <warp> <category>` | `aquawarps.edit` | Files it under a category. Alias `cat` |
+| `/aquawarps icon <warp> [material]` | `aquawarps.edit` | Sets the menu icon, or uses the item in your hand |
+| `/aquawarps relocate <warp>` | `aquawarps.edit` | Moves it to where you stand. Aliases `move`, `setloc` |
+| `/aquawarps fee <warp> <amount>` | `aquawarps.edit` | Entry fee charged to visitors. Aliases `toll`, `price` |
+| `/aquawarps tag <warp> <add\|remove> <tag>` | `aquawarps.tags` | Adds or removes a tag. Alias `tags` |
+
+Tags are lowercased and stripped of `#`. Only letters and digits are allowed.
+
+<Callout type="info">
+  Colour codes in descriptions and reviews are stripped unless the player has `aquawarps.format`.
+  Picking an icon needs the `CUSTOM_ICON` perk, which a warp unlocks by levelling.
+</Callout>
+
+## Visitors
+
+| Command | Permission | What it does |
+| --- | --- | --- |
+| `/aquawarps trust <warp> <player>` | `aquawarps.trust` | Lets them in even when it is private |
+| `/aquawarps untrust <warp> <player>` | `aquawarps.trust` | Takes that back |
+| `/aquawarps ban <warp> <player>` | `aquawarps.ban` | Blocks them from travelling there |
+| `/aquawarps unban <warp> <player>` | `aquawarps.ban` | Lifts it |
+
+Trusting a banned player unbans them, and banning a trusted one untrusts them.
+
+## Social
+
+| Command | Permission | What it does |
+| --- | --- | --- |
+| `/aquawarps favorite <warp>` | `aquawarps.favorite` | Saves or unsaves it. Alias `fav` |
+| `/aquawarps favorites` | `aquawarps.favorite` | Your saved warps. Alias `favs` |
+| `/aquawarps rate <warp> <1-5> [review]` | `aquawarps.rate` | Stars, with an optional written review. Aliases `vote`, `review` |
+| `/aquawarps promote <warp> [tier]` | `aquawarps.promote` | Buys a promotion. Without a tier it opens the menu. Aliases `promotion`, `boost` |
+| `/aquawarps report <warp> [reason]` | `aquawarps.report` | Reports it. Without a reason it opens the menu |
+
+## Chat input
+
+When the plugin asks for something in chat, `/aquawarps input cancel` drops the request. Typing
+`cancel`, `exit` or `quit` does the same.
+
+`/aquawarps input test` prints which chat channel the plugin is using and sends a clickable line to
+prove it works.
+
+## Permissions
+
+| Permission | Default | Grants |
+| --- | --- | --- |
+| `aquawarps.limit.<number>` | `aquawarps.limit.3` | That many warps |
+| `aquawarps.limit.*` | — | Unlimited warps |
+| `aquawarps.icon.custom` | op | Pick any icon, ignoring the perk |
+| `aquawarps.format` | op | Colour codes in descriptions and reviews |
+| `aquawarps.category.<id>` | — | Whatever node a category asks for |
+| `aquawarps.admin` | op | The admin commands, the admin menu and report notices |
+| `aquawarps.reload` | op | `/aquawarps reload` |
+
+The limit is the **highest** node the player holds, not the sum. Slots bought with pearls are added
+on top of it.
+
+## Bypasses
+
+| Permission | Ignores |
+| --- | --- |
+| `aquawarps.bypass.cooldown` | The wait between travels |
+| `aquawarps.bypass.warmup` | The countdown |
+| `aquawarps.bypass.fee` | Entry fees |
+| `aquawarps.bypass.ban` | Being banned from a warp |
+| `aquawarps.bypass.private` | Private and password warps |
+| `aquawarps.bypass.world` | Blocked worlds |

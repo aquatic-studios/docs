@@ -7,5 +7,6 @@ export default {
   aquashulk: 'AquaShulk',
   aquaspawn: 'AquaSpawn',
   aquatac: 'AquaTac',
-  aquatebex: 'AquaTebex'
+  aquatebex: 'AquaTebex',
+  aquawarps: 'AquaWarps'
 } satisfies MetaRecord

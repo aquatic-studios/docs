@@ -1,0 +1,90 @@
+---
+title: Admin
+description: Staff commands, reports and cleanup.
+---
+
+import { Callout } from 'nextra/components'
+
+# Admin
+
+Everything here needs `aquawarps.admin`. `/aquawarps admin` with no arguments opens the staff menu.
+
+| Command | What it does |
+| --- | --- |
+| `/aquawarps admin delete <warp>` | Deletes any warp |
+| `/aquawarps admin feature <warp>` | Toggles the featured flag |
+| `/aquawarps admin hide <warp>` | Toggles hidden, which pulls it out of the listings |
+| `/aquawarps admin owner <warp> <player>` | Transfers ownership |
+| `/aquawarps admin tp <warp>` | Travels there ignoring every check |
+| `/aquawarps admin reports` | Pending reports |
+| `/aquawarps admin pearls <give\|take\|set> <player> <amount>` | Edits a balance |
+| `/aquawarps admin purge <days>` | Deletes warps whose owner has not logged in for that long |
+| `/aquawarps admin stats` | Totals and the storage in use |
+| `/aquawarps reload` | Reloads the config, messages, categories and menus. Alias `rl` |
+
+Hidden is not deleted. Staff see hidden warps in the listings and can put them back at any time.
+
+<Callout type="warning">
+  `purge` removes warps permanently, and their ratings and favourites go with them. There is no
+  confirmation.
+</Callout>
+
+## Reports
+
+Players report a warp from its menu or with `/aquawarps report <warp> [reason]`. The reasons offered
+in the menu come from the config.
+
+```yaml filename="config.yml"
+moderation:
+  reports: true
+  reasons:
+    - 'Inappropriate content'
+    - 'Trap warp'
+    - 'Advertising'
+    - 'Offensive name'
+    - 'Other'
+  auto-hide-after: 5
+  notify-staff: true
+  cooldown-minutes: 5
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `reports` | `true` | Off hides the report button |
+| `reasons` | 5 entries | What the report menu offers |
+| `auto-hide-after` | `5` | Reports before a warp hides itself. `0` disables it |
+| `notify-staff` | `true` | Tells everyone with `aquawarps.admin` when one comes in |
+| `cooldown-minutes` | `5` | Wait before the same player can report again |
+
+The reports menu closes a report in two ways: resolve it and leave the warp alone, or resolve it and
+delete the warp.
+
+## Storage
+
+```yaml filename="config.yml"
+storage:
+  type: SQLITE
+  mysql:
+    host: localhost
+    port: 3306
+    database: aquawarps
+    username: root
+    password: ''
+    ssl: false
+```
+
+`SQLITE`, `MYSQL`, `MARIADB` or `H2`. The driver is downloaded on startup. Seven tables are created,
+all prefixed `aquawarps_`.
+
+<Callout type="warning">
+  Changing the type needs a restart and **does not migrate** anything. The new database starts empty.
+</Callout>
+
+## Automatic cleanup
+
+```yaml filename="config.yml"
+warp:
+  delete-after-inactive-days: 0
+```
+
+Checked once a day. `0` disables it. `/aquawarps admin purge <days>` does the same on demand.
