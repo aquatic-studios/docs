@@ -164,7 +164,8 @@ samp {
 
 .nextra-sidebar li > a,
 .nextra-sidebar li > button {
-  border-radius: var(--as-r-sm) !important;
+  position: relative;
+  border-radius: 0 !important;
   padding: 0.42rem 0.65rem !important;
   color: var(--as-nav) !important;
   font-weight: 450;
@@ -173,15 +174,25 @@ samp {
 
 .nextra-sidebar li > a:hover,
 .nextra-sidebar li > button:hover {
-  background: var(--as-surface) !important;
+  background: var(--as-tint) !important;
   color: var(--as-text) !important;
 }
 
 .nextra-sidebar li.active > a {
-  background: var(--as-accent-tint) !important;
+  background: var(--as-surface) !important;
   color: var(--as-accent) !important;
-  font-weight: 600 !important;
-  box-shadow: inset 2px 0 0 0 var(--as-accent);
+  font-weight: 500 !important;
+  box-shadow: none;
+}
+
+.nextra-sidebar li.active > a::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 2px;
+  background: var(--as-accent);
 }
 
 .nextra-sidebar li:has(> ul) > a,

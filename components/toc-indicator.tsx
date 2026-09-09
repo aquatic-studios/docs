@@ -77,7 +77,10 @@ export function TocIndicator() {
       })
 
       total = length
-      svg.style.height = `${list.scrollHeight}px`
+      // Sizing this from scrollHeight feeds back into it: the rail is absolutely
+      // positioned inside the list, so it grows the scrollable area, which grows
+      // the rail again and leaves the list with a scrollbar it never needed.
+      svg.style.height = `${prevY}px`
       basePath.setAttribute('d', d)
       activePath.setAttribute('d', d)
     }
