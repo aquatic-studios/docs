@@ -1,0 +1,106 @@
+---
+title: Mobs
+description: The mob catalog, per mob rates, tiers and permissions.
+---
+
+import { Callout } from 'nextra/components'
+
+# Mobs
+
+Every spawnable mob of your server version already works. `mobs.yml` only exists to change something
+about one.
+
+## Defaults
+
+Applied to any mob you do not list.
+
+```yaml filename="mobs.yml"
+defaults:
+  enabled: true
+  permission: ""
+  delay: 200
+  min-delay: 200
+  max-delay: 800
+  count: 4
+  max-nearby: 6
+  player-range: 16
+  spawn-range: 4
+  tier: 1
+  max-per-player: 0
+  icon: SPAWNER
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `enabled` | `true` | Whether unlisted mobs can be used at all |
+| `permission` | empty | Node needed for an unlisted mob. `%mob%` becomes the lowercase name |
+| `delay` | `200` | Ticks before the first spawn after placing |
+| `min-delay` / `max-delay` | `200` / `800` | Random delay between cycles |
+| `count` | `4` | Mobs produced per cycle |
+| `max-nearby` | `6` | The spawner stops while this many of its mob are nearby |
+| `player-range` | `16` | A player must be within this many blocks |
+| `spawn-range` | `4` | Radius the mobs appear in |
+| `tier` | `1` | Cosmetic rank shown in `/aquavirtual mobs` |
+| `max-per-player` | `0` | How many of one mob a player may own. `0` is unlimited |
+| `icon` | `SPAWNER` | Material used in the menu |
+
+Delays are in ticks. 20 ticks is one second.
+
+<Callout type="info">
+  Setting `permission: "aquavirtual.mob.%mob%"` in `defaults` locks every unlisted mob behind its own
+  node at once, without writing a block per mob.
+</Callout>
+
+## Disabled
+
+```yaml filename="mobs.yml"
+disabled:
+  - ENDER_DRAGON
+  - WITHER
+  - WARDEN
+  - ELDER_GUARDIAN
+```
+
+Mobs nobody can use even though the server can spawn them. Remove one to allow it. The defaults also
+block giants, illusioners, ravagers, evokers, piglin brutes, wither skeletons, endermen, villagers,
+wandering traders, iron golems and snow golems.
+
+## Overrides
+
+Anything you leave out falls back to `defaults`.
+
+```yaml filename="mobs.yml"
+mobs:
+  BLAZE:
+    display: "&#FFA42DBlaze"
+    permission: "aquavirtual.mob.blaze"
+    tier: 3
+    min-delay: 400
+    max-delay: 900
+    count: 3
+    max-nearby: 4
+    max-per-player: 2
+```
+
+`display` is the only key that does not exist in `defaults`. It is the name shown everywhere, colours
+included.
+
+## Tiers
+
+`tier` is cosmetic. It groups mobs in `/aquavirtual mobs` so players can see at a glance which ones
+are the good ones. The shipped catalog runs from tier 1 for zombies and cows up to tier 4 for
+guardians.
+
+## Levels
+
+The values here are the level 1 numbers. `/aquavirtual setlevel` scales them with the multipliers in
+`config.yml`:
+
+| At level `n` | Becomes |
+| --- | --- |
+| Delay | `delay × level-delay-multiplier ^ (n - 1)` |
+| Count | `count + level-count-bonus × (n - 1)` |
+| Max nearby | `max-nearby + level-nearby-bonus × (n - 1)` |
+
+So with the defaults a level 3 blaze spawner runs at `400 × 0.85²` ticks, produces `5` per cycle and
+tolerates `8` nearby.

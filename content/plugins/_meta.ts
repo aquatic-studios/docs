@@ -8,5 +8,6 @@ export default {
   aquaspawn: 'AquaSpawn',
   aquatac: 'AquaTac',
   aquatebex: 'AquaTebex',
+  aquavirtual: 'AquaVirtual',
   aquawarps: 'AquaWarps'
 } satisfies MetaRecord

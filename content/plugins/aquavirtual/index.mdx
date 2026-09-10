@@ -1,0 +1,63 @@
+---
+title: AquaVirtual
+description: Spawners a player owns as data, placed as real blocks only while they are in use.
+asIndexPage: true
+---
+
+import { Callout } from 'nextra/components'
+
+# AquaVirtual
+
+A virtual spawner belongs to a player, not to a chunk. It sits in the database until they place it,
+becomes a real spawner block while it is out, and goes back to being data when they pick it up.
+Every one runs on a countdown.
+
+| | |
+| --- | --- |
+| **Base command** | `/aquavirtual` |
+| **Aliases** | `/av`, `/virtual`, `/vspawner`, `/virtualspawner` |
+| **Minecraft** | `1.20+` |
+| **Storage** | SQLite or H2 |
+| **Soft-depend** | PlaceholderAPI, WorldGuard, WorldEdit |
+| **Source** | [GitHub](https://github.com/aquatic-studios/AquaVirtual) |
+
+## States
+
+| State | Means |
+| --- | --- |
+| `STORED` | Owned but not in the world |
+| `PLACED` | A real spawner block, producing mobs |
+| `FROZEN` | Paused by staff. No mobs, no countdown |
+| `EXPIRED` | The time ran out |
+
+## Duration modes
+
+The mode decides **when** the countdown burns, and it is set per spawner.
+
+| Mode | Burns |
+| --- | --- |
+| `REAL_TIME` | Wall clock. Even while stored, even while the server is off |
+| `ACTIVE_TIME` | Only while the block is placed |
+| `ONLINE_TIME` | Only while placed **and** the owner is connected |
+| `PERMANENT` | Never |
+
+<Callout type="info">
+  A `REAL_TIME` spawner cannot lose progress in a crash, because it is measured against the clock.
+  The other modes are counted while the server runs, so they can lose up to one save interval.
+</Callout>
+
+## Slots
+
+Every player has a number of slots, and a spawner takes one whether it is stored or placed. The
+limit is the higher of the config default and the best `aquavirtual.slots.<number>` node they hold,
+plus any manual bonus, capped by `max-slots`.
+
+## Files
+
+| File | Holds |
+| --- | --- |
+| `config.yml` | Storage, slots, time, expiry, placement, protection, spawning |
+| `mobs.yml` | The mob catalog, per mob rates and permissions |
+| `blacklist.yml` | Everywhere a spawner is not allowed to exist |
+| `gui.yml` | The spawner menu |
+| `messages.yml` | Every string |

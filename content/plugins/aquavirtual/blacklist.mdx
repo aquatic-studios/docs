@@ -1,0 +1,143 @@
+---
+title: Blacklist
+description: Where spawners are not allowed, and the WorldGuard integration.
+---
+
+import { Callout } from 'nextra/components'
+
+# Blacklist
+
+`blacklist.yml` is every place a virtual spawner may not exist. Seven sections, each a plain list.
+
+| Section | Holds |
+| --- | --- |
+| `worlds` | World names |
+| `regions` | WorldGuard region ids |
+| `flags` | WorldGuard flags |
+| `biomes` | Biome keys |
+| `entities` | Mobs denied server wide, on top of `mobs.yml` |
+| `materials` | Materials a spawner may not touch |
+| `cuboids` | Raw areas, no region plugin needed |
+
+The whole file is bypassed with `aquavirtual.bypass.blacklist`.
+
+## Scoping to one world
+
+Any entry in any section takes a `@world` suffix.
+
+```yaml filename="blacklist.yml"
+regions:
+  - spawn
+  - "arena@world"
+```
+
+`spawn` applies to every world. `arena@world` only blocks the region named `arena` in the world
+called `world`.
+
+## Worlds
+
+```yaml filename="blacklist.yml"
+worlds:
+  - example_world
+```
+
+What this list means depends on `placement.world-mode` in `config.yml`:
+
+| Mode | The list is |
+| --- | --- |
+| `BLACKLIST` | The worlds where spawners are denied |
+| `WHITELIST` | The only worlds where spawners work |
+
+## Flags
+
+```yaml filename="blacklist.yml"
+flags:
+  - pvp
+  - "mob-spawning=DENY"
+```
+
+A plain name blocks where the region resolves that flag to `DENY`. `name=VALUE` blocks when the flag
+resolves to exactly that value.
+
+```yaml filename="config.yml"
+worldguard:
+  blacklist-flags-deny-only: true
+```
+
+Turning that off makes plain entries block on `ALLOW` too, which is what you want for a flag that
+should never sit near a spawner.
+
+## Materials
+
+```yaml filename="blacklist.yml"
+materials:
+  - BEDROCK
+  - BARRIER
+```
+
+Checked against both the target block and the one underneath it.
+
+## Cuboids
+
+```yaml filename="blacklist.yml"
+cuboids:
+  - "example_world:100,0,100:200,120,200"
+```
+
+Written as `world:x1,y1,z1:x2,y2,z2`. Useful when you have no region plugin.
+
+## Editing in game
+
+```
+/aquavirtual blacklist add <section> <entry>
+/aquavirtual blacklist remove <section> <entry>
+/aquavirtual blacklist list [section]
+```
+
+Writes straight back into the file. `list` without a section prints all seven with a total.
+
+## WorldGuard
+
+```yaml filename="config.yml"
+worldguard:
+  enabled: true
+  flag-name: aquavirtual-spawners
+  flag-default: ALLOW
+  respect-build-flag: true
+  blacklist-flags-deny-only: true
+  require-region: false
+  require-region-membership: true
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `enabled` | `true` | Master switch. Ignored entirely without WorldGuard |
+| `flag-name` | `aquavirtual-spawners` | Name of the region flag the plugin registers |
+| `flag-default` | `ALLOW` | Its value inside regions that do not set it |
+| `respect-build-flag` | `true` | Also deny where the vanilla build flag denies you |
+| `blacklist-flags-deny-only` | `true` | Whether plain flag entries only block on `DENY` |
+| `require-region` | `false` | Only allow placing inside a region, any region |
+| `require-region-membership` | `true` | Require being member or owner of every region covering the block |
+
+<Callout type="warning">
+  `flag-name` and `flag-default` need a **restart**. WorldGuard only accepts new flags while the
+  server is booting, so a reload cannot change them.
+</Callout>
+
+Once registered the flag works like any other:
+
+```
+/rg flag <region> aquavirtual-spawners deny
+```
+
+If another plugin already owns that name, AquaVirtual logs a warning and reuses the existing flag.
+
+## Why can't I place here
+
+```
+/aquavirtual check
+```
+
+Runs the whole chain against the block you are looking at and names the first rule that stops you.
+The order is mob, biome, cuboid, ground, world, material, height, distance between spawners,
+distance from spawn, then the WorldGuard checks.

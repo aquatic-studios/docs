@@ -1,0 +1,128 @@
+---
+title: Menu
+description: The spawner menu, its four item states and the click actions.
+---
+
+import { Callout } from 'nextra/components'
+
+# Menu
+
+One file, `gui.yml`. `/aquavirtual gui` opens it, and staff can open someone else's with
+`/aquavirtual gui <player>`.
+
+```yaml filename="gui.yml"
+menu_title: '&8AquaVirtual | %player% (%page%/%pages%)'
+size: 54
+```
+
+## Content
+
+The spawners are drawn into `slots`, in that order, one page per full set.
+
+```yaml filename="gui.yml"
+content:
+  slots: [10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 34]
+  show_expired: true
+```
+
+A spawner is rendered with the template matching its state, so the four look different without any
+conditions in the file.
+
+| Template | Used for |
+| --- | --- |
+| `stored` | Owned, not in the world |
+| `placed` | A real block, producing mobs |
+| `frozen` | Paused by staff |
+| `expired` | Out of time |
+| `empty` | Shown in the first slot when the player owns nothing |
+
+```yaml filename="gui.yml"
+  placed:
+    material: SPAWNER
+    amount: 1
+    model_data: 0
+    display_name: '&#56FF00&l%mob% &7#%id%'
+    lore:
+      - '&7State: %state%'
+      - '&#33CCFFTime left: &f%time%'
+      - '&#33CCFFLocation: &f%location%'
+      - ''
+      - '&#FFA42DLeft click to teleport'
+      - '&#FFA42DRight click to pick it up'
+    left_click_commands:
+      - '[teleport] %id%'
+    right_click_commands:
+      - '[pickup] %id%'
+      - '[refresh]'
+```
+
+`previous` and `next` are the page arrows, each with its own `slot`.
+
+## Fixed items
+
+Anything under `items` sits in a fixed slot and is not tied to a spawner.
+
+```yaml filename="gui.yml"
+items:
+  info:
+    material: PAPER
+    slot: 49
+    display_name: '&#33CCFF&lYour Spawners'
+    lore:
+      - '&#33CCFFSlots: &f%used%&7/&f%limit%'
+      - '&#33CCFFNext expiry: &f%next%'
+```
+
+## Actions
+
+| Action | Does |
+| --- | --- |
+| `[teleport] <id>` | Goes to that spawner |
+| `[pickup] <id>` | Picks it up |
+| `[page] next\|previous\|first\|last\|<n>` | Turns the page |
+| `[refresh]` | Redraws the menu in place |
+| `[close]` | Closes it |
+| `[command] <command>` | Runs a command as the player |
+| `[console] <command>` | Runs it from the console |
+| `[message] <text>` | Sends a line |
+
+The id is optional on `[teleport]` and `[pickup]` inside a spawner template, since the clicked item
+already knows which one it is.
+
+An action can stop the rest of the list. `[teleport]`, `[page]`, `[refresh]` and `[close]` always
+do, so put them last. `[command]`, `[console]` and `[message]` always carry on.
+
+<Callout type="info">
+  `[pickup]` only carries on when the pickup actually worked. That is why the shipped `placed`
+  template ends with `[refresh]`: the menu redraws after a successful pickup, and stays untouched
+  when the click was refused.
+</Callout>
+
+## Placeholders
+
+On a spawner item:
+
+| Placeholder | Is |
+| --- | --- |
+| `%id%` | The spawner id |
+| `%mob%` | Its mob, coloured |
+| `%state%` | Stored, Placed, Frozen or Expired |
+| `%mode%` | Its duration mode |
+| `%level%` | Its level |
+| `%time%` | Time left |
+| `%total%` | Its full lifetime |
+| `%progress%` | How much of it is used |
+| `%location%` | Where it is placed |
+| `%mobs%` | Mobs it has produced |
+
+On the menu itself:
+
+| Placeholder | Is |
+| --- | --- |
+| `%player%` | The owner being viewed |
+| `%used%` / `%limit%` | Slots |
+| `%stored%` `%placed%` `%frozen%` `%expired%` | Counts per state |
+| `%next%` | Next expiry |
+| `%page%` / `%pages%` / `%total%` | Paging |
+
+Any `%aquavirtual_*%` placeholder works here too.

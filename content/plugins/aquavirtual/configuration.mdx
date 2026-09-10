@@ -1,0 +1,206 @@
+---
+title: Configuration
+description: Slots, countdowns, expiry, placement rules, protection and spawn rates.
+---
+
+import { Callout } from 'nextra/components'
+
+# Configuration
+
+Most options apply with `/aquavirtual reload`. Storage and the WorldGuard flag need a restart.
+
+## Slots
+
+```yaml filename="config.yml"
+spawners:
+  default-slots: 5
+  max-slots: 256
+  permission-slots: true
+  max-per-chunk: 4
+  count-expired: false
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `default-slots` | `5` | Slots every player gets before bonuses |
+| `max-slots` | `256` | Hard ceiling nothing can go over |
+| `permission-slots` | `true` | Read `aquavirtual.slots.<number>` and take the highest |
+| `max-per-chunk` | `4` | Placed spawners allowed in one chunk. `0` disables it |
+| `count-expired` | `false` | Whether expired records still take a slot |
+
+A stored spawner takes a slot just like a placed one. `max-per-chunk` is bypassed with
+`aquavirtual.bypass.limit`.
+
+## Time
+
+```yaml filename="config.yml"
+time:
+  tick-seconds: 1
+  default-duration: 30d
+  default-mode: REAL_TIME
+  warn-thresholds:
+    - 86400
+    - 3600
+    - 600
+    - 60
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `tick-seconds` | `1` | How often the countdown is recalculated |
+| `default-duration` | `30d` | Used by `give` when you type no duration |
+| `default-mode` | `REAL_TIME` | Used by `give` when you type no mode |
+| `warn-thresholds` | 4 steps | Seconds left at which the owner is warned, once per step |
+
+The defaults warn at one day, one hour, ten minutes and one minute.
+
+## Expiry
+
+```yaml filename="config.yml"
+expiry:
+  remove-block: true
+  notify-owner: true
+  delete-record: false
+  broadcast: false
+  grace-seconds: 0
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `remove-block` | `true` | Takes the block out of the world when time runs out |
+| `notify-owner` | `true` | Offline owners get a summary on their next join |
+| `delete-record` | `false` | Deletes the row instead of keeping it as expired history |
+| `broadcast` | `false` | Announces every expiry to the server |
+| `grace-seconds` | `0` | Extra seconds the block survives past zero |
+
+## Placement
+
+```yaml filename="config.yml"
+placement:
+  mode: ADJACENT
+  max-distance: 6
+  cooldown-seconds: 3
+  min-y: auto
+  max-y: auto
+  min-distance-between: 0
+  min-distance-from-spawn: 0
+  require-solid-ground: false
+  rebind-on-pickup: true
+  world-mode: BLACKLIST
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `mode` | `ADJACENT` | `ADJACENT` places against the face you look at, `REPLACE` turns that block into the spawner |
+| `max-distance` | `6` | How far you can be looking |
+| `cooldown-seconds` | `3` | Wait between two placements from the same player |
+| `min-y` / `max-y` | `auto` | Height limits. `auto` uses the world limits |
+| `min-distance-between` | `0` | Blocks between two placed spawners. `0` disables it |
+| `min-distance-from-spawn` | `0` | Blocks from the world spawn. `0` disables it |
+| `require-solid-ground` | `false` | Demand a solid block underneath |
+| `rebind-on-pickup` | `true` | An undecided spawner becomes choosable again when picked up |
+| `world-mode` | `BLACKLIST` | Whether `blacklist.yml` worlds are the denied ones or the only allowed ones |
+
+<Callout type="info">
+  `/aquavirtual check` names the exact rule stopping a placement where you are looking, which is
+  faster than reading this page twice.
+</Callout>
+
+## Protection
+
+```yaml filename="config.yml"
+protection:
+  only-owner-break: true
+  deny-untracked-break: false
+  deny-vanilla-placement: false
+  deny-explosions: true
+  deny-pistons: true
+  deny-spawn-eggs: true
+  deny-fire: true
+  drop-on-break: false
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `only-owner-break` | `true` | Only the owner can break their spawner |
+| `deny-untracked-break` | `false` | Deny breaking spawner blocks this plugin does not own |
+| `deny-vanilla-placement` | `false` | Deny placing spawner items by hand, so every spawner is virtual |
+| `deny-explosions` | `true` | Protect from every explosion |
+| `deny-pistons` | `true` | Cancel piston moves that would push one |
+| `deny-spawn-eggs` | `true` | Deny changing one with a spawn egg |
+| `deny-fire` | `true` | Protect from fire, burning and fading |
+| `drop-on-break` | `false` | Drop a physical spawner item on pickup |
+
+<Callout type="warning">
+  Leave `drop-on-break` off. With it on a player gets both the record back and an item, which
+  duplicates spawners.
+</Callout>
+
+`only-owner-break` is bypassed with `aquavirtual.bypass.protection`.
+
+## Spawn rates
+
+```yaml filename="config.yml"
+spawning:
+  require-owner-online: false
+  stop-when-frozen: true
+  max-level: 5
+  level-delay-multiplier: 0.85
+  level-count-bonus: 1
+  level-nearby-bonus: 2
+  chunk-entity-cap: 40
+  count-statistics: true
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `require-owner-online` | `false` | Stop producing while the owner is offline |
+| `stop-when-frozen` | `true` | Frozen spawners produce nothing |
+| `max-level` | `5` | Highest level `setlevel` accepts |
+| `level-delay-multiplier` | `0.85` | Delay multiplier per level above one. Lower is faster |
+| `level-count-bonus` | `1` | Extra mobs per cycle per level above one |
+| `level-nearby-bonus` | `2` | Extra nearby entity allowance per level |
+| `chunk-entity-cap` | `40` | Cancel spawns when the chunk holds this many living entities. `0` disables it |
+| `count-statistics` | `true` | Count produced mobs for the placeholders and `/aquavirtual stats` |
+
+Levels multiply against the per mob values in `mobs.yml`. A level 3 zombie spawner with a `400` tick
+delay runs at `400 × 0.85²`, produces `count + 2` mobs and tolerates `max-nearby + 4` nearby.
+
+## Sounds and particles
+
+```yaml filename="config.yml"
+sounds:
+  place: "block.beacon.activate"
+  pickup: "block.beacon.deactivate"
+  error: "entity.villager.no"
+  success: "entity.player.levelup"
+  expire: "block.conduit.deactivate"
+  volume: 1.0
+  pitch: 1.0
+
+particles:
+  enabled: true
+  type: FLAME
+  amount: 24
+```
+
+Sounds are **namespaced keys**, not the old enum names. `""` disables one.
+
+## General
+
+```yaml filename="config.yml"
+general:
+  debug: false
+  date-format: "yyyy-MM-dd HH:mm:ss"
+  command-cooldown-seconds: 0
+  log-actions: true
+  log-to-console: true
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `debug` | `false` | Verbose diagnostics in the console |
+| `date-format` | `yyyy-MM-dd HH:mm:ss` | How absolute dates are rendered |
+| `command-cooldown-seconds` | `0` | Wait between two AquaVirtual commands from one player |
+| `log-actions` | `true` | Write every action into the history table |
+| `log-to-console` | `true` | Also print administrative actions |

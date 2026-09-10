@@ -1,0 +1,128 @@
+---
+title: Admin
+description: Granting spawners, editing time, cleanup, storage and the legacy import.
+---
+
+import { Callout } from 'nextra/components'
+
+# Admin
+
+`/aquavirtual admin` prints this list in game. Aliases `adminhelp`, `ahelp`.
+
+| Command | Permission | What it does |
+| --- | --- | --- |
+| `/aquavirtual give <player> <amount> [mob\|any] [duration] [mode]` | `aquavirtual.give` | Grants spawners. Aliases `grant`, `add` |
+| `/aquavirtual revoke <player\|id> <amount\|all\|id> [mob]` | `aquavirtual.revoke` | Takes them back. Alias `take` |
+| `/aquavirtual addtime <id\|player> <duration>` | `aquavirtual.addtime` | Adds or removes time. Alias `extend` |
+| `/aquavirtual settime <id> <duration> [mode]` | `aquavirtual.settime` | Sets the exact time left. Alias `time` |
+| `/aquavirtual freeze <id>` | `aquavirtual.freeze` | Pauses a spawner and its countdown. Alias `pause` |
+| `/aquavirtual unfreeze <id>` | `aquavirtual.unfreeze` | Resumes it. Alias `resume` |
+| `/aquavirtual setlevel <id> <level>` | `aquavirtual.setlevel` | Changes the spawn rate level. Aliases `level`, `upgrade` |
+| `/aquavirtual lookup <player> [bonus <n>]` | `aquavirtual.lookup` | Inspects a player, edits their slot bonus. Aliases `whois`, `profile` |
+| `/aquavirtual purge <expired\|orphans\|player>` | `aquavirtual.purge` | Cleans stored records. Alias `clean` |
+| `/aquavirtual check` | `aquavirtual.check` | Explains what blocks placement where you look. Alias `why` |
+| `/aquavirtual blacklist <add\|remove\|list>` | `aquavirtual.blacklist` | Edits `blacklist.yml` in game. Aliases `bl`, `deny` |
+| `/aquavirtual storage <backup\|flush>` | `aquavirtual.storage` | Storage stats and maintenance. Aliases `db`, `database` |
+| `/aquavirtual migrate <file> [world]` | `aquavirtual.migrate` | Imports a legacy BSpawner `playerdata.yml` |
+| `/aquavirtual reload` | `aquavirtual.reload` | Reloads every file. Alias `rl` |
+
+All of these sit under `aquavirtual.admin`, which is op by default.
+
+## Giving
+
+```
+/aquavirtual give Senkex 5
+/aquavirtual give Senkex 1 blaze 7d ACTIVE_TIME
+/aquavirtual give Senkex 3 any permanent
+```
+
+`any` (or `*`) grants an undecided spawner, one the player binds to a mob the first time they place
+it. Leaving out the duration uses `time.default-duration`, leaving out the mode uses
+`time.default-mode`.
+
+A grant is refused when it would push the player past their slot limit, unless they hold
+`aquavirtual.bypass.limit`.
+
+## Taking back
+
+```
+/aquavirtual revoke Senkex 2
+/aquavirtual revoke Senkex all
+/aquavirtual revoke Senkex 3 zombie
+/aquavirtual revoke 412
+```
+
+The first argument is either a player or a spawner id.
+
+## Time
+
+```
+/aquavirtual addtime 412 7d
+/aquavirtual addtime 412 -2h
+/aquavirtual addtime Senkex 1d
+/aquavirtual settime 412 30d ONLINE_TIME
+```
+
+`addtime` on a player name touches every spawner they own. `settime` can also change the mode.
+
+## Cleanup
+
+| Argument | Removes |
+| --- | --- |
+| `expired` | Every record already past its countdown |
+| `orphans` | Placed records whose block is no longer there |
+| `player <name>` | Everything one player owns |
+
+<Callout type="warning">
+  `purge` deletes rows. There is no confirmation and no undo beyond a backup.
+</Callout>
+
+## Storage
+
+```yaml filename="config.yml"
+storage:
+  type: SQLITE
+  save-interval-seconds: 30
+  log-retention-days: 30
+  backup-on-start: true
+  backup-keep: 5
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `type` | `SQLITE` | `SQLITE` or `H2`. The driver downloads into `libraries/` on startup |
+| `save-interval-seconds` | `30` | How often dirty records are flushed from RAM |
+| `log-retention-days` | `30` | Days of action history kept. `0` keeps everything |
+| `backup-on-start` | `true` | Copies the database into `backups/` on every enable |
+| `backup-keep` | `5` | Backups kept before the oldest is deleted |
+
+`/aquavirtual storage` prints the stats, `storage backup` makes one on demand and `storage flush`
+writes pending records immediately.
+
+<Callout type="warning">
+  Changing `type` needs a restart and **does not migrate** anything. The new database starts empty.
+</Callout>
+
+Placement based countdowns can lose at most one save interval in a crash. `REAL_TIME` ones lose
+nothing, because they are measured against the wall clock.
+
+## Importing from BSpawner
+
+```
+/aquavirtual migrate playerdata.yml
+/aquavirtual migrate playerdata.yml world_nether
+```
+
+Reads a legacy `playerdata.yml` from the plugin folder and grants what it finds. The optional world
+argument is used for entries that do not carry one.
+
+## Audit log
+
+```yaml filename="config.yml"
+general:
+  log-actions: true
+  log-to-console: true
+```
+
+Every grant, placement, pickup, transfer, freeze, time change, purge and expiry is written to the
+history table with who did it. `log-to-console` also prints the administrative ones.

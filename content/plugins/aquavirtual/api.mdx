@@ -1,0 +1,145 @@
+---
+title: Developer API
+description: Read and grant spawners, test placement and listen to the four events.
+---
+
+import { Callout, Tabs } from 'nextra/components'
+
+# Developer API
+
+Everything is static on `AquaVirtualAPI`. There is nothing to instantiate and no service to look up.
+
+```yaml filename="plugin.yml"
+softdepend: [AquaVirtual]
+```
+
+<Callout type="warning">
+  Depend on it at compile time only. The plugin ships the implementation at runtime, so shading it
+  will break your add on.
+</Callout>
+
+## Install
+
+<Tabs items={['Gradle (Kotlin)', 'Maven']}>
+  <Tabs.Tab>
+```kotlin filename="build.gradle.kts"
+repositories {
+    maven("https://jitpack.io")
+}
+
+dependencies {
+    compileOnly("com.github.aquatic-studios:AquaVirtual:VERSION")
+}
+```
+  </Tabs.Tab>
+  <Tabs.Tab>
+```xml filename="pom.xml"
+<repository>
+    <id>jitpack.io</id>
+    <url>https://jitpack.io</url>
+</repository>
+
+<dependency>
+    <groupId>com.github.aquatic-studios</groupId>
+    <artifactId>AquaVirtual</artifactId>
+    <version>VERSION</version>
+    <scope>provided</scope>
+</dependency>
+```
+  </Tabs.Tab>
+</Tabs>
+
+## Availability
+
+```java
+if (!AquaVirtualAPI.isAvailable()) return;
+```
+
+It flips on at the very end of enable, once the spawners are loaded and restored, and off again on
+disable. Check it rather than only checking that the plugin is enabled. Every read returns an empty
+result instead of throwing when it is false.
+
+## Reading
+
+| Method | Returns |
+| --- | --- |
+| `getSpawners(UUID owner)` | Every spawner that player owns |
+| `getSpawner(long id)` | One by id, or `null` |
+| `getSpawnerAt(Location location)` | The spawner at that block, or `null` |
+| `isVirtualSpawner(Location location)` | Whether that block is one |
+| `getSlotLimit(Player player)` | Their slot limit |
+| `getUsedSlots(UUID owner)` | Slots in use |
+| `countState(UUID owner, SpawnerState state)` | How many are in that state |
+| `getRemainingMillis(long spawnerId)` | Time left, `0` when unknown |
+
+```java
+for (VirtualSpawner spawner : AquaVirtualAPI.getSpawners(player.getUniqueId())) {
+    getLogger().info(spawner.id() + " " + spawner.state() + " " + spawner.displayMob());
+}
+```
+
+## Writing
+
+```java
+List<VirtualSpawner> created = AquaVirtualAPI.grant(
+        player.getUniqueId(),
+        player.getName(),
+        EntityType.BLAZE,
+        DurationMode.ACTIVE_TIME,
+        TimeUnit.DAYS.toMillis(7),
+        2,
+        "MyPlugin");
+```
+
+| Method | Does |
+| --- | --- |
+| `grant(owner, ownerName, type, mode, durationMillis, amount, actor)` | Grants spawners. `type` may be `null` for an undecided one |
+| `revoke(owner, type, amount, actor)` | Removes some. Returns how many went |
+| `addTime(spawnerId, millis, actor)` | Adds time. A negative value removes it |
+
+`actor` is written into the audit log, so pass your plugin name.
+
+<Callout type="info">
+  `grant` does not check slot limits. `/aquavirtual give` does that before calling in, so an add on
+  that should respect them has to compare `getUsedSlots` against `getSlotLimit` itself.
+</Callout>
+
+## Testing placement
+
+```java
+PlacementResult result = AquaVirtualAPI.testPlacement(player, block, EntityType.ZOMBIE);
+if (!result.isAllowed()) {
+    result.send(player);
+    return;
+}
+```
+
+Runs the same chain as `/aquavirtual check`. `send` gives the player the exact message the plugin
+would have used, already filled in.
+
+## Events
+
+| Event | Fires | Cancellable |
+| --- | --- | --- |
+| `SpawnerGrantEvent` | A spawner is granted | No |
+| `SpawnerPlaceEvent` | One is placed | Yes |
+| `SpawnerPickupEvent` | One is picked up | Yes |
+| `SpawnerExpireEvent` | One runs out of time | No |
+
+All four extend `AquaVirtualEvent` and expose `getSpawner()`.
+
+| Event | Also gives |
+| --- | --- |
+| `SpawnerGrantEvent` | `getOwner()`, `getActor()` |
+| `SpawnerPlaceEvent` | `getPlayer()`, `getBlock()` |
+| `SpawnerPickupEvent` | `getPlayer()`, which is `null` when the plugin did it |
+| `SpawnerExpireEvent` | `getLocation()` as a string |
+
+```java
+@EventHandler
+public void onPlace(SpawnerPlaceEvent event) {
+    if (event.getBlock().getWorld().getName().equals("arena")) {
+        event.setCancelled(true);
+    }
+}
+```

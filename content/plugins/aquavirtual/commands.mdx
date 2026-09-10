@@ -1,0 +1,106 @@
+---
+title: Commands
+description: Player commands, permissions and the duration syntax.
+---
+
+import { Callout } from 'nextra/components'
+
+# Commands
+
+Base `/aquavirtual`. Aliases: `/av`, `/virtual`, `/vspawner`, `/virtualspawner`.
+
+## Player
+
+| Command | Permission | What it does |
+| --- | --- | --- |
+| `/aquavirtual place [mob] [id]` | `aquavirtual.place` | Places a stored spawner where you look. Aliases `set`, `deploy` |
+| `/aquavirtual pickup [id]` | `aquavirtual.pickup` | Picks a placed one back up. Aliases `take`, `remove` |
+| `/aquavirtual list [player] [page]` | `aquavirtual.list` | Your spawners and their time left. Alias `ls` |
+| `/aquavirtual info [id]` | `aquavirtual.info` | Everything about one. Aliases `show`, `inspect` |
+| `/aquavirtual gui [player]` | `aquavirtual.gui` | Opens the menu. Alias `menu` |
+| `/aquavirtual mobs [page]` | `aquavirtual.mobs` | Mobs you are allowed to use. Alias `moblist` |
+| `/aquavirtual stats [player]` | `aquavirtual.stats` | Your statistics. Alias `statistics` |
+| `/aquavirtual teleport <id>` | `aquavirtual.teleport` | Goes to one of your placed spawners. Aliases `tp`, `goto` |
+| `/aquavirtual transfer <id> <player>` | `aquavirtual.transfer` | Hands one to someone else |
+| `/aquavirtual help` | `aquavirtual.help` | Command list. Aliases `?`, `commands` |
+
+`place`, `pickup`, `gui` and `teleport` are player only. Passing another player's name to `list`,
+`gui` or `stats` needs `aquavirtual.admin`.
+
+All of these sit under `aquavirtual.use`, which is `true` by default.
+
+## Placing
+
+Without an id, `place` takes the first spawner that fits. With one it takes that exact spawner.
+
+```
+/aquavirtual place
+/aquavirtual place blaze
+/aquavirtual place 412
+```
+
+A spawner granted **without** a mob is undecided: it has no type until the owner names one the first
+time they place it. That is what the `[mob]` argument is for.
+
+<Callout type="info">
+  With `placement.rebind-on-pickup` on, an undecided spawner goes back to being undecided when it is
+  picked up, so the player can bind it to a different mob next time.
+</Callout>
+
+Placement fails for a long list of reasons. `/aquavirtual check` says which one applies where you
+are looking.
+
+## Durations
+
+Accepted by `give`, `addtime` and `settime`.
+
+| Unit | Is |
+| --- | --- |
+| `ms` | Milliseconds |
+| `s` | Seconds |
+| `m` | Minutes |
+| `h` | Hours |
+| `d` | Days |
+| `w` | Weeks |
+| `mo` | Months |
+| `y` | Years |
+
+Units combine, and `permanent`, `perm`, `forever`, `infinite` and `never` all mean no expiry.
+
+```
+30d
+12h
+1w2d3h
+permanent
+```
+
+`addtime` also takes a negative value to remove time.
+
+## Permissions
+
+| Permission | Default | Grants |
+| --- | --- | --- |
+| `aquavirtual.use` | true | Every player command |
+| `aquavirtual.admin` | op | Everything, including the bypasses |
+| `aquavirtual.slots.<number>` | false | That many slots |
+| `aquavirtual.mob.<mob>` | — | A mob that asks for a permission |
+| `aquavirtual.mob.*` | op | Every mob |
+
+The slot node is the **highest** one the player holds, not the sum, and it is still capped by
+`spawners.max-slots`.
+
+## Bypasses
+
+| Permission | Ignores |
+| --- | --- |
+| `aquavirtual.bypass.limit` | Slot limits and the per chunk cap |
+| `aquavirtual.bypass.blacklist` | Everything in `blacklist.yml` |
+| `aquavirtual.bypass.worldguard` | The region checks |
+| `aquavirtual.bypass.cooldown` | The wait between placements |
+| `aquavirtual.bypass.protection` | Owner only breaking |
+| `aquavirtual.bypass.*` | All of the above |
+
+<Callout type="warning">
+  `aquavirtual.bypass.expiry` is registered so it shows up in permission plugins, but nothing in the
+  plugin reads it yet. Granting it changes nothing.
+</Callout>

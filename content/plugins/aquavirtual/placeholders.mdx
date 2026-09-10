@@ -1,0 +1,71 @@
+---
+title: Placeholders
+description: Server totals, per player counts and the next expiry.
+---
+
+import { Callout } from 'nextra/components'
+
+# Placeholders
+
+AquaVirtual registers one PlaceholderAPI expansion, `aquavirtual`.
+
+## Server
+
+These need no player, so they work on the console and in server wide displays.
+
+| Placeholder | Returns |
+| --- | --- |
+| `%aquavirtual_server_total%` | Spawners on the server |
+| `%aquavirtual_server_owners%` | Players who own at least one |
+| `%aquavirtual_server_mobs%` | Mobs produced in total |
+
+## Player
+
+| Placeholder | Returns |
+| --- | --- |
+| `%aquavirtual_total%` | Spawners they own |
+| `%aquavirtual_stored%` | Owned but not placed |
+| `%aquavirtual_placed%` | Out in the world |
+| `%aquavirtual_frozen%` | Paused |
+| `%aquavirtual_expired%` | Out of time |
+| `%aquavirtual_limit%` | Their slot limit |
+| `%aquavirtual_used%` | Slots in use |
+| `%aquavirtual_free%` | Slots left |
+| `%aquavirtual_available%` | The same as `free` |
+| `%aquavirtual_bonus%` | Their manual slot bonus |
+| `%aquavirtual_granted%` | Spawners ever granted to them |
+| `%aquavirtual_mobs%` | Mobs their spawners have produced |
+
+## Next expiry
+
+| Placeholder | Returns |
+| --- | --- |
+| `%aquavirtual_next_expiry%` | Time left on whichever runs out first |
+| `%aquavirtual_next_expiry_short%` | The same, abbreviated |
+| `%aquavirtual_next_expiry_seconds%` | The same as a raw number |
+| `%aquavirtual_next_expiry_id%` | Which spawner it is |
+| `%aquavirtual_next_expiry_mob%` | Its mob |
+
+All five return `-` when the player owns nothing that expires.
+
+## Per mob
+
+```
+%aquavirtual_count_<mob>%
+%aquavirtual_placed_<mob>%
+```
+
+`count_` counts every spawner of that mob the player owns except expired ones. `placed_` counts only
+the ones currently out in the world.
+
+```
+%aquavirtual_count_zombie%
+%aquavirtual_placed_blaze%
+```
+
+An unknown mob returns `0`.
+
+<Callout type="info">
+  `%aquavirtual_mobs%` needs `spawning.count-statistics` on. With it off nothing is counted and the
+  placeholder stays at zero.
+</Callout>
