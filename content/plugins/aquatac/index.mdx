@@ -1,6 +1,6 @@
 ---
 title: AquaTac
-description: Tic tac toe in a chest GUI, with bets paid through Vault.
+description: Tic tac toe in a chest GUI, with bets, stats, leaderboards and a bot.
 asIndexPage: true
 ---
 
@@ -8,31 +8,51 @@ import { Callout } from 'nextra/components'
 
 # AquaTac
 
-Two players bet money and play tic tac toe on a chest board. The winner takes the pot.
+Two players play tic tac toe on a chest board. They can bet on it, practise against a bot, and every
+result is kept as stats.
 
 | | |
 | --- | --- |
-| **Base command** | `/tictactoe` |
+| **Commands** | `/tictactoe` to play, `/aquatac` to administer |
+| **Version** | `1.1.0` |
 | **Minecraft** | `1.16+` |
 | **Folia** | Supported |
-| **Depends** | Vault, plus an economy plugin |
+| **Storage** | SQLite or H2 |
+| **Soft-depend** | Vault, PlaceholderAPI |
+| **Download** | [SpigotMC](https://www.spigotmc.org/resources/137042/) |
+| **Source** | [GitHub](https://github.com/aquatic-studios/AquaTac) |
 
 ## A match
 
-1. A player runs `/tictactoe invite <player> <bet>`.
-2. The other accepts with `/tictactoe accept <player>`. Both stakes are taken.
+1. A player runs `/ttt invite <player> [bet]`, or just `/ttt <player>`.
+2. The other accepts. Both stakes are taken.
 3. The board opens as a chest GUI. Players click a cell on their turn.
-4. The winner gets the whole pot. On a draw both bets come back.
+4. The winner takes the pot, minus the tax if you set one. A draw refunds both.
+
+Against the bot it is one command: `/ttt bot [difficulty]`. Bot matches are always free.
+
+## Economy
+
+Vault is no longer required. Three backends:
+
+| Type | Moves money with |
+| --- | --- |
+| `CUSTOM` | Your own commands, so any economy plugin works |
+| `VAULT` | Vault plus an economy plugin |
+| `NONE` | Nothing. Every match is free |
+
+If the chosen backend cannot start, the plugin falls back to `NONE` and matches stay playable for
+free instead of breaking.
 
 <Callout type="warning">
-  Vault and an economy plugin are required. Without them every command answers
-  `economy-unavailable` and no match can start.
+  The permission root changed in `1.1.0`. `tictactoe.play` is now **`aquatac.play`**. Update your
+  permission plugin or nobody will be able to challenge.
 </Callout>
 
 ## Files
 
 | File | Holds |
 | --- | --- |
-| `config.yml` | Bet limits, expiry, match rules |
+| `config.yml` | Economy, storage, bets, requests, match rules, bot |
 | `menu.yml` | Board titles, markers and sounds |
-| `messages.yml` | Every string the plugin prints |
+| `messages.yml` | Every string |

@@ -1,7 +1,9 @@
 ---
 title: Board
-description: Board titles, markers and sounds.
+description: Board titles, cell markers and sounds.
 ---
+
+import { Callout } from 'nextra/components'
 
 # Board
 
@@ -12,14 +14,22 @@ Everything visual lives in `menu.yml`.
 ```yaml filename="menu.yml"
 board:
   titles:
+    board: "&#54ADF4&lTic-Tac-Toe"
     turn: "&#54ADF4%player%&8's turn"
     win: "&#8DFF87%player% won!"
-    draw: "&#FFA42D Draw!"
-    forfeit: "&#8DFF87%player% won!"
+    draw: "&#FFA42DDraw!"
+    forfeit: "&#8DFF87%player% wins"
 ```
 
-The GUI title changes with the state of the match. `%player%` is whoever the title is about: the
-player to move, or the winner.
+| Title | Shown |
+| --- | --- |
+| `board` | While playing, when `game.dynamic-title` is off |
+| `turn` | While playing, when `dynamic-title` is on |
+| `win` | On a win |
+| `draw` | On a draw |
+| `forfeit` | When someone leaves or times out |
+
+`%player%` is whoever the title is about: the player to move, or the winner.
 
 ## Markers
 
@@ -27,23 +37,42 @@ player to move, or the winner.
   markers:
     first:
       material: BLUE_DYE
-      display_name: "&#54ADF4● First player"
+      display_name: "&#54ADF4● %player%"
+      lore: []
+      use-player-head: false
+
     second:
       material: WHITE_DYE
-      display_name: "&#F0F8FF○ Second player"
+      display_name: "&#F0F8FF○ %player%"
+      lore: []
+      use-player-head: false
+
+    winner:
+      material: LIME_STAINED_GLASS_PANE
+      display_name: "&#8DFF87⭐ %player%"
+      lore: []
+
     empty:
       enabled: true
       material: GRAY_STAINED_GLASS_PANE
       display_name: "&8Empty cell"
+      lore: []
 ```
 
-| Key | What it does |
+| Marker | Used for |
 | --- | --- |
-| `first` | Item for the player who moves first |
-| `second` | Item for the other one |
-| `empty` | Filler in a free cell. `enabled: false` leaves it blank |
+| `first` | Cells of the player who moves first |
+| `second` | Cells of the other one |
+| `winner` | The three winning cells, when `game.highlight-winning-line` is on |
+| `empty` | A free cell. `enabled: false` leaves it blank |
 
-Any material of your server version works.
+`use-player-head` swaps the material for that player's head. Any material of your server version
+works.
+
+<Callout type="info">
+  `%player%` inside a marker is the owner of that cell, so the board reads as two named players
+  rather than two symbols.
+</Callout>
 
 ## Sounds
 
@@ -53,6 +82,10 @@ sounds:
   win: "ENTITY_PLAYER_LEVELUP:1:1"
   lose: "ENTITY_VILLAGER_NO:1:1"
   draw: "BLOCK_NOTE_BLOCK_BASS:1:1"
+  challenge: "ENTITY_EXPERIENCE_ORB_PICKUP:1:1"
 ```
 
-The format is `SOUND:volume:pitch`. `win` plays for the winner, `lose` for the other player.
+The format is `NAME:volume:pitch`. Both enum names (`BLOCK_NOTE_BLOCK_HAT`) and namespaced keys
+(`block.note_block.hat`) work. Use `""` or `none` to mute one.
+
+`win` plays for the winner, `lose` for the other player, `challenge` for whoever receives one.

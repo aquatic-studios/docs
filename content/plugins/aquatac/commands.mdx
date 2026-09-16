@@ -1,61 +1,120 @@
 ---
 title: Commands
-description: AquaTac commands and permissions.
+description: Every AquaTac command and permission.
 ---
 
 import { Callout } from 'nextra/components'
 
 # Commands
 
-Two commands: `/tictactoe` to play, `/aquatac` to administer.
+Two commands, `/tictactoe` and `/aquatac`. Both accept **every** subcommand below, so the split is
+only about which one is easier to type. They differ in what the bare command prints: `/tictactoe`
+shows the player info, `/aquatac` shows the plugin banner.
+
+| Command | Aliases |
+| --- | --- |
+| `/tictactoe` | `/ttt`, `/tic` |
+| `/aquatac` | `/atac`, `/aqtac` |
 
 ## Playing
 
-Base `/tictactoe`, alias `/ttt`.
+| Command | Permission | What it does |
+| --- | --- | --- |
+| `/ttt invite <player> [bet]` | `aquatac.play` | Challenges someone. Aliases `challenge`, `duel` |
+| `/ttt accept <player>` | `aquatac.play` | Accepts and starts the match |
+| `/ttt decline <player>` | `aquatac.play` | Rejects it. Aliases `deny`, `reject` |
+| `/ttt cancel` | `aquatac.play` | Withdraws the challenge you sent |
+| `/ttt rematch` | `aquatac.rematch` | Re-challenges whoever you last played. Alias `again` |
+| `/ttt bot [difficulty]` | `aquatac.bot` | Practice match. Aliases `ai`, `solo`, `practice` |
+| `/ttt info` | everyone | Your current match |
+| `/ttt help` | `aquatac.help` | Command list. Aliases `?`, `commands` |
 
-| Command | What it does |
-| --- | --- |
-| `/tictactoe invite <player> <bet>` | Challenges someone. `challenge` is an alias |
-| `/tictactoe accept <player>` | Accepts and starts the match |
-| `/tictactoe decline <player>` | Rejects it. `deny` is an alias |
-| `/tictactoe info` | Your current match |
-| `/tictactoe help` | Command list |
-
-All of it needs `tictactoe.play`, which everyone has by default.
+`/ttt <player>` is a shortcut for `/ttt invite <player>` whenever the first word is an online player
+name.
 
 ```
-/tictactoe invite Senkex 500
-/tictactoe accept Senkex
+/ttt Senkex
+/ttt invite Senkex 500
+/ttt accept Senkex
+/ttt bot impossible
 ```
 
-| A challenge fails when | Reply |
-| --- | --- |
-| Vault or the economy is missing | `economy-unavailable` |
-| The target is offline | `player-not-found` |
-| You challenge yourself | `cant-challenge-self` |
-| The target lacks `tictactoe.play` | `opponent-cant-play` |
-| Either player is already playing | `already-in-match` |
-| The bet is outside `bet.min` or `bet.max` | limit message |
+The bet is optional. Without one, or with betting off, the match is played for free.
 
-## Admin
-
-Base `/aquatac`, aliases `/atac` and `/aqtac`.
+## Stats
 
 | Command | Permission | What it does |
 | --- | --- | --- |
-| `/aquatac help` | `aquatac.help` | Command list |
-| `/aquatac info` | `aquatac.help` | Plugin info |
-| `/aquatac reload` | `aquatac.admin` | Reloads every file |
+| `/ttt stats [player]` | `aquatac.stats` | Wins, losses, draws, streaks and money |
+| `/ttt top [column]` | `aquatac.top` | Leaderboard. Alias `leaderboard` |
+
+Columns: `wins`, `losses`, `draws`, `games`, `streak`, `best_streak`, `earned`. Defaults to `wins`.
+
+## Admin
+
+| Command | Permission | What it does |
+| --- | --- | --- |
+| `/aquatac reload` | `aquatac.reload` | Reloads every file |
+| `/aquatac end <player\|all>` | `aquatac.end` | Force ends a match, or all of them. Alias `forceend` |
+| `/aquatac reset <player\|all confirm>` | `aquatac.reset` | Wipes stats |
+| `/aquatac debug` | `aquatac.debug` | Version, economy, storage, queue and active matches |
+
+```
+/aquatac end Senkex
+/aquatac end all
+/aquatac reset Senkex
+/aquatac reset all confirm
+```
+
+<Callout type="warning">
+  `reset all` needs the literal word `confirm` after it. Without it the plugin only asks again.
+</Callout>
+
+Force ending refunds both bets when `game.refund-on-force-end` is on.
 
 ## Permissions
 
-| Node | Default | What it grants |
+| Node | Default | Grants |
 | --- | --- | --- |
-| `tictactoe.play` | everyone | Challenge, accept and decline |
-| `aquatac.help` | everyone | The help menu |
-| `aquatac.admin` | op | Reload |
+| `aquatac.play` | everyone | Challenge, accept, decline, cancel |
+| `aquatac.help` | everyone | The help list |
+| `aquatac.stats` | everyone | `stats` |
+| `aquatac.top` | everyone | `top` |
+| `aquatac.bot` | everyone | `bot` |
+| `aquatac.rematch` | everyone | `rematch` |
+| `aquatac.broadcast` | everyone | Receives win and draw broadcasts |
+| `aquatac.reload` | op | `reload` |
+| `aquatac.end` | op | `end` |
+| `aquatac.reset` | op | `reset` |
+| `aquatac.debug` | op | `debug` |
+| `aquatac.update` | op | The update notice on join |
+| `aquatac.admin` | op | All of the above |
 
-<Callout type="info">
-  Taking `tictactoe.play` from a player also stops others from challenging them: the challenger gets
-  `opponent-cant-play`.
+<Callout type="warning">
+  In `1.0.0` these were `tictactoe.play`, `aquatac.help` and `aquatac.admin`. The root is now
+  `aquatac` for everything, and `tictactoe.play` does nothing.
 </Callout>
+
+Taking `aquatac.play` from a player also stops others from challenging them: the challenger gets
+`opponent-cant-play`.
+
+## Bypasses
+
+| Node | Default | Ignores |
+| --- | --- | --- |
+| `aquatac.bypass.cooldown` | op | The wait between challenges |
+| `aquatac.bypass.bet-limits` | op | `bet.min` and `bet.max` |
+| `aquatac.bypass.*` | op | Both |
+
+## Why a challenge fails
+
+| Reason | Reply |
+| --- | --- |
+| The target is offline | `player-not-found` |
+| You challenge yourself | `cant-challenge-self` |
+| The target lacks `aquatac.play` | `opponent-cant-play` |
+| You are already playing | `already-in-match` |
+| They are already playing | `opponent-in-match` |
+| You challenged too recently | `challenge-cooldown` |
+| The bet is outside `bet.min` or `bet.max` | limit message |
+| Either side cannot cover the stake | no funds message |

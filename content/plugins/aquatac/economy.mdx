@@ -1,0 +1,106 @@
+---
+title: Economy
+description: The three money backends, bet limits and the pot tax.
+---
+
+import { Callout } from 'nextra/components'
+
+# Economy
+
+```yaml filename="config.yml"
+economy:
+  type: CUSTOM # CUSTOM, VAULT, NONE
+```
+
+| Type | Moves money with |
+| --- | --- |
+| `CUSTOM` | Commands you write, so any economy plugin works |
+| `VAULT` | Vault plus an economy plugin like EssentialsX |
+| `NONE` | Nothing. Every match is free |
+
+<Callout type="info">
+  If the chosen backend cannot start, the plugin logs why and falls back to `NONE`. Matches stay
+  playable for free instead of every command failing.
+</Callout>
+
+`VAULT` gets one retry a tick after startup, so an economy plugin that registers its provider after
+AquaTac still works.
+
+## Custom commands
+
+The default. Only read when `type` is `CUSTOM`.
+
+```yaml filename="config.yml"
+  custom:
+    currency-format: "$%amount%"
+    balance-placeholder: ""
+    run-as: CONSOLE
+    deposit-commands: []
+    withdraw-commands: []
+```
+
+| Key | What it does |
+| --- | --- |
+| `currency-format` | How an amount is printed. `%amount%` is the number |
+| `balance-placeholder` | Placeholder used to read a balance. Needs PlaceholderAPI |
+| `run-as` | `CONSOLE` or `PLAYER`. Console is almost always right |
+| `deposit-commands` | Run when a player is paid: a won pot, or a refund |
+| `withdraw-commands` | Run when a stake is taken |
+
+Both lists take `%player%`, `%uuid%` and `%amount%`.
+
+```yaml filename="config.yml"
+    deposit-commands:
+      - "eco give %player% %amount%"
+    withdraw-commands:
+      - "eco take %player% %amount%"
+```
+
+| Economy plugin | Deposit |
+| --- | --- |
+| EssentialsX | `eco give %player% %amount%` |
+| CoinsEngine | `coins give %player% coins %amount%` |
+| PlayerPoints | `points give %player% %amount%` |
+
+<Callout type="warning">
+  Leaving **both** lists empty makes the backend fail to start, so the plugin falls back to `NONE`
+  and betting is off. Fill in at least one.
+</Callout>
+
+### Checking funds
+
+`balance-placeholder` is how AquaTac knows whether a player can afford a bet.
+
+```yaml filename="config.yml"
+    balance-placeholder: "%vault_eco_balance%"
+```
+
+Leave it empty and the plugin cannot check. It then **trusts** your economy plugin to reject a
+player who cannot pay, which means a challenge can start and the withdraw command can silently fail.
+`/aquatac debug` prints whether balance checking is active.
+
+## Bets
+
+```yaml filename="config.yml"
+bet:
+  enabled: true
+  min: 1.0
+  max: 1000000.0
+  tax-percent: 0.0
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `enabled` | `true` | Off makes `/ttt invite <player>` work with no amount and stake nothing |
+| `min` | `1.0` | Smallest stake. Stops spam challenges for meaningless amounts |
+| `max` | `1000000.0` | Largest stake. `0` removes the upper limit |
+| `tax-percent` | `0.0` | Cut the server keeps from the pot. `0` disables it |
+
+`min` and `max` are ignored for anyone with `aquatac.bypass.bet-limits`.
+
+### Tax
+
+The tax comes out of the **pot**, not each stake. At `tax-percent: 5` a 100 bet from both sides
+makes a pot of 200, the server keeps 10 and the winner is paid 190.
+
+A draw refunds both stakes in full. The tax only applies to a win.

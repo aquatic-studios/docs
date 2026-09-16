@@ -1,33 +1,34 @@
 ---
 title: Configuration
-description: Bet limits, challenge expiry and match rules.
+description: Challenges, match rules, the turn timer and the bot.
 ---
 
 import { Callout } from 'nextra/components'
 
 # Configuration
 
-## Bets
+Most options apply with `/aquatac reload`. Storage is the exception and needs a restart.
 
-```yaml filename="config.yml"
-bet:
-  min: 1.0
-  max: 1000000.0
-```
-
-| Key | Default | What it does |
-| --- | --- | --- |
-| `min` | `1.0` | Smallest stake allowed. Stops spam challenges for meaningless amounts |
-| `max` | `1000000.0` | Largest stake. `0` removes the upper limit |
+Money settings live on the [Economy](/plugins/aquatac/economy/) page, stats on
+[Stats](/plugins/aquatac/stats/).
 
 ## Requests
 
 ```yaml filename="config.yml"
 request:
   expiry-seconds: 60
+  cooldown-seconds: 3
+  clickable: true
 ```
 
-How long a challenge stays valid before it expires silently. `0` means challenges never expire.
+| Key | Default | What it does |
+| --- | --- | --- |
+| `expiry-seconds` | `60` | How long a challenge stays valid. `0` means never expires |
+| `cooldown-seconds` | `3` | Wait between sending challenges. `0` disables it |
+| `clickable` | `true` | Shows `[accept]` `[decline]` buttons under the message |
+
+The text commands keep working whether or not the buttons are on. The cooldown is skipped with
+`aquatac.bypass.cooldown`.
 
 ## Match
 
@@ -36,28 +37,74 @@ game:
   broadcast-win: false
   broadcast-draw: false
   spawn-firework-for-winner: true
-  end-delay-ticks: 30
-  turn-timeout-seconds: 0
+  highlight-winning-line: true
+  end-delay-ticks: 60
+  turn-timeout-seconds: 30
+  turn-actionbar: true
+  dynamic-title: false
   forfeit-on-leave: true
   refund-on-force-end: true
+  allow-rematch: true
 ```
 
 | Key | Default | What it does |
 | --- | --- | --- |
-| `broadcast-win` | `false` | Announces wins to the whole server |
-| `broadcast-draw` | `false` | Announces draws |
+| `broadcast-win` | `false` | Announces wins to everyone holding `aquatac.broadcast` |
+| `broadcast-draw` | `false` | The same for draws |
 | `spawn-firework-for-winner` | `true` | Launches a firework at the winner |
-| `end-delay-ticks` | `30` | How long the final board stays open. 20 ticks is one second |
-| `turn-timeout-seconds` | `0` | A player who takes longer forfeits. `0` disables the timer |
-| `forfeit-on-leave` | `true` | `true` the leaver forfeits and the opponent takes the pot, `false` cancels and refunds both |
-| `refund-on-force-end` | `true` | Refunds both bets when a match is force ended by a reload or shutdown |
+| `highlight-winning-line` | `true` | Paints the three winning cells with the `winner` marker |
+| `end-delay-ticks` | `60` | How long the final board stays open. 20 ticks is one second |
+| `turn-timeout-seconds` | `30` | A player who takes longer forfeits. `0` disables the timer |
+| `turn-actionbar` | `true` | Shows whose turn it is and the time left on the action bar |
+| `dynamic-title` | `false` | Whether the GUI title follows the turn |
+| `forfeit-on-leave` | `true` | `true` the leaver loses the pot, `false` cancels and refunds |
+| `refund-on-force-end` | `true` | Refunds both bets when the server force ends a match |
+| `allow-rematch` | `true` | Whether `/ttt rematch` works |
+
+<Callout type="info">
+  `dynamic-title` costs a reopen. With it off the board keeps one title and the cells are repainted
+  in place, so the GUI never flickers between moves. With it on the inventory has to be reopened on
+  every single move to change the title.
+</Callout>
+
+Leaving covers all three cases: closing the board, disconnecting, and running out of time on the
+turn timer.
 
 <Callout type="warning">
   Leave `refund-on-force-end` on. With it off, a reload or restart during a match makes both players
   lose their stake.
 </Callout>
 
-<Callout type="info">
-  Leaving covers all three cases: closing the board, disconnecting, and running out of time on the
-  turn timer.
-</Callout>
+## Bot
+
+```yaml filename="config.yml"
+bot:
+  enabled: true
+  name: "&#54ADF4AquaBot"
+  default-difficulty: NORMAL
+  move-delay-ticks: 20
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `enabled` | `true` | Off makes `/ttt bot` answer `bot-disabled` |
+| `name` | `AquaBot` | Name on the board and in messages. Colours allowed |
+| `default-difficulty` | `NORMAL` | Used when the player names none |
+| `move-delay-ticks` | `20` | How long it waits before playing. Instant moves feel wrong |
+
+| Difficulty | Plays |
+| --- | --- |
+| `EASY` | At random |
+| `NORMAL` | Beatable, slips about half the time |
+| `HARD` | Rarely slips |
+| `IMPOSSIBLE` | Solved. It can never be beaten |
+
+Bot matches are always free. Nothing is staked and nothing is paid out.
+
+## Updates
+
+```yaml filename="config.yml"
+update-notify: true
+```
+
+Checks SpigotMC on startup and tells staff holding `aquatac.update` when they join.

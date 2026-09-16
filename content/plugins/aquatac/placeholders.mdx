@@ -1,0 +1,55 @@
+---
+title: Placeholders
+description: Match state, stats and money through PlaceholderAPI.
+---
+
+import { Callout } from 'nextra/components'
+
+# Placeholders
+
+AquaTac registers one PlaceholderAPI expansion, `aquatac`.
+
+## Server
+
+| Placeholder | Returns |
+| --- | --- |
+| `%aquatac_active_matches%` | Matches running right now |
+| `%aquatac_economy%` | The backend in use |
+| `%aquatac_betting%` | `true` or `false` |
+
+## Current match
+
+Only meaningful while the player is online and playing.
+
+| Placeholder | Returns |
+| --- | --- |
+| `%aquatac_in_match%` | `true` or `false` |
+| `%aquatac_opponent%` | Who they are playing |
+| `%aquatac_match_bet%` | The stake, formatted |
+
+## Stats
+
+| Placeholder | Returns |
+| --- | --- |
+| `%aquatac_wins%` | Matches won |
+| `%aquatac_losses%` | Matches lost |
+| `%aquatac_draws%` | Matches drawn |
+| `%aquatac_forfeits%` | Losses from leaving or timing out |
+| `%aquatac_games%` | Total played |
+| `%aquatac_winrate%` | Win percentage |
+| `%aquatac_streak%` | Current win streak |
+| `%aquatac_best_streak%` | Highest streak reached |
+| `%aquatac_earned%` | Money won, formatted |
+| `%aquatac_lost%` | Money lost, formatted |
+| `%aquatac_net%` | Earned minus lost, formatted |
+| `%aquatac_earned_raw%` | The same as a plain number |
+| `%aquatac_lost_raw%` | The same as a plain number |
+| `%aquatac_net_raw%` | The same as a plain number |
+
+Use the `_raw` ones for anything that does maths on the value. The others carry the currency format
+from `economy.custom.currency-format`.
+
+<Callout type="info">
+  Stats placeholders read the **cache**, so they return an empty string for a player whose stats are
+  not loaded. A player's stats load on join, so this only affects offline lookups.
+</Callout>

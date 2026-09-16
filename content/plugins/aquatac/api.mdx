@@ -1,0 +1,166 @@
+---
+title: Developer API
+description: Start and end matches, read stats and listen to the three events.
+---
+
+import { Callout, Tabs } from 'nextra/components'
+
+# Developer API
+
+New in `1.1.0`. `AquaTacAPI` is a singleton reached with `AquaTacAPI.get()`.
+
+```yaml filename="plugin.yml"
+softdepend: [AquaTac]
+```
+
+<Callout type="warning">
+  Depend on it at compile time only. The plugin ships the implementation at runtime, so shading it
+  will break your add on.
+</Callout>
+
+## Install
+
+<Tabs items={['Gradle (Kotlin)', 'Maven']}>
+  <Tabs.Tab>
+```kotlin filename="build.gradle.kts"
+repositories {
+    maven("https://jitpack.io")
+}
+
+dependencies {
+    compileOnly("com.github.aquatic-studios:AquaTac:1.1.0")
+}
+```
+  </Tabs.Tab>
+  <Tabs.Tab>
+```xml filename="pom.xml"
+<repository>
+    <id>jitpack.io</id>
+    <url>https://jitpack.io</url>
+</repository>
+
+<dependency>
+    <groupId>com.github.aquatic-studios</groupId>
+    <artifactId>AquaTac</artifactId>
+    <version>1.1.0</version>
+    <scope>provided</scope>
+</dependency>
+```
+  </Tabs.Tab>
+</Tabs>
+
+Builds are published through [JitPack](https://jitpack.io/#aquatic-studios/AquaTac).
+
+## Getting the API
+
+```java
+if (!AquaTacAPI.isAvailable()) return;
+
+AquaTacAPI api = AquaTacAPI.get();
+```
+
+`get()` throws `IllegalStateException` while the plugin is not enabled, so check `isAvailable()` in
+anything that can run before AquaTac has loaded.
+
+## Matches
+
+| Method | Returns |
+| --- | --- |
+| `isInMatch(UUID player)` | Whether they are playing |
+| `getMatch(Player player)` | Their `Match`, or `null` |
+| `getActiveMatches()` | How many are running |
+| `startMatch(Player first, Player second, double bet)` | A `StartResult` |
+| `startBotMatch(Player player, Bot.Difficulty difficulty)` | A `StartResult` |
+| `endMatch(Player player)` | Force ends theirs, if any |
+
+```java
+GameManager.StartResult result = api.startMatch(one, two, 250.0);
+if (result != GameManager.StartResult.OK) {
+    one.sendMessage("Could not start: " + result);
+}
+```
+
+| `StartResult` | Means |
+| --- | --- |
+| `OK` | The match started |
+| `ALREADY_IN_MATCH` | One of them is busy |
+| `SENDER_NO_FUNDS` | The first player cannot cover the stake |
+| `RECEIVER_NO_FUNDS` | The second cannot |
+| `TRANSACTION_FAILED` | The economy refused the withdraw |
+
+`startMatch` skips the challenge step entirely, so it fires `MatchStartEvent` but never
+`ChallengeSendEvent` — that one only fires for `/ttt invite`.
+
+### Reading a match
+
+`Match` exposes `getId()`, `getFirstId()`, `getSecondId()`, `getFirstName()`, `getSecondName()`,
+`getBet()`, `isVsBot()`, `isFinished()`, `getBoard()`, and `markOf(UUID)` / `nameOf(Mark)` /
+`idOf(Mark)` / `playerOf(Mark)` to move between a player and their side.
+
+## Stats
+
+| Method | Returns |
+| --- | --- |
+| `getCachedStats(UUID player)` | Their `PlayerStats`, or `null` when not cached |
+| `getStats(OfflinePlayer player, Consumer<PlayerStats>)` | Loads them, then calls you back |
+| `getTop(StatColumn column, int limit, Consumer<List<PlayerStats>>)` | A leaderboard page |
+
+```java
+api.getStats(player, stats ->
+        getLogger().info(stats.wins() + "W " + stats.losses() + "L " + stats.winRate() + "%"));
+```
+
+<Callout type="info">
+  `getStats` calls back straight away, on your thread, when the player is already cached. Otherwise
+  it loads on a background thread and calls back on the main thread. `getTop` always goes to the
+  database. `getCachedStats` never blocks and returns `null` instead.
+</Callout>
+
+`PlayerStats` gives `wins()`, `losses()`, `draws()`, `forfeits()`, `games()`, `streak()`,
+`bestStreak()`, `earned()`, `lost()`, `net()`, `winRate()` and `lastPlayed()`.
+
+`StatColumn` is `WINS`, `LOSSES`, `DRAWS`, `GAMES`, `STREAK`, `BEST_STREAK` or `EARNED`.
+
+## Economy
+
+| Method | Returns |
+| --- | --- |
+| `getEconomy()` | The active `EconomyProvider` |
+| `isBettingEnabled()` | Whether money is actually moving |
+
+`isBettingEnabled()` is false when `bet.enabled` is off, when the type is `NONE`, or when the chosen
+backend failed to start and fell back.
+
+## Events
+
+| Event | Fires | Cancellable |
+| --- | --- | --- |
+| `ChallengeSendEvent` | A challenge is sent | Yes |
+| `MatchStartEvent` | A match begins | No |
+| `MatchEndEvent` | A match ends | No |
+
+```java
+@EventHandler
+public void onChallenge(ChallengeSendEvent event) {
+    if (event.getTarget().hasMetadata("afk")) {
+        event.setCancelled(true);
+        return;
+    }
+    event.setBet(event.getBet() * 2);
+}
+```
+
+`ChallengeSendEvent` gives `getChallenger()`, `getTarget()`, `getBet()` and `setBet(double)`, so an
+add on can change the stake before it is taken.
+
+`MatchEndEvent` gives `getMatch()`, `getReason()`, `getWinner()`, `getLoser()` and `getPayout()`.
+
+| `EndReason` | Means |
+| --- | --- |
+| `WIN` | Someone made three in a row |
+| `DRAW` | The board filled up |
+| `LEFT` | A player closed the board or disconnected |
+| `TIMEOUT` | A player ran out of turn time |
+| `CANCELLED` | The server force ended it |
+
+On a draw and on a cancel, `getWinner()` and `getLoser()` are `null`.

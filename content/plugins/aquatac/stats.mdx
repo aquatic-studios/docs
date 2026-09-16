@@ -1,0 +1,79 @@
+---
+title: Stats
+description: What is recorded, where it is kept and how to reset it.
+---
+
+import { Callout } from 'nextra/components'
+
+# Stats
+
+```yaml filename="config.yml"
+stats:
+  enabled: true
+```
+
+Off opens no database at all, and `/ttt stats`, `/ttt top` and `/aquatac reset` stop working.
+
+## What is kept
+
+| Field | Is |
+| --- | --- |
+| `wins` | Matches won |
+| `losses` | Matches lost |
+| `draws` | Matches drawn |
+| `forfeits` | Losses from leaving or timing out |
+| `streak` | Current win streak |
+| `best_streak` | Highest streak ever reached |
+| `earned` | Money won |
+| `lost` | Money staked and lost |
+
+Games and win rate are derived from those, not stored.
+
+## Storage
+
+```yaml filename="config.yml"
+storage:
+  type: SQLITE
+  save-interval-minutes: 5
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `type` | `SQLITE` | `SQLITE` or `H2`. The driver downloads on startup |
+| `save-interval-minutes` | `5` | How often cached stats are flushed from RAM |
+
+Stats are also written when a player logs off and on shutdown, so the interval only matters for a
+crash.
+
+<Callout type="warning">
+  Changing `type` needs a restart and **does not migrate** anything. The new database starts empty.
+</Callout>
+
+Writes go through a queue on a background thread. `/aquatac debug` shows how many are pending.
+
+## Leaderboard
+
+```
+/ttt top
+/ttt top streak
+/ttt top earned
+```
+
+| Column | Ranks by |
+| --- | --- |
+| `wins` | Wins. The default |
+| `losses` | Losses |
+| `draws` | Draws |
+| `games` | Wins plus losses plus draws |
+| `streak` | Current streak |
+| `best_streak` | Best streak ever |
+| `earned` | Money won |
+
+## Resetting
+
+```
+/aquatac reset Senkex
+/aquatac reset all confirm
+```
+
+One player, or everything. The `all` form refuses to run without the literal word `confirm`.

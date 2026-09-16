@@ -123,7 +123,34 @@ No releases documented yet.
 
 ## AquaTac
 
-No releases documented yet.
+### 1.1.0
+
+- Added a developer API. `AquaTacAPI` starts and force ends matches, reads live match state, looks up stats and leaderboards, and reports the active economy backend.
+- Added the events `ChallengeSendEvent`, `MatchStartEvent` and `MatchEndEvent`. The challenge event is cancellable and lets an add on rewrite the stake before it is taken.
+- Added builds on [JitPack](https://jitpack.io/#aquatic-studios/AquaTac).
+- Added a bot for single player practice with `/ttt bot [difficulty]`, in `EASY`, `NORMAL`, `HARD` and `IMPOSSIBLE`. The last one is solved and cannot be beaten. Bot matches are always free.
+- Added statistics kept in SQLite or H2: wins, losses, draws, forfeits, current and best streak, and money won and lost.
+- Added `/ttt stats [player]` and `/ttt top [column]`, ranking by wins, losses, draws, games, streak, best streak or money earned.
+- Added `/aquatac reset <player|all confirm>` to wipe stats, and `/aquatac end <player|all>` to force end matches with a refund.
+- Added `/aquatac debug`, printing the version, server, Folia, economy backend, whether balance checking works, storage, cached stats, queued writes and active matches.
+- Reworked the economy. Vault is no longer required: `CUSTOM` runs your own deposit and withdraw commands so any economy plugin works, `VAULT` keeps the old behaviour and `NONE` plays every match for free. A backend that fails to start falls back to `NONE` instead of breaking every command.
+- Added `economy.custom.balance-placeholder`, so the plugin can check funds through PlaceholderAPI before a challenge starts.
+- Added `bet.tax-percent`, a cut the server keeps from the pot, useful as a money sink. Draws still refund both stakes in full.
+- Added `bet.enabled`, letting `/ttt invite <player>` work with no amount at all.
+- Moved every permission under the `aquatac` root. `tictactoe.play` is now `aquatac.play`, and the new nodes are `stats`, `top`, `bot`, `rematch`, `broadcast`, `reset`, `end`, `debug` and `update`.
+- Added the bypasses `aquatac.bypass.cooldown` and `aquatac.bypass.bet-limits`.
+- Added `/ttt cancel` to withdraw a challenge you sent, and `/ttt rematch` to re-challenge whoever you last played.
+- Added `/ttt <player>` as a shortcut for `/ttt invite <player>`.
+- Added clickable `[accept]` and `[decline]` buttons under the challenge message, toggleable with `request.clickable`.
+- Added `request.cooldown-seconds`, a wait between sending challenges.
+- Added a PlaceholderAPI expansion with match state, stats, win rate, streaks and money, including `_raw` variants for anything that does maths on the value.
+- Added `game.highlight-winning-line` and the `winner` marker, painting the three winning cells before the board closes.
+- Added `use-player-head` on the `first` and `second` markers, and `%player%` inside a marker so the board reads as two named players.
+- Added `game.turn-actionbar`, showing whose turn it is and the time left.
+- Added `game.dynamic-title`. Off keeps one title and repaints the cells in place, so the GUI never flickers between moves; on reopens the inventory each move to follow the turn.
+- Added `game.allow-rematch` and the `bot` section to `config.yml`, plus `storage` and `stats`.
+- Added an update checker that asks SpigotMC on startup and notifies staff with `aquatac.update` on join, toggleable with `update-notify`.
+- Changed sound parsing to accept both enum names and namespaced keys, with `""` or `none` to mute one.
 
 ## AquaTebex
 
