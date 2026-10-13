@@ -10,6 +10,109 @@ import { Callout } from 'nextra/components'
 `webhook.yml` posts an embed when something happens to a clan. Off by default.
 
 ```yaml filename="webhook.yml"
+enabled: false
+url: ''
+
+username: 'AquaClan'
+avatar: 'https://mc-heads.net/avatar/MHF_Question/128'
+
+server: 'My Server'
+console-name: 'Console'
+allow-mentions: false
+```
+
+| Key | What it does |
+| --- | --- |
+| `url` | Your Discord webhook URL |
+| `username` / `avatar` | Name and avatar of every message |
+| `server` | Replaces `%server%` |
+| `console-name` | Shown as `%player%` when the console does it |
+| `allow-mentions` | Lets `@everyone`, `@here` and role pings work. Off so no clan can ping through its name or tag |
+
+<Callout type="error">
+  Never commit a real webhook URL to a public repository. Anyone who finds it can post to your
+  channel until you revoke it.
+</Callout>
+
+## Events
+
+| Event | Fires when | Extra placeholders |
+| --- | --- | --- |
+| `create` | A clan is created | `%player%` |
+| `disband` | A clan is disbanded, by command or admin | `%player%` |
+| `join` | A player joins | `%player%` |
+| `leave` | A player leaves or is kicked | `%player%` |
+| `rename` | The clan is renamed | `%old_name%`, `%new_name%` |
+| `tag` | The custom tag changes | `%old_tag%`, `%new_tag%` |
+| `role` | A member is promoted or demoted | `%player%`, `%old_role%`, `%new_role%` |
+| `level-up` | The clan levels up | `%old_level%`, `%new_level%` |
+| `ally-add` / `ally-remove` | An alliance starts or ends | `%other%`, `%other_leader%`, `%other_members%`, `%other_level%` |
+| `rival-add` / `rival-remove` | A rivalry starts or ends | Same as above |
+| `home-create` | A home is set. Off by default | `%home%` |
+| `banner-change` / `banner-delete` | The banner changes or is removed. Off by default | |
+
+Every event also has `%clan%`, `%clan_tag%`, `%clan_nickname%`, `%clan_description%`, `%leader%`,
+`%leader_uuid%`, `%members%`, `%level%`, `%points%`, `%kills%`, `%deaths%`, `%kdr%`, `%bank%`,
+`%allies%`, `%rivals%`, `%homes%` and `%server%`. `%player_uuid%` comes along with `%player%`.
+
+## Per event
+
+```yaml filename="webhook.yml"
+events:
+  create:
+    enabled: true
+    url: ''
+    username: ''
+    avatar: ''
+    content: ''
+    embed:
+      author:
+        name: '%player%'
+        url: ''
+        icon: 'https://mc-heads.net/avatar/%player%/64'
+      title: '🏰 Clan created'
+      url: ''
+      description: '**%player%** founded the clan **%clan%**'
+      color: '#56FF00'
+      thumbnail: 'https://mc-heads.net/avatar/%player%/128'
+      image: ''
+      fields:
+        - name: 'Clan'
+          value: '%clan%'
+          inline: true
+        - name: 'Leader'
+          value: '%leader%'
+          inline: true
+      footer:
+        text: '%server% • AquaClan'
+        icon: ''
+      timestamp: true
+```
+
+| Key | What it does |
+| --- | --- |
+| `enabled` | Turns the event on or off |
+| `url` | Sends this event to another channel. `''` uses the global one |
+| `username` / `avatar` | Overrides the global ones. `''` keeps them |
+| `content` | Text above the embed, where pings live |
+| `color` | Embed side color, hex or decimal |
+| `author` | Small line above the title, with icon and link |
+| `title` / `url` | Title and where clicking it goes |
+| `description` | Body. `\n` makes a line break |
+| `image` | Big image under the embed, `''` hides it |
+| `thumbnail` | Small image top right, `''` hides it |
+| `fields` | Extra rows. `inline: true` puts them side by side |
+| `footer` | Bottom line, with an optional icon |
+| `timestamp` | Stamps the current time |
+
+Delete the `fields` list for none, or the whole `embed` to send only `content`.
+
+## Default file
+
+<details>
+<summary>`webhook.yml`</summary>
+
+```yaml filename="webhook.yml"
 # Do not change this
 version: 1
 
