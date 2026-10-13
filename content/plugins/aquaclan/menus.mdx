@@ -1,23 +1,13 @@
 ---
 title: Menus
-description: Edit any of the 35 menus, their items, buttons and actions.
+description: Edit any of the 36 menus, their items, textures, filler and actions.
 ---
 
 import { Callout } from 'nextra/components'
 
 # Menus
 
-Every menu is one file in `menus/`. Same shape in all of them, so learning one is learning all 35.
-
-```
-main · short · create · clans · clanlist · clan_info · clan_members
-clan_allies · clan_rivals · clan_settings · clan_stats · members
-members_top · allies · allylist · rivals · rivallist · invites
-invites_sent · invite_players · profile · settings · bank · mail
-banner_editor · banner_colors · banner_patterns · bans · logger
-levels · leaderboard · tops · points · kills · deaths · kdr
-```
-
+Every menu is one file in `menus/`. Same shape in all of them, so learning one is learning all 36.
 Open any of them with `/clan open <menu> [clan]`.
 
 ## Structure
@@ -32,125 +22,4016 @@ items:
     slot: 4
     display_name: '&#FFEE00&lYour Clan'
     lore:
+      - '&7Everything about your clan.'
+      - ''
       - '&#54ADF4Name: &f%aquaclan_name%'
-      - '&#54ADF4Level: &f%aquaclan_level%'
+      - '&#54ADF4Leader: &f%aquaclan_leader%'
+      - '&#54ADF4Level: &f%aquaclan_level% &8• &#54ADF4Points: &f%aquaclan_points%'
+      - '&#54ADF4Members: &f%aquaclan_online%&7/&f%aquaclan_members%'
+      - '&#54ADF4Kills: &f%aquaclan_kills% &8• &#54ADF4KDR: &f%aquaclan_kdr%'
+      - ''
+      - '&#FF9E08Click to view full info'
     left_click_commands:
       - '[player] clan info'
       - '[close]'
-```
-
-| Key | What it does |
-| --- | --- |
-| `menu_title` | GUI title |
-| `size` | Slots, a multiple of 9 |
-| `material` | Any material of your version |
-| `slot` | Position, zero indexed |
-| `display_name` / `lore` | Item text, placeholders work |
-| `left_click_commands` | Actions on left click |
-| `right_click_commands` | Actions on right click |
-
-## Item options
-
-| Option | What it does |
-| --- | --- |
-| `requires-clan` | Hides the item from players with no clan |
-| `hide-with-clan` | Hides it from players who **have** one |
-| `hide-without-clan` | Hides it from players who do not |
-| `permission` | Node needed to see it |
-| `head` | Renders a player head |
-| `clan-banner` | Renders the clan's banner as the item |
-| `no-clan` | A whole replacement item for players with no clan |
-
-```yaml filename="menus/main.yml"
     no-clan:
       material: BARRIER
       display_name: '&#FF2D2D&lYou have no clan'
       lore:
+        - '&7You are not in a clan yet.'
+        - ''
         - '&#FFEE00Create one: &f/clan create <name>'
+        - '&7Or accept an invite: &f/clan accept'
       left_click_commands:
         - '[close]'
-```
 
-## Actions
-
-| Action | What it does |
-| --- | --- |
-| `[menu] <name>` | Opens another menu |
-| `[close]` | Closes the GUI |
-| `[player] <command>` | Runs a command as the player |
-| `[console] <command>` | Runs it as console |
-| `[message] <text>` | Sends a message |
-| `[sound] <SOUND>` | Plays a sound |
-| `[input]` | Asks for an answer in chat |
-| `[refresh]` | Redraws the menu without closing it |
-| `[invite-send]` | Sends an invitation |
-| `[invite-accept]` | Accepts one |
-| `[invite-deny]` | Denies one |
-| `[invite-revoke]` | Cancels one you sent |
-| `[profile-toggle]` | Flips a profile setting |
-
-## Chat input
-
-`[input]` asks the player to type the answer in chat, which is how clans get created without a
-command.
-
-```yaml filename="config.yml"
-chat-input:
-  timeout-seconds: 60
-  cancel-words:
-    - cancel
-    - cancelar
-  bossbar:
-    enabled: true
-    color: BLUE
-    style: PROGRESS
-  title:
-    enabled: true
-    fade-in: 5
-    stay: 60
-    fade-out: 10
-  sounds:
-    open: BLOCK_NOTE_BLOCK_PLING
-    success: ENTITY_PLAYER_LEVELUP
-    cancel: BLOCK_NOTE_BLOCK_BASS
-```
-
-| Key | Default | What it does |
-| --- | --- | --- |
-| `timeout-seconds` | `60` | Time to answer before it cancels |
-| `cancel-words` | `cancel`, `cancelar` | Words that abort it |
-| `bossbar` | on | Countdown bar. `PINK`, `BLUE`, `RED`, `GREEN`, `YELLOW`, `PURPLE`, `WHITE` |
-| `title` | on | Countdown title, timings in ticks |
-| `sounds` | | Played on open, success and cancel |
-
-## Clan context
-
-A menu opened for another clan shows **that** clan's placeholders, including its position in every
-ranking.
-
-```
-/clan open levels ClanMuerte
-```
-
-<Callout type="warning">
-  A menu opened without a clan falls back to your own. Commands that end up with an unresolved
-  `%aquaclan_name%` are skipped instead of running broken.
-</Callout>
-
-## Rankings
-
-```yaml filename="config.yml"
-menu:
-  top-limit: 200
-  block-not-have-clan:
-    enabled: true
-    material: RED_STAINED_GLASS_PANE
-    display_name: '&#FF2D2D&lI need to create a clan'
+  members:
+    material: PLAYER_HEAD
+    slot: 10
+    requires-clan: true
+    display_name: '&#FFEE00&lMembers'
     lore:
-      - '&7You are not in a clan yet.'
+      - '&7Manage your clan members.'
+      - ''
+      - '&#54ADF4Members: &f%aquaclan_members%'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] members'
+
+  homes:
+    material: RED_BED
+    slot: 11
+    requires-clan: true
+    display_name: '&#FFEE00&lClan Home'
+    lore:
+      - '&7Teleport to your clan home.'
+      - ''
+      - '&#FF9E08Click to teleport'
+    left_click_commands:
+      - '[player] clan home'
+      - '[close]'
+
+  bank:
+    material: GOLD_INGOT
+    slot: 12
+    requires-clan: true
+    display_name: '&#FFEE00&lClan Bank'
+    lore:
+      - '&7Deposit and withdraw funds.'
+      - ''
+      - '&#54ADF4Balance: &f%aquaclan_bank%'
+      - ''
+      - '&#FF9E08Click to view'
+    left_click_commands:
+      - '[player] clan bank'
+      - '[close]'
+
+  chat:
+    material: WRITABLE_BOOK
+    slot: 13
+    requires-clan: true
+    display_name: '&#FFEE00&lClan Chat'
+    lore:
+      - '&7Talk privately with your clan.'
+      - ''
+      - '&#FF9E08Click to toggle'
+    left_click_commands:
+      - '[player] clan chat'
+      - '[close]'
+
+  allies:
+    material: LIME_DYE
+    slot: 14
+    requires-clan: true
+    display_name: '&#FFEE00&lAllies'
+    lore:
+      - '&7Manage allied clans.'
+      - ''
+      - '&#54ADF4Allies: &f%aquaclan_allies%'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] allies'
+
+  rivals:
+    material: RED_DYE
+    slot: 15
+    requires-clan: true
+    display_name: '&#FFEE00&lRivals'
+    lore:
+      - '&7Manage rival clans.'
+      - ''
+      - '&#54ADF4Rivals: &f%aquaclan_rivals%'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] rivals'
+
+  settings:
+    material: COMPARATOR
+    slot: 16
+    requires-clan: true
+    display_name: '&#FFEE00&lSettings'
+    lore:
+      - '&7Configure your clan.'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] settings'
+
+  mail:
+    material: PAPER
+    slot: 20
+    requires-clan: true
+    display_name: '&#FFEE00&lMail'
+    lore:
+      - '&7Read your clan mailbox.'
+      - ''
+      - '&#54ADF4Unread: &f%aquaclan_mail_unread%'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] mail'
+
+  logger:
+    material: BOOK
+    slot: 21
+    requires-clan: true
+    display_name: '&#FFEE00&lActivity Log'
+    lore:
+      - '&7Recent clan activity.'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] logger'
+
+  leaderboard:
+    material: DIAMOND
+    slot: 24
+    display_name: '&#FFEE00&lRankings'
+    lore:
+      - '&7Top clans by points, kills, level,'
+      - '&7members, bank and more.'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] tops'
+
+  invites:
+    material: PAPER
+    slot: 22
+    display_name: '&#FFEE00&lInvitations'
+    lore:
+      - '&7Clans that invited you and the'
+      - '&7invitations your clan sent out.'
+      - ''
+      - '&#54ADF4Received: &f%aquaclan_pending_invites%'
+      - '&#54ADF4Sent: &f%aquaclan_sent_invites%'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] invites'
+
+  clans:
+    material: SHIELD
+    slot: 23
+    display_name: '&#FFEE00&lAll Clans'
+    lore:
+      - '&7Browse every clan with full info,'
+      - '&7rankings and statistics.'
+      - ''
+      - '&#54ADF4Total clans: &f%aquaclan_count%'
+      - ''
+      - '&#FF9E08Left click for the clan list'
+      - '&#FF9E08Right click for the rankings'
+    left_click_commands:
+      - '[menu] clans'
+    right_click_commands:
+      - '[menu] tops'
+
+  close:
+    material: BARRIER
+    slot: 31
+    display_name: '&#FF2D2D&lClose'
+    lore:
+      - '&7Close this menu.'
+    left_click_commands:
+      - '[close]'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-35
 ```
 
-`top-limit` caps how many clans the ranking menus list. `block-not-have-clan` is the item shown on
-buttons that need a clan when the viewer has none.
+</details>
 
-Lists show 45 entries per page with the navigation on the bottom row.
+<details>
+<summary>`short.yml`</summary>
+
+```yaml filename="menus/short.yml"
+menu_title: '&8AquaClan | Quick Menu'
+size: 27
+
+items:
+  create:
+    material: WRITABLE_BOOK
+    slot: 10
+    hide-with-clan: true
+    display_name: '&#FFEE00&lCreate Clan'
+    lore:
+      - '&7Found your own clan and start'
+      - '&7the adventure with your friends.'
+      - ''
+      - '&#54ADF4&l» Requirements:'
+      - ' &8→ &#FFEE00Name: &f%aquaclan_name_min%&7-&f%aquaclan_name_max% &7characters'
+      - ' &8→ &#FFEE00Cost: &f%aquaclan_create_cost%'
+      - ' &8→ &#FFEE00Your balance: &f%aquaclan_balance%'
+      - ''
+      - '&#FF9E08Click and write the name in chat!'
+    left_click_commands:
+      - '[input] create short'
+
+  my_clan:
+    material: SHIELD
+    slot: 10
+    hide-without-clan: true
+    clan-banner: true
+    display_name: '&#FFEE00&lMy Clan'
+    lore:
+      - '&7%aquaclan_description%'
+      - ''
+      - '&#54ADF4&l» Information:'
+      - ' &8→ &#FFEE00Clan: &f%aquaclan_name%'
+      - ' &8→ &#FFEE00Leader: &f%aquaclan_leader%'
+      - ' &8→ &#FFEE00Level: &f%aquaclan_level% &8• &#FFEE00Points: &f%aquaclan_points%'
+      - ' &8→ &#FFEE00Members: &f%aquaclan_online%&7/&f%aquaclan_members%'
+      - ' &8→ &#FFEE00Kills: &f%aquaclan_kills% &8• &#FFEE00KDR: &f%aquaclan_kdr%'
+      - ' &8→ &#FFEE00Ranking: &f#%aquaclan_rank_points%'
+      - ''
+      - '&#FF9E08Left click for the clan panel'
+      - '&#FF9E08Right click for the full menu'
+    left_click_commands:
+      - '[menu] clan_info'
+    right_click_commands:
+      - '[menu] main'
+
+  invites:
+    material: PAPER
+    slot: 12
+    display_name: '&#FFEE00&lInvitations'
+    lore:
+      - '&7Invitations other clans sent to you'
+      - '&7and the ones your clan sent out.'
+      - ''
+      - '&#54ADF4&l» Summary:'
+      - ' &8→ &#FFEE00Received: &f%aquaclan_pending_invites%'
+      - ' &8→ &#FFEE00Sent by your clan: &f%aquaclan_sent_invites%'
+      - ''
+      - '&#FF9E08Left click to open your invitations'
+      - '&#FF9E08Right click to invite a player'
+    left_click_commands:
+      - '[menu] invites'
+    right_click_commands:
+      - '[input] invite invites'
+
+  clans:
+    material: BOOKSHELF
+    slot: 14
+    display_name: '&#FFEE00&lAll Clans'
+    lore:
+      - '&7Browse every clan on the server,'
+      - '&7their rankings and full statistics.'
+      - ''
+      - '&#54ADF4&l» Summary:'
+      - ' &8→ &#FFEE00Total clans: &f%aquaclan_count%'
+      - ''
+      - '&#FF9E08Left click to browse the clan list'
+      - '&#FF9E08Right click to open the rankings'
+    left_click_commands:
+      - '[menu] clans'
+    right_click_commands:
+      - '[menu] tops'
+
+  profile:
+    material: PLAYER_HEAD
+    slot: 16
+    head: '%viewer%'
+    display_name: '&#FFEE00&lProfile'
+    lore:
+      - '&7Your personal settings and stats.'
+      - ''
+      - '&#54ADF4&l» Statistics:'
+      - ' &8→ &#FFEE00Clan: &f%aquaclan_name%'
+      - ' &8→ &#FFEE00Role: &f%aquaclan_role%'
+      - ' &8→ &#FFEE00Kills: &f%aquaclan_profile_kills% &8• &#FFEE00Deaths: &f%aquaclan_profile_deaths%'
+      - ' &8→ &#FFEE00KDR: &f%aquaclan_profile_kdr%'
+      - ''
+      - '&#54ADF4&l» Options:'
+      - ' &8→ &#FFEE00Clan invitations: %aquaclan_profile_setting_clan_invites%'
+      - ''
+      - '&#FF9E08Click to open your profile'
+    left_click_commands:
+      - '[menu] profile'
+
+  close:
+    material: BARRIER
+    slot: 22
+    display_name: '&#FF2D2D&lClose'
+    lore:
+      - '&7Close this menu.'
+    left_click_commands:
+      - '[close]'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-26
+```
+
+</details>
+
+<details>
+<summary>`create.yml`</summary>
+
+```yaml filename="menus/create.yml"
+menu_title: '&8AquaClan | Create Clan'
+size: 27
+
+items:
+  create:
+    material: WRITABLE_BOOK
+    slot: 11
+    hide-with-clan: true
+    display_name: '&#FFEE00&lCreate Your Clan'
+    lore:
+      - '&7Click and the chat will ask you'
+      - '&7for the name of your new clan.'
+      - ''
+      - '&#54ADF4&l» Cost: &f%aquaclan_create_cost%'
+      - '&#54ADF4&l» Your balance: &f%aquaclan_balance%'
+      - ''
+      - '&#FF9E08Click and write the name in chat!'
+    left_click_commands:
+      - '[input] create short'
+
+  already:
+    material: SHIELD
+    slot: 11
+    hide-without-clan: true
+    clan-banner: true
+    display_name: '&#FF2D2D&lYou Already Have a Clan'
+    lore:
+      - '&7You are already a member of &f%aquaclan_name%&7.'
+      - ''
+      - '&#FF9E08Click to see your clan'
+    left_click_commands:
+      - '[menu] main'
+
+  rules:
+    material: BOOK
+    slot: 13
+    display_name: '&#54ADF4&lName Rules'
+    lore:
+      - '&7Follow these rules or the name'
+      - '&7will be rejected.'
+      - ''
+      - ' &8→ &#FFEE00Minimum: &f%aquaclan_name_min% &7characters'
+      - ' &8→ &#FFEE00Maximum: &f%aquaclan_name_max% &7characters'
+      - ' &8→ &#FFEE00Only letters and numbers'
+      - ' &8→ &#FFEE00The name must be free'
+      - ''
+      - '&7You can change it later with &f/clan rename'
+
+  benefits:
+    material: NETHER_STAR
+    slot: 15
+    display_name: '&#54ADF4&lClan Benefits'
+    lore:
+      - ' &8→ &#FFEE00Private clan chat'
+      - ' &8→ &#FFEE00Clan homes and bank'
+      - ' &8→ &#FFEE00Allies, rivals and wars'
+      - ' &8→ &#FFEE00Levels with rewards'
+      - ' &8→ &#FFEE00Custom banner and tag'
+
+  back:
+    material: ARROW
+    slot: 22
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to the quick menu.'
+    left_click_commands:
+      - '[menu] short'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-26
+```
+
+</details>
+
+### Your clan
+
+<details>
+<summary>`clan_info.yml`</summary>
+
+```yaml filename="menus/clan_info.yml"
+menu_title: '&8Clan | %clan_name%'
+size: 36
+
+items:
+  banner:
+    material: SHIELD
+    slot: 4
+    clan-banner: true
+    display_name: '&#FFEE00&l%clan_name%'
+    lore:
+      - '&7%clan_description%'
+      - ''
+      - '&#54ADF4&l» Identity:'
+      - ' &8→ &#FFEE00Tag: &r%clan_tag%'
+      - ' &8→ &#FFEE00Nickname: &f%clan_nickname%'
+      - ' &8→ &#FFEE00Leader: &f%clan_leader%'
+      - ' &8→ &#FFEE00Created: &f%clan_created% &8(&f%clan_days%d&8)'
+      - ' &8→ &#FFEE00Verified: %clan_verified%'
+      - ''
+      - '&#54ADF4&l» Ranking:'
+      - ' &8→ &#FFEE00Points: &f#%clan_rank_points%'
+      - ' &8→ &#FFEE00Kills: &f#%clan_rank_kills%'
+      - ' &8→ &#FFEE00Level: &f#%clan_rank_level%'
+
+  leader:
+    material: PLAYER_HEAD
+    slot: 10
+    head: '%clan_leader%'
+    display_name: '&#FFEE00&lLeader'
+    lore:
+      - '&7Who runs this clan.'
+      - ''
+      - ' &8→ &#FFEE00Leader: &f%clan_leader%'
+      - ' &8→ &#FFEE00Co-leaders: &f%clan_co_leaders%'
+      - ' &8→ &#FFEE00Moderators: &f%clan_moderators%'
+      - ' &8→ &#FFEE00Members: &f%clan_rookies%'
+
+  members:
+    material: PLAYER_HEAD
+    slot: 12
+    display_name: '&#FFEE00&lMembers'
+    lore:
+      - '&7Everyone that belongs to this clan.'
+      - ''
+      - ' &8→ &#FFEE00Members: &f%clan_members%&7/&f%clan_max_members%'
+      - ' &8→ &#FFEE00Online: &#56FF00%clan_online% &8• &#FF2D2DOffline: &f%clan_offline%'
+      - ' &8→ &#FFEE00Free slots: &f%clan_free_slots%'
+      - ''
+      - '&#FF9E08Click to open the member list'
+    left_click_commands:
+      - '[menu] clan_members'
+
+  stats:
+    material: NETHER_STAR
+    slot: 14
+    display_name: '&#FFEE00&lStatistics'
+    lore:
+      - '&7Full statistics of this clan.'
+      - ''
+      - ' &8→ &#FFEE00Level: &f%clan_level%&7/&f%clan_max_level%'
+      - ' &8→ &#FFEE00Points: &f%clan_points%'
+      - ' &8→ &#FFEE00Kills: &f%clan_kills% &8• &#FFEE00Deaths: &f%clan_deaths%'
+      - ' &8→ &#FFEE00KDR: &f%clan_kdr%'
+      - ''
+      - '&#FF9E08Click for detailed statistics'
+    left_click_commands:
+      - '[menu] clan_stats'
+
+  economy:
+    material: GOLD_INGOT
+    slot: 16
+    display_name: '&#FFEE00&lEconomy'
+    lore:
+      - '&7What this clan owns.'
+      - ''
+      - ' &8→ &#FFEE00Bank: &f%clan_bank%'
+      - ' &8→ &#FFEE00Homes: &f%clan_homes%'
+      - ' &8→ &#FFEE00Bank ranking: &f#%clan_rank_bank%'
+
+  allies:
+    material: LIME_DYE
+    slot: 20
+    display_name: '&#FFEE00&lAllies'
+    lore:
+      - '&7Clans allied with this one.'
+      - ''
+      - ' &8→ &#FFEE00Allies: &f%clan_allies%'
+      - ''
+      - '&#FF9E08Click to open the ally list'
+    left_click_commands:
+      - '[menu] clan_allies'
+
+  rivals:
+    material: RED_DYE
+    slot: 22
+    display_name: '&#FFEE00&lRivals'
+    lore:
+      - '&7Clans at war with this one.'
+      - ''
+      - ' &8→ &#FFEE00Rivals: &f%clan_rivals%'
+      - ''
+      - '&#FF9E08Click to open the rival list'
+    left_click_commands:
+      - '[menu] clan_rivals'
+
+  join:
+    material: LIME_STAINED_GLASS_PANE
+    slot: 24
+    hide-with-clan: true
+    display_name: '&#56FF00&lJoin This Clan'
+    lore:
+      - '&7Only works if the clan is open'
+      - '&7or if you were invited.'
+      - ''
+      - ' &8→ &#FFEE00Open: %clan_open%'
+      - ' &8→ &#FFEE00Free slots: &f%clan_free_slots%'
+      - ''
+      - '&#FF9E08Click to try to join'
+    left_click_commands:
+      - '[player] clan accept %clan_name%'
+      - '[close]'
+
+  chat_info:
+    material: BOOK
+    slot: 24
+    hide-without-clan: true
+    display_name: '&#FFEE00&lChat Info'
+    lore:
+      - '&7Print the clan information in chat.'
+      - ''
+      - '&#FF9E08Click to print'
+    left_click_commands:
+      - '[player] clan info %clan_name%'
+      - '[close]'
+
+  back:
+    material: BARRIER
+    slot: 31
+    display_name: '&#FF2D2D&lBack'
+    lore:
+      - '&7Return to the clan list.'
+    left_click_commands:
+      - '[menu] clans'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-35
+```
+
+</details>
+
+<details>
+<summary>`clan_members.yml`</summary>
+
+```yaml filename="menus/clan_members.yml"
+menu_title: '&8Members | %clan_name% (%page%/%pages%)'
+size: 54
+
+content:
+  source: clan_members
+  slots:
+    - 0-44
+  item:
+    material: PLAYER_HEAD
+    display_name: '&#FFEE00&l%name%'
+    lore:
+      - '&7Member of &f%clan%&7.'
+      - ''
+      - ' &8→ &#FFEE00Role: &f%role%'
+      - ' &8→ &#FFEE00Status: %status%'
+      - ' &8→ &#FFEE00Kills: &f%kills% &8• &#FFEE00Deaths: &f%deaths%'
+      - ' &8→ &#FFEE00KDR: &f%kdr%'
+      - ' &8→ &#FFEE00First seen: &f%first_seen%'
+      - ''
+      - '&#FF9E08Click to see the full profile'
+    left_click_commands:
+      - '[player] clan profile view %name%'
+      - '[close]'
+  empty:
+    material: PAPER
+    display_name: '&#FFA42D&lNo members'
+    lore:
+      - '&7This clan has no members to show.'
+  previous:
+    material: ARROW
+    slot: 48
+    display_name: '&#54ADF4&lPrevious Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+  next:
+    material: ARROW
+    slot: 50
+    display_name: '&#54ADF4&lNext Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+
+items:
+  info:
+    material: SHIELD
+    slot: 45
+    clan-banner: true
+    display_name: '&#FFEE00&l%clan_name%'
+    lore:
+      - '&7%clan_description%'
+      - ''
+      - ' &8→ &#FFEE00Members: &f%clan_members%&7/&f%clan_max_members%'
+      - ' &8→ &#FFEE00Online: &#56FF00%clan_online% &8• &#FF2D2DOffline: &f%clan_offline%'
+      - ' &8→ &#FFEE00Leader: &f%clan_leader%'
+
+  panel:
+    material: BOOK
+    slot: 46
+    display_name: '&#FFEE00&lClan Panel'
+    lore:
+      - '&7All the information of this clan.'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] clan_info'
+
+  stats:
+    material: NETHER_STAR
+    slot: 47
+    display_name: '&#FFEE00&lStatistics'
+    lore:
+      - '&7Detailed statistics of this clan.'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] clan_stats'
+
+  back:
+    material: ARROW
+    slot: 49
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to the clan panel.'
+    left_click_commands:
+      - '[menu] clan_info'
+
+  allies:
+    material: LIME_DYE
+    slot: 51
+    display_name: '&#FFEE00&lAllies'
+    lore:
+      - '&7Clans allied with this one.'
+      - ''
+      - ' &8→ &#FFEE00Allies: &f%clan_allies%'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] clan_allies'
+
+  rivals:
+    material: RED_DYE
+    slot: 52
+    display_name: '&#FFEE00&lRivals'
+    lore:
+      - '&7Clans at war with this one.'
+      - ''
+      - ' &8→ &#FFEE00Rivals: &f%clan_rivals%'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] clan_rivals'
+
+  close:
+    material: BARRIER
+    slot: 53
+    display_name: '&#FF2D2D&lClose'
+    lore:
+      - '&7Close this menu.'
+    left_click_commands:
+      - '[close]'
+
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-53
+```
+
+</details>
+
+<details>
+<summary>`clan_allies.yml`</summary>
+
+```yaml filename="menus/clan_allies.yml"
+menu_title: '&8Allies | %clan_name% (%page%/%pages%)'
+size: 54
+
+content:
+  source: clan_allies
+  slots:
+    - 0-44
+  item:
+    material: SHIELD
+    display_name: '&#56FF00&l%name%'
+    lore:
+      - '&7%description%'
+      - ''
+      - ' &8→ &#FFEE00Relation: &f%relation% &7of &f%clan%'
+      - ' &8→ &#FFEE00Leader: &f%leader%'
+      - ' &8→ &#FFEE00Members: &f%members%&7/&f%max_members%'
+      - ' &8→ &#FFEE00Level: &f%level% &8• &#FFEE00Points: &f%points%'
+      - ' &8→ &#FFEE00Kills: &f%kills% &8• &#FFEE00KDR: &f%kdr%'
+      - ' &8→ &#FFEE00Ranking: &f#%position%'
+      - ''
+      - '&#FF9E08Left click for the full clan panel'
+      - '&#FF9E08Right click for detailed statistics'
+    left_click_commands:
+      - '[menu] clan_info %name%'
+    right_click_commands:
+      - '[menu] clan_stats %name%'
+  empty:
+    material: PAPER
+    display_name: '&#FFA42D&lNo allies'
+    lore:
+      - '&7This clan has no allies yet.'
+  previous:
+    material: ARROW
+    slot: 48
+    display_name: '&#54ADF4&lPrevious Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+  next:
+    material: ARROW
+    slot: 50
+    display_name: '&#54ADF4&lNext Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+
+items:
+  info:
+    material: LIME_DYE
+    slot: 45
+    display_name: '&#FFEE00&lAllies'
+    lore:
+      - '&7Clans allied with this one.'
+      - ''
+      - ' &8→ &#FFEE00Clan: &f%clan_name%'
+      - ' &8→ &#FFEE00Allies: &f%clan_allies% &8• &#FFEE00Rivals: &f%clan_rivals%'
+      - ' &8→ &#FFEE00Showing: &f%total%'
+
+  other:
+    material: RED_DYE
+    slot: 46
+    display_name: '&#FFEE00&lRivals'
+    lore:
+      - '&7See the rivals of this clan.'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] clan_rivals'
+
+  members:
+    material: PLAYER_HEAD
+    slot: 47
+    head: '%clan_leader%'
+    display_name: '&#FFEE00&lMembers'
+    lore:
+      - '&7Everyone in this clan.'
+      - ''
+      - ' &8→ &#FFEE00Members: &f%clan_members%&7/&f%clan_max_members%'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] clan_members'
+
+  back:
+    material: ARROW
+    slot: 49
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to the clan panel.'
+    left_click_commands:
+      - '[menu] clan_info'
+
+  panel:
+    material: BOOK
+    slot: 51
+    display_name: '&#FFEE00&lClan Panel'
+    lore:
+      - '&7All the information of this clan.'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] clan_info'
+
+  stats:
+    material: NETHER_STAR
+    slot: 52
+    display_name: '&#FFEE00&lStatistics'
+    lore:
+      - '&7Detailed statistics of this clan.'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] clan_stats'
+
+  close:
+    material: BARRIER
+    slot: 53
+    display_name: '&#FF2D2D&lClose'
+    lore:
+      - '&7Close this menu.'
+    left_click_commands:
+      - '[close]'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-53
+```
+
+</details>
+
+<details>
+<summary>`clan_rivals.yml`</summary>
+
+```yaml filename="menus/clan_rivals.yml"
+menu_title: '&8Rivals | %clan_name% (%page%/%pages%)'
+size: 54
+
+content:
+  source: clan_rivals
+  slots:
+    - 0-44
+  item:
+    material: SHIELD
+    display_name: '&#FF2D2D&l%name%'
+    lore:
+      - '&7%description%'
+      - ''
+      - ' &8→ &#FFEE00Relation: &f%relation% &7of &f%clan%'
+      - ' &8→ &#FFEE00Leader: &f%leader%'
+      - ' &8→ &#FFEE00Members: &f%members%&7/&f%max_members%'
+      - ' &8→ &#FFEE00Level: &f%level% &8• &#FFEE00Points: &f%points%'
+      - ' &8→ &#FFEE00Kills: &f%kills% &8• &#FFEE00KDR: &f%kdr%'
+      - ' &8→ &#FFEE00Ranking: &f#%position%'
+      - ''
+      - '&#FF9E08Left click for the full clan panel'
+      - '&#FF9E08Right click for detailed statistics'
+    left_click_commands:
+      - '[menu] clan_info %name%'
+    right_click_commands:
+      - '[menu] clan_stats %name%'
+  empty:
+    material: PAPER
+    display_name: '&#FFA42D&lNo rivals'
+    lore:
+      - '&7This clan has no rivals yet.'
+  previous:
+    material: ARROW
+    slot: 48
+    display_name: '&#54ADF4&lPrevious Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+  next:
+    material: ARROW
+    slot: 50
+    display_name: '&#54ADF4&lNext Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+
+items:
+  info:
+    material: RED_DYE
+    slot: 45
+    display_name: '&#FFEE00&lRivals'
+    lore:
+      - '&7Clans at war with this one.'
+      - ''
+      - ' &8→ &#FFEE00Clan: &f%clan_name%'
+      - ' &8→ &#FFEE00Allies: &f%clan_allies% &8• &#FFEE00Rivals: &f%clan_rivals%'
+      - ' &8→ &#FFEE00Showing: &f%total%'
+
+  other:
+    material: LIME_DYE
+    slot: 46
+    display_name: '&#FFEE00&lAllies'
+    lore:
+      - '&7See the allies of this clan.'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] clan_allies'
+
+  members:
+    material: PLAYER_HEAD
+    slot: 47
+    head: '%clan_leader%'
+    display_name: '&#FFEE00&lMembers'
+    lore:
+      - '&7Everyone in this clan.'
+      - ''
+      - ' &8→ &#FFEE00Members: &f%clan_members%&7/&f%clan_max_members%'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] clan_members'
+
+  back:
+    material: ARROW
+    slot: 49
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to the clan panel.'
+    left_click_commands:
+      - '[menu] clan_info'
+
+  panel:
+    material: BOOK
+    slot: 51
+    display_name: '&#FFEE00&lClan Panel'
+    lore:
+      - '&7All the information of this clan.'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] clan_info'
+
+  stats:
+    material: NETHER_STAR
+    slot: 52
+    display_name: '&#FFEE00&lStatistics'
+    lore:
+      - '&7Detailed statistics of this clan.'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] clan_stats'
+
+  close:
+    material: BARRIER
+    slot: 53
+    display_name: '&#FF2D2D&lClose'
+    lore:
+      - '&7Close this menu.'
+    left_click_commands:
+      - '[close]'
+
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-53
+```
+
+</details>
+
+<details>
+<summary>`clan_settings.yml`</summary>
+
+```yaml filename="menus/clan_settings.yml"
+menu_title: '&8Clan Settings | Clan: %aquaclan_name%'
+size: 27
+
+items:
+  open:
+    material: OAK_DOOR
+    slot: 11
+    requires-clan: true
+    display_name: '&#FFEE00&lOpen Join'
+    lore:
+      - '&7Let anyone join without an invite'
+      - '&7using &f/clan join %aquaclan_name%&7.'
+      - ''
+      - '&#54ADF4State: %aquaclan_setting_open%'
+      - ''
+      - '&#FF9E08Click to toggle'
+    left_click_commands:
+      - '[player] clan settings toggle open'
+      - '[menu] clan_settings'
+
+  ally_chat:
+    material: WRITABLE_BOOK
+    slot: 12
+    requires-clan: true
+    display_name: '&#FFEE00&lAlly Chat'
+    lore:
+      - '&7Share your clan chat with online'
+      - '&7members of allied clans.'
+      - ''
+      - '&#54ADF4State: %aquaclan_setting_ally_chat%'
+      - ''
+      - '&#FF9E08Click to toggle'
+    left_click_commands:
+      - '[player] clan settings toggle ally_chat'
+      - '[menu] clan_settings'
+
+  public_home:
+    material: RED_BED
+    slot: 14
+    requires-clan: true
+    display_name: '&#FFEE00&lPublic Home'
+    lore:
+      - '&7Allow allied clans to teleport to'
+      - '&7your home with &f/clan home %aquaclan_name%&7.'
+      - ''
+      - '&#54ADF4State: %aquaclan_setting_public_home%'
+      - ''
+      - '&#FF9E08Click to toggle'
+    left_click_commands:
+      - '[player] clan settings toggle public_home'
+      - '[menu] clan_settings'
+
+  join_notify:
+    material: BELL
+    slot: 15
+    requires-clan: true
+    display_name: '&#FFEE00&lJoin Notify'
+    lore:
+      - '&7Announce to the clan when a member'
+      - '&7joins or leaves.'
+      - ''
+      - '&#54ADF4State: %aquaclan_setting_join_notify%'
+      - ''
+      - '&#FF9E08Click to toggle'
+    left_click_commands:
+      - '[player] clan settings toggle join_notify'
+      - '[menu] clan_settings'
+
+  friendly_fire:
+    material: IRON_SWORD
+    slot: 13
+    requires-clan: true
+    display_name: '&#FFEE00&lFriendly Fire'
+    lore:
+      - '&7Allow clan members to damage'
+      - '&7each other.'
+      - ''
+      - '&#54ADF4Enabled: &f%aquaclan_friendly_fire%'
+      - ''
+      - '&#FF9E08Click to toggle'
+    left_click_commands:
+      - '[player] clan ff'
+      - '[menu] clan_settings'
+
+  back:
+    material: BOOK
+    slot: 22
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to the settings menu.'
+    left_click_commands:
+      - '[menu] settings'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-26
+```
+
+</details>
+
+<details>
+<summary>`clan_stats.yml`</summary>
+
+```yaml filename="menus/clan_stats.yml"
+menu_title: '&8Statistics | %clan_name%'
+size: 36
+
+items:
+  banner:
+    material: SHIELD
+    slot: 4
+    clan-banner: true
+    display_name: '&#FFEE00&l%clan_name%'
+    lore:
+      - '&7%clan_description%'
+      - ''
+      - ' &8→ &#FFEE00Leader: &f%clan_leader%'
+      - ' &8→ &#FFEE00Created: &f%clan_created_time%'
+
+  combat:
+    material: DIAMOND_SWORD
+    slot: 10
+    display_name: '&#FFEE00&lCombat'
+    lore:
+      - ' &8→ &#FFEE00Kills: &f%clan_kills%'
+      - ' &8→ &#FFEE00Deaths: &f%clan_deaths%'
+      - ' &8→ &#FFEE00KDR: &f%clan_kdr%'
+      - ' &8→ &#FFEE00Friendly fire: %clan_friendly_fire%'
+      - ''
+      - '&#54ADF4&l» Rankings:'
+      - ' &8→ &#FFEE00Kills: &f#%clan_rank_kills%'
+      - ' &8→ &#FFEE00Deaths: &f#%clan_rank_deaths%'
+      - ' &8→ &#FFEE00KDR: &f#%clan_rank_kdr%'
+
+  progress:
+    material: EXPERIENCE_BOTTLE
+    slot: 12
+    display_name: '&#FFEE00&lProgress'
+    lore:
+      - ' &8→ &#FFEE00Level: &f%clan_level%&7/&f%clan_max_level%'
+      - ' &8→ &#FFEE00Points: &f%clan_points%'
+      - ' &8→ &#FFEE00Points to next level: &f%clan_points_next%'
+      - ''
+      - '&#54ADF4&l» Rankings:'
+      - ' &8→ &#FFEE00Points: &f#%clan_rank_points%'
+      - ' &8→ &#FFEE00Level: &f#%clan_rank_level%'
+
+  roster:
+    material: PLAYER_HEAD
+    slot: 14
+    head: '%clan_leader%'
+    display_name: '&#FFEE00&lRoster'
+    lore:
+      - ' &8→ &#FFEE00Members: &f%clan_members%&7/&f%clan_max_members%'
+      - ' &8→ &#FFEE00Online: &#56FF00%clan_online%'
+      - ' &8→ &#FFEE00Offline: &#FF2D2D%clan_offline%'
+      - ' &8→ &#FFEE00Free slots: &f%clan_free_slots%'
+      - ''
+      - '&#54ADF4&l» Roles:'
+      - ' &8→ &#FFEE00Leader: &f%clan_leaders%'
+      - ' &8→ &#FFEE00Co-leaders: &f%clan_co_leaders%'
+      - ' &8→ &#FFEE00Moderators: &f%clan_moderators%'
+      - ' &8→ &#FFEE00Members: &f%clan_rookies%'
+      - ''
+      - '&#FF9E08Click to open the member list'
+    left_click_commands:
+      - '[menu] clan_members'
+
+  economy:
+    material: GOLD_INGOT
+    slot: 16
+    display_name: '&#FFEE00&lEconomy'
+    lore:
+      - ' &8→ &#FFEE00Bank: &f%clan_bank%'
+      - ' &8→ &#FFEE00Bank ranking: &f#%clan_rank_bank%'
+      - ' &8→ &#FFEE00Homes: &f%clan_homes%'
+      - ' &8→ &#FFEE00Banner: %clan_has_banner%'
+
+  relations:
+    material: LIME_DYE
+    slot: 20
+    display_name: '&#FFEE00&lRelations'
+    lore:
+      - ' &8→ &#FFEE00Allies: &f%clan_allies% &8(&f#%clan_rank_allies%&8)'
+      - ' &8→ &#FFEE00Rivals: &f%clan_rivals% &8(&f#%clan_rank_rivals%&8)'
+      - ' &8→ &#FFEE00Bans: &f%clan_bans%'
+      - ''
+      - '&#FF9E08Left click for the ally list'
+      - '&#FF9E08Right click for the rival list'
+    left_click_commands:
+      - '[menu] clan_allies'
+    right_click_commands:
+      - '[menu] clan_rivals'
+
+  history:
+    material: CLOCK
+    slot: 22
+    display_name: '&#FFEE00&lHistory'
+    lore:
+      - ' &8→ &#FFEE00Created: &f%clan_created%'
+      - ' &8→ &#FFEE00Age: &f%clan_days% &7days'
+      - ' &8→ &#FFEE00Oldest ranking: &f#%clan_rank_oldest%'
+      - ' &8→ &#FFEE00Open to everyone: %clan_open%'
+
+  panel:
+    material: BOOK
+    slot: 24
+    display_name: '&#FFEE00&lClan Panel'
+    lore:
+      - '&7Go back to the clan panel.'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] clan_info'
+
+  back:
+    material: BARRIER
+    slot: 31
+    display_name: '&#FF2D2D&lBack'
+    lore:
+      - '&7Return to the clan list.'
+    left_click_commands:
+      - '[menu] clans'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-35
+```
+
+</details>
+
+<details>
+<summary>`members.yml`</summary>
+
+```yaml filename="menus/members.yml"
+menu_title: '&8Members | Clan: %aquaclan_name%'
+size: 54
+
+content:
+  source: members
+  slots:
+    - 0-44
+  item:
+    material: PLAYER_HEAD
+    display_name: '&#FFEE00&l%name%'
+    lore:
+      - '&#54ADF4Role: &f%role%'
+      - '&#54ADF4Status: %status%'
+      - ''
+      - '&#FF9E08Left-click: promote'
+      - '&#FF9E08Right-click: kick'
+    left_click_commands:
+      - '[player] clan promote %name%'
+    right_click_commands:
+      - '[player] clan kick %name%'
+  empty:
+    material: PAPER
+    display_name: '&#FFA42D&lNo members'
+    lore:
+      - '&7This clan has no members.'
+  previous:
+    material: ARROW
+    slot: 48
+    display_name: '&#54ADF4&lPrevious Page'
+  next:
+    material: ARROW
+    slot: 50
+    display_name: '&#54ADF4&lNext Page'
+
+items:
+  invite:
+    material: LIME_DYE
+    slot: 47
+    display_name: '&#FFEE00&lInvite'
+    lore:
+      - '&7Invite a player to your clan,'
+      - '&7online or offline.'
+      - ''
+      - '&#54ADF4Members: &f%aquaclan_members%&7/&f%aquaclan_slots%'
+      - '&#54ADF4Pending invitations: &f%aquaclan_sent_invites%'
+      - ''
+      - '&#FF9E08Left click to pick an online player'
+      - '&#FF9E08Right click to write the name in chat'
+    left_click_commands:
+      - '[menu] invite_players'
+    right_click_commands:
+      - '[input] invite members'
+
+  invitations:
+    material: PAPER
+    slot: 51
+    display_name: '&#FFEE00&lSent Invitations'
+    lore:
+      - '&7Invitations waiting for an answer.'
+      - ''
+      - '&#54ADF4Pending: &f%aquaclan_sent_invites%'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] invites_sent'
+  back:
+    material: BOOK
+    slot: 49
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to the main menu.'
+    left_click_commands:
+      - '[menu] main'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-53
+```
+
+</details>
+
+<details>
+<summary>`allies.yml`</summary>
+
+```yaml filename="menus/allies.yml"
+menu_title: '&8Allies | Clan: %aquaclan_name%'
+size: 27
+
+items:
+  info:
+    material: LIME_DYE
+    slot: 13
+    display_name: '&#FFEE00&lAllies'
+    lore:
+      - '&7Clans you are allied with.'
+      - ''
+      - '&#54ADF4Allies: &f%aquaclan_allies%'
+      - ''
+      - '&#FF9E08Click to view the list'
+    left_click_commands:
+      - '[menu] allylist'
+
+  add:
+    material: EMERALD
+    slot: 11
+    display_name: '&#FFEE00&lRequest Ally'
+    lore:
+      - '&7Send an alliance request.'
+      - ''
+      - '&#54ADF4Use: &f/clan ally add <tag>'
+      - ''
+      - '&#FF9E08Click for the command'
+    left_click_commands:
+      - '[message] %prefix% &#FFEE00Type &f/clan ally add <tag>'
+      - '[close]'
+
+  remove:
+    material: BARRIER
+    slot: 15
+    display_name: '&#FFEE00&lRemove Ally'
+    lore:
+      - '&7Break an alliance.'
+      - ''
+      - '&#54ADF4Use: &f/clan ally remove <tag>'
+      - ''
+      - '&#FF9E08Click for the command'
+    left_click_commands:
+      - '[message] %prefix% &#FFEE00Type &f/clan ally remove <tag>'
+      - '[close]'
+
+  back:
+    material: BOOK
+    slot: 22
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to the main menu.'
+    left_click_commands:
+      - '[menu] main'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-26
+```
+
+</details>
+
+<details>
+<summary>`rivals.yml`</summary>
+
+```yaml filename="menus/rivals.yml"
+menu_title: '&8Rivals | Clan: %aquaclan_name%'
+size: 27
+
+items:
+  info:
+    material: RED_DYE
+    slot: 13
+    display_name: '&#FFEE00&lRivals'
+    lore:
+      - '&7Clans you are at war with.'
+      - ''
+      - '&#54ADF4Rivals: &f%aquaclan_rivals%'
+      - ''
+      - '&#FF9E08Click to view the list'
+    left_click_commands:
+      - '[menu] rivallist'
+
+  add:
+    material: IRON_SWORD
+    slot: 11
+    display_name: '&#FFEE00&lRequest Rival'
+    lore:
+      - '&7Declare a rivalry.'
+      - ''
+      - '&#54ADF4Use: &f/clan rival add <tag>'
+      - ''
+      - '&#FF9E08Click for the command'
+    left_click_commands:
+      - '[message] %prefix% &#FFEE00Type &f/clan rival add <tag>'
+      - '[close]'
+
+  remove:
+    material: BARRIER
+    slot: 15
+    display_name: '&#FFEE00&lRemove Rival'
+    lore:
+      - '&7End a rivalry.'
+      - ''
+      - '&#54ADF4Use: &f/clan rival remove <tag>'
+      - ''
+      - '&#FF9E08Click for the command'
+    left_click_commands:
+      - '[message] %prefix% &#FFEE00Type &f/clan rival remove <tag>'
+      - '[close]'
+
+  back:
+    material: BOOK
+    slot: 22
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to the main menu.'
+    left_click_commands:
+      - '[menu] main'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-26
+```
+
+</details>
+
+<details>
+<summary>`settings.yml`</summary>
+
+```yaml filename="menus/settings.yml"
+menu_title: '&8Settings | Clan: %aquaclan_name%'
+size: 27
+
+items:
+  friendly_fire:
+    material: IRON_SWORD
+    slot: 10
+    requires-clan: true
+    display_name: '&#FFEE00&lFriendly Fire'
+    lore:
+      - '&7Allow members to hit each other.'
+      - ''
+      - '&#54ADF4Enabled: &f%aquaclan_friendly_fire%'
+      - ''
+      - '&#FF9E08Click to toggle'
+    left_click_commands:
+      - '[player] clan ff'
+      - '[menu] settings'
+
+  view:
+    material: COMPARATOR
+    slot: 11
+    requires-clan: true
+    display_name: '&#FFEE00&lClan Settings'
+    lore:
+      - '&7Toggle open join, ally chat,'
+      - '&7public home and join notify.'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] clan_settings'
+
+  description:
+    material: NAME_TAG
+    slot: 12
+    requires-clan: true
+    display_name: '&#FFEE00&lDescription'
+    lore:
+      - '&7Change the clan description.'
+      - ''
+      - '&#54ADF4Use: &f/clan description <text>'
+      - ''
+      - '&#FF9E08Click for the command'
+    left_click_commands:
+      - '[message] %prefix% &#FFEE00Type &f/clan description <text>'
+      - '[close]'
+
+  banned:
+    material: IRON_BARS
+    slot: 13
+    requires-clan: true
+    display_name: '&#FFEE00&lBanned Players'
+    lore:
+      - '&7Manage banned players.'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] bans'
+
+  rename:
+    material: ANVIL
+    slot: 14
+    requires-clan: true
+    display_name: '&#FFEE00&lRename Clan'
+    lore:
+      - '&7Change your clan name.'
+      - ''
+      - '&#54ADF4Use: &f/clan rename <name>'
+      - ''
+      - '&#FF9E08Click for the command'
+    left_click_commands:
+      - '[message] %prefix% &#FFEE00Type &f/clan rename <name>'
+      - '[close]'
+
+  customize_tag:
+    material: OAK_SIGN
+    slot: 15
+    requires-clan: true
+    display_name: '&#FFEE00&lClan Tag'
+    lore:
+      - '&#54ADF4Clan: &f%aquaclan_name%'
+      - '&#54ADF4Tag: %aquaclan_tag%'
+      - '&#54ADF4Leader: &f%aquaclan_leader%'
+      - ''
+      - '&#54ADF4Change your tag with:'
+      - '&f/clan custom tag <text>'
+      - ''
+      - '&7You can color it using:'
+      - '&#54ADF4• Legacy color codes'
+      - '&#54ADF4• Hex colors &#RRGGBB'
+      - '&#54ADF4• MiniMessage gradient tags'
+      - ''
+      - '&#FF9E08Click for the command'
+    left_click_commands:
+      - '[message] %prefix% &#FFEE00Type &f/clan custom tag <text>'
+      - '[close]'
+
+  edit_banner:
+    material: SHIELD
+    slot: 16
+    requires-clan: true
+    display_name: '&#FFEE00&lClan Banner'
+    lore:
+      - '&7This is what everyone sees next'
+      - '&7to your clan in the clan lists.'
+      - ''
+      - '&#FF9E08Click to design your banner'
+    left_click_commands:
+      - '[player] clan banner edit'
+
+  back:
+    material: BOOK
+    slot: 22
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to the main menu.'
+    left_click_commands:
+      - '[menu] main'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-26
+```
+
+</details>
+
+<details>
+<summary>`bank.yml`</summary>
+
+```yaml filename="menus/bank.yml"
+menu_title: '&8Top Bank | %page%/%pages%'
+size: 54
+
+content:
+  source: top_bank
+  slots:
+    - 0-44
+  item:
+    material: PLAYER_HEAD
+    display_name: '&7[&#FFEE00#%position%&7] &#FFEE00&l%name%'
+    lore:
+      - '&7%description%'
+      - ''
+      - '&#54ADF4&l» Bank: &f%value%'
+      - ''
+      - '&#54ADF4&l» Information:'
+      - ' &8→ &#FFEE00Tag: &r%tag%'
+      - ' &8→ &#FFEE00Leader: &f%leader%'
+      - ' &8→ &#FFEE00Members: &f%members%&7/&f%max_members% &8(&#56FF00%online% online&8)'
+      - ' &8→ &#FFEE00Level: &f%level%&7/&f%max_level% &8• &#FFEE00Points: &f%points%'
+      - ' &8→ &#FFEE00Kills: &f%kills% &8• &#FFEE00Deaths: &f%deaths%'
+      - ' &8→ &#FFEE00KDR: &f%kdr% &8• &#FFEE00Bank: &f%bank%'
+      - ' &8→ &#FFEE00Allies: &f%allies% &8• &#FFEE00Rivals: &f%rivals%'
+      - ' &8→ &#FFEE00Created: &f%created% &8(&f%days%d&8)'
+      - ''
+      - '&#FF9E08Left click for the full clan panel'
+      - '&#FF9E08Right click for detailed statistics'
+    left_click_commands:
+      - '[menu] clan_info %name%'
+    right_click_commands:
+      - '[menu] clan_stats %name%'
+  empty:
+    material: PAPER
+    display_name: '&#FFA42D&lNo clans'
+    lore:
+      - '&7There is nothing to rank yet.'
+  previous:
+    material: ARROW
+    slot: 48
+    display_name: '&#54ADF4&lPrevious Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+  next:
+    material: ARROW
+    slot: 50
+    display_name: '&#54ADF4&lNext Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+
+items:
+  info:
+    material: GOLD_INGOT
+    slot: 45
+    display_name: '&#FFEE00&lTop Bank'
+    lore:
+      - '&7The best clans of the server'
+      - '&7sorted by bank.'
+      - ''
+      - ' &8→ &#FFEE00Ranked clans: &f%total%'
+      - ' &8→ &#FFEE00Page: &f%page%&7/&f%pages%'
+
+  selected:
+    material: SHIELD
+    slot: 46
+    clan-banner: true
+    display_name: '&#FFEE00&lSelected Clan'
+    lore:
+      - '&7Opened with &f/clan open bank <clan>'
+      - ''
+      - ' &8→ &#FFEE00Clan: &f%clan_name%'
+      - ' &8→ &#FFEE00Bank: &f%clan_value_bank%'
+      - ' &8→ &#FFEE00Position: &f#%clan_rank_bank%'
+      - ''
+      - '&#FF9E08Click for the full clan panel'
+    left_click_commands:
+      - '[menu] clan_info'
+
+  rankings:
+    material: DIAMOND
+    slot: 47
+    display_name: '&#FFEE00&lOther Rankings'
+    lore:
+      - '&7Points, levels, kills, deaths,'
+      - '&7KDR, members and bank.'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] tops'
+
+  back:
+    material: ARROW
+    slot: 49
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to the rankings.'
+    left_click_commands:
+      - '[menu] tops'
+
+  search:
+    material: NAME_TAG
+    slot: 51
+    display_name: '&#FFEE00&lSearch Clan'
+    lore:
+      - '&7Find a clan by writing its name.'
+      - ''
+      - '&#FF9E08Click and write the name in chat!'
+    left_click_commands:
+      - '[input] search bank'
+
+  clans:
+    material: BOOKSHELF
+    slot: 52
+    display_name: '&#FFEE00&lAll Clans'
+    lore:
+      - '&7Browse every clan with full info.'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] clans'
+
+  close:
+    material: BARRIER
+    slot: 53
+    display_name: '&#FF2D2D&lClose'
+    lore:
+      - '&7Close this menu.'
+    left_click_commands:
+      - '[close]'
+
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-53
+```
+
+</details>
+
+<details>
+<summary>`mail.yml`</summary>
+
+```yaml filename="menus/mail.yml"
+menu_title: '&8Clan Mail | Clan: %aquaclan_name%'
+size: 54
+
+content:
+  source: mail
+  slots:
+    - 0-44
+  item:
+    material: PAPER
+    display_name: '&#FFEE00&l%from%'
+    lore:
+      - '&7%date%'
+      - ''
+      - '&f%text%'
+  empty:
+    material: PAPER
+    display_name: '&#FFA42D&lNo mail'
+    lore:
+      - '&7Your clan mailbox is empty.'
+  previous:
+    material: ARROW
+    slot: 48
+    display_name: '&#54ADF4&lPrevious Page'
+  next:
+    material: ARROW
+    slot: 50
+    display_name: '&#54ADF4&lNext Page'
+
+items:
+  back:
+    material: BOOK
+    slot: 49
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to the main menu.'
+    left_click_commands:
+      - '[menu] main'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-53
+```
+
+</details>
+
+<details>
+<summary>`bans.yml`</summary>
+
+```yaml filename="menus/bans.yml"
+menu_title: '&8Banned Players | Clan: %aquaclan_name%'
+size: 54
+
+content:
+  source: bans
+  slots:
+    - 0-44
+  item:
+    material: PLAYER_HEAD
+    display_name: '&#FF2D2D&l%name%'
+    lore:
+      - '&7Banned from the clan.'
+      - ''
+      - '&#FF9E08Right-click to unban'
+    right_click_commands:
+      - '[player] clan unban %name%'
+  empty:
+    material: PAPER
+    display_name: '&#56FF00&lNo bans'
+    lore:
+      - '&7No players are banned.'
+  previous:
+    material: ARROW
+    slot: 48
+    display_name: '&#54ADF4&lPrevious Page'
+  next:
+    material: ARROW
+    slot: 50
+    display_name: '&#54ADF4&lNext Page'
+
+items:
+  back:
+    material: BOOK
+    slot: 49
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to the settings menu.'
+    left_click_commands:
+      - '[menu] settings'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-53
+```
+
+</details>
+
+<details>
+<summary>`logger.yml`</summary>
+
+```yaml filename="menus/logger.yml"
+menu_title: '&8Activity Log | Clan: %aquaclan_name%'
+size: 54
+
+content:
+  source: logger
+  slots:
+    - 0-44
+  item:
+    material: PAPER
+    display_name: '&f%text%'
+    lore:
+      - '&8%time%'
+  empty:
+    material: PAPER
+    display_name: '&#FFA42D&lNo activity'
+    lore:
+      - '&7Nothing has happened yet.'
+  previous:
+    material: ARROW
+    slot: 48
+    display_name: '&#54ADF4&lPrevious Page'
+  next:
+    material: ARROW
+    slot: 50
+    display_name: '&#54ADF4&lNext Page'
+
+items:
+  back:
+    material: BOOK
+    slot: 49
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to the main menu.'
+    left_click_commands:
+      - '[menu] main'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-53
+```
+
+</details>
+
+### Clan lists
+
+<details>
+<summary>`clans.yml`</summary>
+
+```yaml filename="menus/clans.yml"
+menu_title: '&8All Clans | %page%/%pages%'
+size: 54
+
+content:
+  source: all_clans
+  slots:
+    - 0-44
+  item:
+    material: SHIELD
+    display_name: '&7[&#FFEE00#%position%&7] &#FFEE00&l%name%'
+    lore:
+      - '&7%description%'
+      - ''
+      - '&#54ADF4&l» Information:'
+      - ' &8→ &#FFEE00Tag: &r%tag%'
+      - ' &8→ &#FFEE00Leader: &f%leader%'
+      - ' &8→ &#FFEE00Members: &f%members%&7/&f%max_members% &8(&#56FF00%online% online&8)'
+      - ' &8→ &#FFEE00Level: &f%level%&7/&f%max_level% &8• &#FFEE00Points: &f%points%'
+      - ' &8→ &#FFEE00Kills: &f%kills% &8• &#FFEE00Deaths: &f%deaths%'
+      - ' &8→ &#FFEE00KDR: &f%kdr% &8• &#FFEE00Bank: &f%bank%'
+      - ' &8→ &#FFEE00Allies: &f%allies% &8• &#FFEE00Rivals: &f%rivals%'
+      - ' &8→ &#FFEE00Created: &f%created% &8(&f%days%d&8)'
+      - ''
+      - '&#FF9E08Left click for the full clan panel'
+      - '&#FF9E08Right click for detailed statistics'
+    left_click_commands:
+      - '[menu] clan_info %name%'
+    right_click_commands:
+      - '[menu] clan_stats %name%'
+  empty:
+    material: PAPER
+    display_name: '&#FFA42D&lNo clans'
+    lore:
+      - '&7There are no clans on the server yet.'
+      - ''
+      - '&#FF9E08Be the first one to create a clan!'
+  previous:
+    material: ARROW
+    slot: 48
+    display_name: '&#54ADF4&lPrevious Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+  next:
+    material: ARROW
+    slot: 50
+    display_name: '&#54ADF4&lNext Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+
+items:
+  info:
+    material: BOOKSHELF
+    slot: 45
+    display_name: '&#FFEE00&lClan List'
+    lore:
+      - '&7Every clan sorted by points.'
+      - ''
+      - ' &8→ &#FFEE00Total clans: &f%aquaclan_count%'
+      - ' &8→ &#FFEE00Page: &f%page%&7/&f%pages%'
+
+  rankings:
+    material: DIAMOND
+    slot: 46
+    display_name: '&#FFEE00&lRankings'
+    lore:
+      - '&7Top clans by points, kills, level,'
+      - '&7members, bank and more.'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] tops'
+
+  search:
+    material: NAME_TAG
+    slot: 47
+    display_name: '&#FFEE00&lSearch Clan'
+    lore:
+      - '&7Find a clan by writing its name.'
+      - ''
+      - '&#FF9E08Click and write the name in chat!'
+    left_click_commands:
+      - '[input] search clans'
+
+  back:
+    material: ARROW
+    slot: 49
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to the quick menu.'
+    left_click_commands:
+      - '[menu] short'
+
+  my_clan:
+    material: SHIELD
+    slot: 51
+    display_name: '&#FFEE00&lMy Clan'
+    lore:
+      - '&7Open the panel of your own clan.'
+      - ''
+      - ' &8→ &#FFEE00Clan: &f%aquaclan_name%'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] clan_info'
+
+  invites:
+    material: PAPER
+    slot: 52
+    display_name: '&#FFEE00&lInvitations'
+    lore:
+      - '&7Clans that invited you.'
+      - ''
+      - ' &8→ &#FFEE00Pending: &f%aquaclan_pending_invites%'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] invites'
+
+  close:
+    material: BARRIER
+    slot: 53
+    display_name: '&#FF2D2D&lClose'
+    lore:
+      - '&7Close this menu.'
+    left_click_commands:
+      - '[close]'
+
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-53
+```
+
+</details>
+
+<details>
+<summary>`clanlist.yml`</summary>
+
+```yaml filename="menus/clanlist.yml"
+menu_title: '&8Clans | (%aquaclan_count%)'
+size: 54
+
+content:
+  source: clans
+  slots:
+    - 0-44
+  item:
+    material: SHIELD
+    display_name: '&#FFEE00&l%name%'
+    lore:
+      - '&7%description%'
+      - ''
+      - '&#54ADF4Leader: &f%leader%'
+      - '&#54ADF4Members: &f%members%'
+      - '&#54ADF4Level: &f%level% &8• &#54ADF4Kills: &f%kills%'
+      - ''
+      - '&#FF9E08Click for info'
+    left_click_commands:
+      - '[player] clan info %name%'
+      - '[close]'
+  empty:
+    material: PAPER
+    display_name: '&#FFA42D&lNo clans'
+    lore:
+      - '&7There are no clans yet.'
+  previous:
+    material: ARROW
+    slot: 48
+    display_name: '&#54ADF4&lPrevious Page'
+  next:
+    material: ARROW
+    slot: 50
+    display_name: '&#54ADF4&lNext Page'
+
+items:
+  back:
+    material: BOOK
+    slot: 49
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to the main menu.'
+    left_click_commands:
+      - '[menu] main'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-53
+```
+
+</details>
+
+<details>
+<summary>`allylist.yml`</summary>
+
+```yaml filename="menus/allylist.yml"
+menu_title: '&8Allies | Clan: %aquaclan_name%'
+size: 54
+
+content:
+  source: allies
+  slots:
+    - 0-44
+  item:
+    material: SHIELD
+    display_name: '&#FFEE00&l%name%'
+    lore:
+      - '&#54ADF4Leader: &f%leader%'
+      - '&#54ADF4Members: &f%members%'
+      - '&#54ADF4Level: &f%level%'
+      - ''
+      - '&#FF9E08Right-click to remove'
+    right_click_commands:
+      - '[player] clan ally remove %name%'
+  empty:
+    material: PAPER
+    display_name: '&#FFA42D&lNo allies'
+    lore:
+      - '&7This clan has no allies.'
+      - ''
+      - '&#54ADF4Use &f/clan ally add <tag>'
+  previous:
+    material: ARROW
+    slot: 48
+    display_name: '&#54ADF4&lPrevious Page'
+  next:
+    material: ARROW
+    slot: 50
+    display_name: '&#54ADF4&lNext Page'
+
+items:
+  back:
+    material: BOOK
+    slot: 49
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to the allies menu.'
+    left_click_commands:
+      - '[menu] allies'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-53
+```
+
+</details>
+
+<details>
+<summary>`rivallist.yml`</summary>
+
+```yaml filename="menus/rivallist.yml"
+menu_title: '&8Rivals | Clan: %aquaclan_name%'
+size: 54
+
+content:
+  source: rivals
+  slots:
+    - 0-44
+  item:
+    material: SHIELD
+    display_name: '&#FFEE00&l%name%'
+    lore:
+      - '&#54ADF4Leader: &f%leader%'
+      - '&#54ADF4Members: &f%members%'
+      - '&#54ADF4Level: &f%level%'
+      - ''
+      - '&#FF9E08Right-click to remove'
+    right_click_commands:
+      - '[player] clan rival remove %name%'
+  empty:
+    material: PAPER
+    display_name: '&#FFA42D&lNo rivals'
+    lore:
+      - '&7This clan has no rivals.'
+      - ''
+      - '&#54ADF4Use &f/clan rival add <tag>'
+  previous:
+    material: ARROW
+    slot: 48
+    display_name: '&#54ADF4&lPrevious Page'
+  next:
+    material: ARROW
+    slot: 50
+    display_name: '&#54ADF4&lNext Page'
+
+items:
+  back:
+    material: BOOK
+    slot: 49
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to the rivals menu.'
+    left_click_commands:
+      - '[menu] rivals'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-53
+```
+
+</details>
+
+### Invitations and profile
+
+<details>
+<summary>`invites.yml`</summary>
+
+```yaml filename="menus/invites.yml"
+menu_title: '&8Invitations | %page%/%pages%'
+size: 54
+
+content:
+  source: invites
+  slots:
+    - 0-44
+  item:
+    material: SHIELD
+    display_name: '&#FFEE00&l%name%'
+    lore:
+      - '&7%description%'
+      - ''
+      - '&#54ADF4&l» Invitation:'
+      - ' &8→ &#FFEE00Invited by: &f%from%'
+      - ' &8→ &#FFEE00Date: &f%date%'
+      - ' &8→ &#FFEE00Expires in: &f%expires%'
+      - ''
+      - '&#54ADF4&l» Clan information:'
+      - ' &8→ &#FFEE00Leader: &f%leader%'
+      - ' &8→ &#FFEE00Members: &f%members%&7/&f%max_members%'
+      - ' &8→ &#FFEE00Level: &f%level% &8• &#FFEE00Points: &f%points%'
+      - ' &8→ &#FFEE00Kills: &f%kills% &8• &#FFEE00KDR: &f%kdr%'
+      - ' &8→ &#FFEE00Ranking: &f#%position%'
+      - ''
+      - '&#56FF00Left click to accept'
+      - '&#FF2D2DRight click to deny'
+    left_click_commands:
+      - '[invite-accept] %name%'
+      - '[sound] ENTITY_PLAYER_LEVELUP'
+    right_click_commands:
+      - '[invite-deny] %name%'
+      - '[sound] BLOCK_NOTE_BLOCK_BASS'
+  empty:
+    material: PAPER
+    display_name: '&#FFA42D&lNo invitations'
+    lore:
+      - '&7Nobody has invited you to a clan yet.'
+      - ''
+      - '&7Browse the clan list and ask a leader'
+      - '&7to send you an invitation.'
+  previous:
+    material: ARROW
+    slot: 48
+    display_name: '&#54ADF4&lPrevious Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+  next:
+    material: ARROW
+    slot: 50
+    display_name: '&#54ADF4&lNext Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+
+items:
+  info:
+    material: PAPER
+    slot: 45
+    display_name: '&#FFEE00&lYour Invitations'
+    lore:
+      - '&7Every clan that wants you in.'
+      - ''
+      - ' &8→ &#FFEE00Pending: &f%aquaclan_pending_invites%'
+      - ' &8→ &#FFEE00Invitations enabled: %aquaclan_profile_setting_clan_invites%'
+      - ''
+      - '&#FF9E08Click to toggle invitations on/off'
+    left_click_commands:
+      - '[profile-toggle] clan_invites'
+      - '[refresh]'
+
+  sent:
+    material: WRITABLE_BOOK
+    slot: 46
+    requires-clan: true
+    display_name: '&#FFEE00&lSent Invitations'
+    lore:
+      - '&7Invitations your clan sent out.'
+      - ''
+      - ' &8→ &#FFEE00Sent: &f%aquaclan_sent_invites%'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] invites_sent'
+
+  invite:
+    material: PLAYER_HEAD
+    slot: 47
+    requires-clan: true
+    display_name: '&#FFEE00&lInvite a Player'
+    lore:
+      - '&7Invite anyone, online or offline.'
+      - ''
+      - '&#54ADF4&l» Cost: &f%aquaclan_invite_cost%'
+      - ''
+      - '&#FF9E08Left click to pick an online player'
+      - '&#FF9E08Right click to write the name in chat'
+    left_click_commands:
+      - '[menu] invite_players'
+    right_click_commands:
+      - '[input] invite invites'
+
+  back:
+    material: ARROW
+    slot: 49
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to the quick menu.'
+    left_click_commands:
+      - '[menu] short'
+
+  profile:
+    material: PLAYER_HEAD
+    slot: 51
+    head: '%viewer%'
+    display_name: '&#FFEE00&lProfile'
+    lore:
+      - '&7Your personal settings.'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] profile'
+
+  clans:
+    material: BOOKSHELF
+    slot: 52
+    display_name: '&#FFEE00&lAll Clans'
+    lore:
+      - '&7Browse every clan with full info.'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] clans'
+
+  close:
+    material: BARRIER
+    slot: 53
+    display_name: '&#FF2D2D&lClose'
+    lore:
+      - '&7Close this menu.'
+    left_click_commands:
+      - '[close]'
+
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-53
+```
+
+</details>
+
+<details>
+<summary>`invites_sent.yml`</summary>
+
+```yaml filename="menus/invites_sent.yml"
+menu_title: '&8Sent Invitations | %page%/%pages%'
+size: 54
+
+content:
+  source: invites_sent
+  slots:
+    - 0-44
+  item:
+    material: PLAYER_HEAD
+    display_name: '&#FFEE00&l%name%'
+    lore:
+      - '&7Waiting for an answer.'
+      - ''
+      - ' &8→ &#FFEE00Status: %status%'
+      - ' &8→ &#FFEE00Invited by: &f%from%'
+      - ' &8→ &#FFEE00Date: &f%date%'
+      - ' &8→ &#FFEE00Expires in: &f%expires%'
+      - ''
+      - '&#FF2D2DRight click to cancel this invitation'
+    right_click_commands:
+      - '[invite-revoke] %name%'
+      - '[sound] BLOCK_NOTE_BLOCK_BASS'
+  empty:
+    material: PAPER
+    display_name: '&#FFA42D&lNo invitations sent'
+    lore:
+      - '&7Your clan has no pending invitations.'
+  previous:
+    material: ARROW
+    slot: 48
+    display_name: '&#54ADF4&lPrevious Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+  next:
+    material: ARROW
+    slot: 50
+    display_name: '&#54ADF4&lNext Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+
+items:
+  info:
+    material: WRITABLE_BOOK
+    slot: 45
+    display_name: '&#FFEE00&lSent Invitations'
+    lore:
+      - '&7Players invited by your clan.'
+      - ''
+      - ' &8→ &#FFEE00Pending: &f%aquaclan_sent_invites%'
+      - ' &8→ &#FFEE00Members: &f%aquaclan_members%&7/&f%aquaclan_slots%'
+
+  invite:
+    material: PLAYER_HEAD
+    slot: 46
+    display_name: '&#FFEE00&lInvite a Player'
+    lore:
+      - '&7Invite anyone, online or offline.'
+      - ''
+      - '&#FF9E08Left click to pick an online player'
+      - '&#FF9E08Right click to write the name in chat'
+    left_click_commands:
+      - '[menu] invite_players'
+    right_click_commands:
+      - '[input] invite invites_sent'
+
+  mine:
+    material: PAPER
+    slot: 47
+    display_name: '&#FFEE00&lMy Invitations'
+    lore:
+      - '&7Clans that invited you.'
+      - ''
+      - ' &8→ &#FFEE00Pending: &f%aquaclan_pending_invites%'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] invites'
+
+  back:
+    material: ARROW
+    slot: 49
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to your invitations.'
+    left_click_commands:
+      - '[menu] invites'
+
+  members:
+    material: PLAYER_HEAD
+    slot: 51
+    display_name: '&#FFEE00&lMembers'
+    lore:
+      - '&7Everyone in your clan.'
+      - ''
+      - ' &8→ &#FFEE00Members: &f%aquaclan_members%'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] clan_members'
+
+  panel:
+    material: BOOK
+    slot: 52
+    display_name: '&#FFEE00&lClan Panel'
+    lore:
+      - '&7All the information of your clan.'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] clan_info'
+
+  close:
+    material: BARRIER
+    slot: 53
+    display_name: '&#FF2D2D&lClose'
+    lore:
+      - '&7Close this menu.'
+    left_click_commands:
+      - '[close]'
+
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-53
+```
+
+</details>
+
+<details>
+<summary>`invite_players.yml`</summary>
+
+```yaml filename="menus/invite_players.yml"
+menu_title: '&8Invite Players | %page%/%pages%'
+size: 54
+
+content:
+  source: invite_targets
+  slots:
+    - 0-44
+  item:
+    material: PLAYER_HEAD
+    display_name: '&#FFEE00&l%name%'
+    lore:
+      - '&7This player has no clan yet.'
+      - ''
+      - ' &8→ &#FFEE00Status: %status%'
+      - ' &8→ &#FFEE00Kills: &f%kills% &8• &#FFEE00Deaths: &f%deaths%'
+      - ' &8→ &#FFEE00KDR: &f%kdr%'
+      - ' &8→ &#FFEE00First seen: &f%first_seen%'
+      - ' &8→ &#FFEE00Accepts invitations: %invites%'
+      - ''
+      - '&#56FF00Click to send an invitation'
+    left_click_commands:
+      - '[invite-send] %name%'
+      - '[sound] ENTITY_EXPERIENCE_ORB_PICKUP'
+  empty:
+    material: PAPER
+    display_name: '&#FFA42D&lNobody available'
+    lore:
+      - '&7Every online player already has a clan'
+      - '&7or was already invited.'
+      - ''
+      - '&#FF9E08Use the search button to invite'
+      - '&#FF9E08an offline player by name.'
+  previous:
+    material: ARROW
+    slot: 48
+    display_name: '&#54ADF4&lPrevious Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+  next:
+    material: ARROW
+    slot: 50
+    display_name: '&#54ADF4&lNext Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+
+items:
+  search:
+    material: NAME_TAG
+    slot: 45
+    display_name: '&#FFEE00&lSearch by Name'
+    lore:
+      - '&7Invite a player who is offline'
+      - '&7by writing the name in chat.'
+      - ''
+      - ' &8→ &#FFEE00Members: &f%aquaclan_members%&7/&f%aquaclan_slots%'
+      - ' &8→ &#FFEE00Cost: &f%aquaclan_invite_cost%'
+      - ''
+      - '&#FF9E08Click and write the name in chat!'
+    left_click_commands:
+      - '[input] invite invite_players'
+
+  sent:
+    material: WRITABLE_BOOK
+    slot: 46
+    display_name: '&#FFEE00&lSent Invitations'
+    lore:
+      - '&7Invitations waiting for an answer.'
+      - ''
+      - ' &8→ &#FFEE00Sent: &f%aquaclan_sent_invites%'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] invites_sent'
+
+  mine:
+    material: PAPER
+    slot: 47
+    display_name: '&#FFEE00&lMy Invitations'
+    lore:
+      - '&7Clans that invited you.'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] invites'
+
+  back:
+    material: ARROW
+    slot: 49
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to your invitations.'
+    left_click_commands:
+      - '[menu] invites'
+
+  members:
+    material: PLAYER_HEAD
+    slot: 51
+    display_name: '&#FFEE00&lMembers'
+    lore:
+      - '&7Everyone in your clan.'
+      - ''
+      - ' &8→ &#FFEE00Members: &f%aquaclan_members%'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] clan_members'
+
+  panel:
+    material: BOOK
+    slot: 52
+    display_name: '&#FFEE00&lClan Panel'
+    lore:
+      - '&7All the information of your clan.'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] clan_info'
+
+  close:
+    material: BARRIER
+    slot: 53
+    display_name: '&#FF2D2D&lClose'
+    lore:
+      - '&7Close this menu.'
+    left_click_commands:
+      - '[close]'
+
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-53
+```
+
+</details>
+
+<details>
+<summary>`profile.yml`</summary>
+
+```yaml filename="menus/profile.yml"
+menu_title: '&8AquaClan | Profile'
+size: 36
+
+items:
+  profile:
+    material: PLAYER_HEAD
+    slot: 4
+    head: '%viewer%'
+    display_name: '&#FFEE00&lYour Profile'
+    lore:
+      - '&7Everything about you.'
+      - ''
+      - '&#54ADF4&l» Clan:'
+      - ' &8→ &#FFEE00Clan: &f%aquaclan_name%'
+      - ' &8→ &#FFEE00Role: &f%aquaclan_role%'
+      - ''
+      - '&#54ADF4&l» Statistics:'
+      - ' &8→ &#FFEE00Kills: &f%aquaclan_profile_kills%'
+      - ' &8→ &#FFEE00Deaths: &f%aquaclan_profile_deaths%'
+      - ' &8→ &#FFEE00KDR: &f%aquaclan_profile_kdr%'
+      - ' &8→ &#FFEE00First seen: &f%aquaclan_profile_first_seen%'
+
+  clan_invites:
+    material: PAPER
+    slot: 10
+    display_name: '&#FFEE00&lClan Invitations'
+    lore:
+      - '&7Allow other clans to invite you.'
+      - '&7When disabled nobody can send you'
+      - '&7an invitation.'
+      - ''
+      - ' &8→ &#FFEE00Status: %aquaclan_profile_setting_clan_invites%'
+      - ''
+      - '&#FF9E08Click to enable or disable'
+    left_click_commands:
+      - '[profile-toggle] clan_invites'
+      - '[sound] UI_BUTTON_CLICK'
+      - '[refresh]'
+
+  invite_alerts:
+    material: BELL
+    slot: 12
+    display_name: '&#FFEE00&lInvitation Alerts'
+    lore:
+      - '&7Get a message when you join with'
+      - '&7invitations waiting for you.'
+      - ''
+      - ' &8→ &#FFEE00Status: %aquaclan_profile_setting_invite_alerts%'
+      - ''
+      - '&#FF9E08Click to enable or disable'
+    left_click_commands:
+      - '[profile-toggle] invite_alerts'
+      - '[sound] UI_BUTTON_CLICK'
+      - '[refresh]'
+
+  pvp_alerts:
+    material: IRON_SWORD
+    slot: 14
+    display_name: '&#FFEE00&lCombat Alerts'
+    lore:
+      - '&7Get a message about kills and'
+      - '&7deaths of your clan.'
+      - ''
+      - ' &8→ &#FFEE00Status: %aquaclan_profile_setting_pvp_alerts%'
+      - ''
+      - '&#FF9E08Click to enable or disable'
+    left_click_commands:
+      - '[profile-toggle] pvp_alerts'
+      - '[sound] UI_BUTTON_CLICK'
+      - '[refresh]'
+
+  mail_alerts:
+    material: MAP
+    slot: 16
+    display_name: '&#FFEE00&lMail Alerts'
+    lore:
+      - '&7Get a message when your clan'
+      - '&7receives new mail.'
+      - ''
+      - ' &8→ &#FFEE00Status: %aquaclan_profile_setting_mail_alerts%'
+      - ''
+      - '&#FF9E08Click to enable or disable'
+    left_click_commands:
+      - '[profile-toggle] mail_alerts'
+      - '[sound] UI_BUTTON_CLICK'
+      - '[refresh]'
+
+  invites:
+    material: WRITABLE_BOOK
+    slot: 21
+    display_name: '&#FFEE00&lMy Invitations'
+    lore:
+      - '&7Clans that want you in.'
+      - ''
+      - ' &8→ &#FFEE00Pending: &f%aquaclan_pending_invites%'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] invites'
+
+  skin:
+    material: ARMOR_STAND
+    slot: 23
+    display_name: '&#FFEE00&lRefresh Skin'
+    lore:
+      - '&7Update the head used by the menus.'
+      - ''
+      - '&#FF9E08Click to refresh'
+    left_click_commands:
+      - '[player] clan profile updateskin'
+      - '[refresh]'
+
+  back:
+    material: BARRIER
+    slot: 31
+    display_name: '&#FF2D2D&lBack'
+    lore:
+      - '&7Return to the quick menu.'
+    left_click_commands:
+      - '[menu] short'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-35
+```
+
+</details>
+
+### Rankings
+
+<details>
+<summary>`tops.yml`</summary>
+
+```yaml filename="menus/tops.yml"
+menu_title: '&8AquaClan | Rankings'
+size: 36
+
+items:
+  info:
+    material: DIAMOND
+    slot: 4
+    display_name: '&#FFEE00&lClan Rankings'
+    lore:
+      - '&7Pick a ranking to see the best'
+      - '&7clans of the server.'
+      - ''
+      - ' &8→ &#FFEE00Total clans: &f%aquaclan_count%'
+      - ' &8→ &#FFEE00Your clan: &f%aquaclan_name%'
+
+  points:
+    material: NETHER_STAR
+    slot: 10
+    display_name: '&#FFEE00&lTop Points'
+    lore:
+      - '&7The clans with the most points.'
+      - ''
+      - ' &8→ &#FFEE00Your position: &f#%aquaclan_rank_points%'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] points'
+
+  levels:
+    material: EXPERIENCE_BOTTLE
+    slot: 11
+    display_name: '&#FFEE00&lTop Levels'
+    lore:
+      - '&7The clans with the highest level.'
+      - ''
+      - ' &8→ &#FFEE00Your position: &f#%aquaclan_rank_level%'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] levels'
+
+  kills:
+    material: DIAMOND_SWORD
+    slot: 12
+    display_name: '&#FFEE00&lTop Kills'
+    lore:
+      - '&7The deadliest clans of the server.'
+      - ''
+      - ' &8→ &#FFEE00Your position: &f#%aquaclan_rank_kills%'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] kills'
+
+  deaths:
+    material: SKELETON_SKULL
+    slot: 13
+    display_name: '&#FFEE00&lTop Deaths'
+    lore:
+      - '&7The clans that died the most.'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] deaths'
+
+  kdr:
+    material: NETHERITE_SWORD
+    slot: 14
+    display_name: '&#FFEE00&lTop KDR'
+    lore:
+      - '&7The best kill/death ratio.'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] kdr'
+
+  members:
+    material: PLAYER_HEAD
+    slot: 15
+    display_name: '&#FFEE00&lTop Members'
+    lore:
+      - '&7The biggest clans of the server.'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] members_top'
+
+  bank:
+    material: GOLD_INGOT
+    slot: 16
+    display_name: '&#FFEE00&lTop Bank'
+    lore:
+      - '&7The richest clans of the server.'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] bank'
+
+  clans:
+    material: BOOKSHELF
+    slot: 22
+    display_name: '&#FFEE00&lAll Clans'
+    lore:
+      - '&7Browse every clan with full info.'
+      - ''
+      - ' &8→ &#FFEE00Total clans: &f%aquaclan_count%'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] clans'
+
+  back:
+    material: BARRIER
+    slot: 31
+    display_name: '&#FF2D2D&lBack'
+    lore:
+      - '&7Return to the quick menu.'
+    left_click_commands:
+      - '[menu] short'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-35
+```
+
+</details>
+
+<details>
+<summary>`leaderboard.yml`</summary>
+
+```yaml filename="menus/leaderboard.yml"
+menu_title: '&8Clan Ranking (%page%/%pages%)'
+size: 54
+
+content:
+  source: leaderboard
+  slots:
+    - 0-44
+  item:
+    material: PLAYER_HEAD
+    display_name: '&7[&#FFEE00Ranking #%position%&7] &#54ADF4Clan &f%tag%'
+    lore:
+      - '&7This clan is on the server ranking.'
+      - ''
+      - '&#54ADF4&l» Information:'
+      - ' &8→ &#FFEE00Points: &f%points%'
+      - ' &8→ &#FFEE00Name: &f%name%'
+      - ' &8→ &#FFEE00Kills: &f%kills%'
+      - ' &8→ &#FFEE00Deaths: &f%deaths%'
+      - ' &8→ &#FFEE00KDR: &f%kdr%'
+      - ' &8→ &#FFEE00Level: &f%level%'
+      - ' &8→ &#FFEE00Leader: &f%leader%'
+      - ' &8→ &#FFEE00Members: &f%members%&7/&f%max_members%'
+      - ''
+      - '&#FF9E08&l▶ &#FF9E08The best clan wins a big payout!'
+  empty:
+    material: PAPER
+    display_name: '&#FFA42D&lNo clans'
+    lore:
+      - '&7There are no clans to rank yet.'
+  previous:
+    material: ARROW
+    slot: 48
+    display_name: '&#54ADF4&lPrevious Page'
+    lore:
+      - '&7Go back one page.'
+  next:
+    material: ARROW
+    slot: 50
+    display_name: '&#54ADF4&lNext Page'
+    lore:
+      - '&7Go to the next page.'
+
+items:
+  close:
+    material: BARRIER
+    slot: 49
+    display_name: '&#FF2D2D&lClose'
+    lore:
+      - '&7Close this menu.'
+    left_click_commands:
+      - '[close]'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-53
+```
+
+</details>
+
+<details>
+<summary>`levels.yml`</summary>
+
+```yaml filename="menus/levels.yml"
+menu_title: '&8Top Levels | %page%/%pages%'
+size: 54
+
+content:
+  source: top_levels
+  slots:
+    - 0-44
+  item:
+    material: PLAYER_HEAD
+    display_name: '&7[&#FFEE00#%position%&7] &#FFEE00&l%name%'
+    lore:
+      - '&7%description%'
+      - ''
+      - '&#54ADF4&l» Level: &f%value%'
+      - ''
+      - '&#54ADF4&l» Information:'
+      - ' &8→ &#FFEE00Tag: &r%tag%'
+      - ' &8→ &#FFEE00Leader: &f%leader%'
+      - ' &8→ &#FFEE00Members: &f%members%&7/&f%max_members% &8(&#56FF00%online% online&8)'
+      - ' &8→ &#FFEE00Level: &f%level%&7/&f%max_level% &8• &#FFEE00Points: &f%points%'
+      - ' &8→ &#FFEE00Kills: &f%kills% &8• &#FFEE00Deaths: &f%deaths%'
+      - ' &8→ &#FFEE00KDR: &f%kdr% &8• &#FFEE00Bank: &f%bank%'
+      - ' &8→ &#FFEE00Allies: &f%allies% &8• &#FFEE00Rivals: &f%rivals%'
+      - ' &8→ &#FFEE00Created: &f%created% &8(&f%days%d&8)'
+      - ''
+      - '&#FF9E08Left click for the full clan panel'
+      - '&#FF9E08Right click for detailed statistics'
+    left_click_commands:
+      - '[menu] clan_info %name%'
+    right_click_commands:
+      - '[menu] clan_stats %name%'
+  empty:
+    material: PAPER
+    display_name: '&#FFA42D&lNo clans'
+    lore:
+      - '&7There is nothing to rank yet.'
+  previous:
+    material: ARROW
+    slot: 48
+    display_name: '&#54ADF4&lPrevious Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+  next:
+    material: ARROW
+    slot: 50
+    display_name: '&#54ADF4&lNext Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+
+items:
+  info:
+    material: EXPERIENCE_BOTTLE
+    slot: 45
+    display_name: '&#FFEE00&lTop Levels'
+    lore:
+      - '&7The best clans of the server'
+      - '&7sorted by levels.'
+      - ''
+      - ' &8→ &#FFEE00Ranked clans: &f%total%'
+      - ' &8→ &#FFEE00Page: &f%page%&7/&f%pages%'
+
+  selected:
+    material: SHIELD
+    slot: 46
+    clan-banner: true
+    display_name: '&#FFEE00&lSelected Clan'
+    lore:
+      - '&7Opened with &f/clan open levels <clan>'
+      - ''
+      - ' &8→ &#FFEE00Clan: &f%clan_name%'
+      - ' &8→ &#FFEE00Level: &f%clan_value_level%'
+      - ' &8→ &#FFEE00Position: &f#%clan_rank_level%'
+      - ''
+      - '&#FF9E08Click for the full clan panel'
+    left_click_commands:
+      - '[menu] clan_info'
+
+  rankings:
+    material: DIAMOND
+    slot: 47
+    display_name: '&#FFEE00&lOther Rankings'
+    lore:
+      - '&7Points, levels, kills, deaths,'
+      - '&7KDR, members and bank.'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] tops'
+
+  back:
+    material: ARROW
+    slot: 49
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to the rankings.'
+    left_click_commands:
+      - '[menu] tops'
+
+  search:
+    material: NAME_TAG
+    slot: 51
+    display_name: '&#FFEE00&lSearch Clan'
+    lore:
+      - '&7Find a clan by writing its name.'
+      - ''
+      - '&#FF9E08Click and write the name in chat!'
+    left_click_commands:
+      - '[input] search levels'
+
+  clans:
+    material: BOOKSHELF
+    slot: 52
+    display_name: '&#FFEE00&lAll Clans'
+    lore:
+      - '&7Browse every clan with full info.'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] clans'
+
+  close:
+    material: BARRIER
+    slot: 53
+    display_name: '&#FF2D2D&lClose'
+    lore:
+      - '&7Close this menu.'
+    left_click_commands:
+      - '[close]'
+
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-53
+```
+
+</details>
+
+<details>
+<summary>`points.yml`</summary>
+
+```yaml filename="menus/points.yml"
+menu_title: '&8Top Points | %page%/%pages%'
+size: 54
+
+content:
+  source: top_points
+  slots:
+    - 0-44
+  item:
+    material: PLAYER_HEAD
+    display_name: '&7[&#FFEE00#%position%&7] &#FFEE00&l%name%'
+    lore:
+      - '&7%description%'
+      - ''
+      - '&#54ADF4&l» Points: &f%value%'
+      - ''
+      - '&#54ADF4&l» Information:'
+      - ' &8→ &#FFEE00Tag: &r%tag%'
+      - ' &8→ &#FFEE00Leader: &f%leader%'
+      - ' &8→ &#FFEE00Members: &f%members%&7/&f%max_members% &8(&#56FF00%online% online&8)'
+      - ' &8→ &#FFEE00Level: &f%level%&7/&f%max_level% &8• &#FFEE00Points: &f%points%'
+      - ' &8→ &#FFEE00Kills: &f%kills% &8• &#FFEE00Deaths: &f%deaths%'
+      - ' &8→ &#FFEE00KDR: &f%kdr% &8• &#FFEE00Bank: &f%bank%'
+      - ' &8→ &#FFEE00Allies: &f%allies% &8• &#FFEE00Rivals: &f%rivals%'
+      - ' &8→ &#FFEE00Created: &f%created% &8(&f%days%d&8)'
+      - ''
+      - '&#FF9E08Left click for the full clan panel'
+      - '&#FF9E08Right click for detailed statistics'
+    left_click_commands:
+      - '[menu] clan_info %name%'
+    right_click_commands:
+      - '[menu] clan_stats %name%'
+  empty:
+    material: PAPER
+    display_name: '&#FFA42D&lNo clans'
+    lore:
+      - '&7There is nothing to rank yet.'
+  previous:
+    material: ARROW
+    slot: 48
+    display_name: '&#54ADF4&lPrevious Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+  next:
+    material: ARROW
+    slot: 50
+    display_name: '&#54ADF4&lNext Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+
+items:
+  info:
+    material: NETHER_STAR
+    slot: 45
+    display_name: '&#FFEE00&lTop Points'
+    lore:
+      - '&7The best clans of the server'
+      - '&7sorted by points.'
+      - ''
+      - ' &8→ &#FFEE00Ranked clans: &f%total%'
+      - ' &8→ &#FFEE00Page: &f%page%&7/&f%pages%'
+
+  selected:
+    material: SHIELD
+    slot: 46
+    clan-banner: true
+    display_name: '&#FFEE00&lSelected Clan'
+    lore:
+      - '&7Opened with &f/clan open points <clan>'
+      - ''
+      - ' &8→ &#FFEE00Clan: &f%clan_name%'
+      - ' &8→ &#FFEE00Points: &f%clan_value_points%'
+      - ' &8→ &#FFEE00Position: &f#%clan_rank_points%'
+      - ''
+      - '&#FF9E08Click for the full clan panel'
+    left_click_commands:
+      - '[menu] clan_info'
+
+  rankings:
+    material: DIAMOND
+    slot: 47
+    display_name: '&#FFEE00&lOther Rankings'
+    lore:
+      - '&7Points, levels, kills, deaths,'
+      - '&7KDR, members and bank.'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] tops'
+
+  back:
+    material: ARROW
+    slot: 49
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to the rankings.'
+    left_click_commands:
+      - '[menu] tops'
+
+  search:
+    material: NAME_TAG
+    slot: 51
+    display_name: '&#FFEE00&lSearch Clan'
+    lore:
+      - '&7Find a clan by writing its name.'
+      - ''
+      - '&#FF9E08Click and write the name in chat!'
+    left_click_commands:
+      - '[input] search points'
+
+  clans:
+    material: BOOKSHELF
+    slot: 52
+    display_name: '&#FFEE00&lAll Clans'
+    lore:
+      - '&7Browse every clan with full info.'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] clans'
+
+  close:
+    material: BARRIER
+    slot: 53
+    display_name: '&#FF2D2D&lClose'
+    lore:
+      - '&7Close this menu.'
+    left_click_commands:
+      - '[close]'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-53
+```
+
+</details>
+
+<details>
+<summary>`kills.yml`</summary>
+
+```yaml filename="menus/kills.yml"
+menu_title: '&8Top Kills | %page%/%pages%'
+size: 54
+
+content:
+  source: top_kills
+  slots:
+    - 0-44
+  item:
+    material: PLAYER_HEAD
+    display_name: '&7[&#FFEE00#%position%&7] &#FFEE00&l%name%'
+    lore:
+      - '&7%description%'
+      - ''
+      - '&#54ADF4&l» Kills: &f%value%'
+      - ''
+      - '&#54ADF4&l» Information:'
+      - ' &8→ &#FFEE00Tag: &r%tag%'
+      - ' &8→ &#FFEE00Leader: &f%leader%'
+      - ' &8→ &#FFEE00Members: &f%members%&7/&f%max_members% &8(&#56FF00%online% online&8)'
+      - ' &8→ &#FFEE00Level: &f%level%&7/&f%max_level% &8• &#FFEE00Points: &f%points%'
+      - ' &8→ &#FFEE00Kills: &f%kills% &8• &#FFEE00Deaths: &f%deaths%'
+      - ' &8→ &#FFEE00KDR: &f%kdr% &8• &#FFEE00Bank: &f%bank%'
+      - ' &8→ &#FFEE00Allies: &f%allies% &8• &#FFEE00Rivals: &f%rivals%'
+      - ' &8→ &#FFEE00Created: &f%created% &8(&f%days%d&8)'
+      - ''
+      - '&#FF9E08Left click for the full clan panel'
+      - '&#FF9E08Right click for detailed statistics'
+    left_click_commands:
+      - '[menu] clan_info %name%'
+    right_click_commands:
+      - '[menu] clan_stats %name%'
+  empty:
+    material: PAPER
+    display_name: '&#FFA42D&lNo clans'
+    lore:
+      - '&7There is nothing to rank yet.'
+  previous:
+    material: ARROW
+    slot: 48
+    display_name: '&#54ADF4&lPrevious Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+  next:
+    material: ARROW
+    slot: 50
+    display_name: '&#54ADF4&lNext Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+
+items:
+  info:
+    material: DIAMOND_SWORD
+    slot: 45
+    display_name: '&#FFEE00&lTop Kills'
+    lore:
+      - '&7The best clans of the server'
+      - '&7sorted by kills.'
+      - ''
+      - ' &8→ &#FFEE00Ranked clans: &f%total%'
+      - ' &8→ &#FFEE00Page: &f%page%&7/&f%pages%'
+
+  selected:
+    material: SHIELD
+    slot: 46
+    clan-banner: true
+    display_name: '&#FFEE00&lSelected Clan'
+    lore:
+      - '&7Opened with &f/clan open kills <clan>'
+      - ''
+      - ' &8→ &#FFEE00Clan: &f%clan_name%'
+      - ' &8→ &#FFEE00Kills: &f%clan_value_kills%'
+      - ' &8→ &#FFEE00Position: &f#%clan_rank_kills%'
+      - ''
+      - '&#FF9E08Click for the full clan panel'
+    left_click_commands:
+      - '[menu] clan_info'
+
+  rankings:
+    material: DIAMOND
+    slot: 47
+    display_name: '&#FFEE00&lOther Rankings'
+    lore:
+      - '&7Points, levels, kills, deaths,'
+      - '&7KDR, members and bank.'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] tops'
+
+  back:
+    material: ARROW
+    slot: 49
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to the rankings.'
+    left_click_commands:
+      - '[menu] tops'
+
+  search:
+    material: NAME_TAG
+    slot: 51
+    display_name: '&#FFEE00&lSearch Clan'
+    lore:
+      - '&7Find a clan by writing its name.'
+      - ''
+      - '&#FF9E08Click and write the name in chat!'
+    left_click_commands:
+      - '[input] search kills'
+
+  clans:
+    material: BOOKSHELF
+    slot: 52
+    display_name: '&#FFEE00&lAll Clans'
+    lore:
+      - '&7Browse every clan with full info.'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] clans'
+
+  close:
+    material: BARRIER
+    slot: 53
+    display_name: '&#FF2D2D&lClose'
+    lore:
+      - '&7Close this menu.'
+    left_click_commands:
+      - '[close]'
+
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-53
+```
+
+</details>
+
+<details>
+<summary>`deaths.yml`</summary>
+
+```yaml filename="menus/deaths.yml"
+menu_title: '&8Top Deaths | %page%/%pages%'
+size: 54
+
+content:
+  source: top_deaths
+  slots:
+    - 0-44
+  item:
+    material: PLAYER_HEAD
+    display_name: '&7[&#FFEE00#%position%&7] &#FFEE00&l%name%'
+    lore:
+      - '&7%description%'
+      - ''
+      - '&#54ADF4&l» Deaths: &f%value%'
+      - ''
+      - '&#54ADF4&l» Information:'
+      - ' &8→ &#FFEE00Tag: &r%tag%'
+      - ' &8→ &#FFEE00Leader: &f%leader%'
+      - ' &8→ &#FFEE00Members: &f%members%&7/&f%max_members% &8(&#56FF00%online% online&8)'
+      - ' &8→ &#FFEE00Level: &f%level%&7/&f%max_level% &8• &#FFEE00Points: &f%points%'
+      - ' &8→ &#FFEE00Kills: &f%kills% &8• &#FFEE00Deaths: &f%deaths%'
+      - ' &8→ &#FFEE00KDR: &f%kdr% &8• &#FFEE00Bank: &f%bank%'
+      - ' &8→ &#FFEE00Allies: &f%allies% &8• &#FFEE00Rivals: &f%rivals%'
+      - ' &8→ &#FFEE00Created: &f%created% &8(&f%days%d&8)'
+      - ''
+      - '&#FF9E08Left click for the full clan panel'
+      - '&#FF9E08Right click for detailed statistics'
+    left_click_commands:
+      - '[menu] clan_info %name%'
+    right_click_commands:
+      - '[menu] clan_stats %name%'
+  empty:
+    material: PAPER
+    display_name: '&#FFA42D&lNo clans'
+    lore:
+      - '&7There is nothing to rank yet.'
+  previous:
+    material: ARROW
+    slot: 48
+    display_name: '&#54ADF4&lPrevious Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+  next:
+    material: ARROW
+    slot: 50
+    display_name: '&#54ADF4&lNext Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+
+items:
+  info:
+    material: SKELETON_SKULL
+    slot: 45
+    display_name: '&#FFEE00&lTop Deaths'
+    lore:
+      - '&7The best clans of the server'
+      - '&7sorted by deaths.'
+      - ''
+      - ' &8→ &#FFEE00Ranked clans: &f%total%'
+      - ' &8→ &#FFEE00Page: &f%page%&7/&f%pages%'
+
+  selected:
+    material: SHIELD
+    slot: 46
+    clan-banner: true
+    display_name: '&#FFEE00&lSelected Clan'
+    lore:
+      - '&7Opened with &f/clan open deaths <clan>'
+      - ''
+      - ' &8→ &#FFEE00Clan: &f%clan_name%'
+      - ' &8→ &#FFEE00Deaths: &f%clan_value_deaths%'
+      - ' &8→ &#FFEE00Position: &f#%clan_rank_deaths%'
+      - ''
+      - '&#FF9E08Click for the full clan panel'
+    left_click_commands:
+      - '[menu] clan_info'
+
+  rankings:
+    material: DIAMOND
+    slot: 47
+    display_name: '&#FFEE00&lOther Rankings'
+    lore:
+      - '&7Points, levels, kills, deaths,'
+      - '&7KDR, members and bank.'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] tops'
+
+  back:
+    material: ARROW
+    slot: 49
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to the rankings.'
+    left_click_commands:
+      - '[menu] tops'
+
+  search:
+    material: NAME_TAG
+    slot: 51
+    display_name: '&#FFEE00&lSearch Clan'
+    lore:
+      - '&7Find a clan by writing its name.'
+      - ''
+      - '&#FF9E08Click and write the name in chat!'
+    left_click_commands:
+      - '[input] search deaths'
+
+  clans:
+    material: BOOKSHELF
+    slot: 52
+    display_name: '&#FFEE00&lAll Clans'
+    lore:
+      - '&7Browse every clan with full info.'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] clans'
+
+  close:
+    material: BARRIER
+    slot: 53
+    display_name: '&#FF2D2D&lClose'
+    lore:
+      - '&7Close this menu.'
+    left_click_commands:
+      - '[close]'
+
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-53
+```
+
+</details>
+
+<details>
+<summary>`kdr.yml`</summary>
+
+```yaml filename="menus/kdr.yml"
+menu_title: '&8Top KDR | %page%/%pages%'
+size: 54
+
+content:
+  source: top_kdr
+  slots:
+    - 0-44
+  item:
+    material: PLAYER_HEAD
+    display_name: '&7[&#FFEE00#%position%&7] &#FFEE00&l%name%'
+    lore:
+      - '&7%description%'
+      - ''
+      - '&#54ADF4&l» KDR: &f%value%'
+      - ''
+      - '&#54ADF4&l» Information:'
+      - ' &8→ &#FFEE00Tag: &r%tag%'
+      - ' &8→ &#FFEE00Leader: &f%leader%'
+      - ' &8→ &#FFEE00Members: &f%members%&7/&f%max_members% &8(&#56FF00%online% online&8)'
+      - ' &8→ &#FFEE00Level: &f%level%&7/&f%max_level% &8• &#FFEE00Points: &f%points%'
+      - ' &8→ &#FFEE00Kills: &f%kills% &8• &#FFEE00Deaths: &f%deaths%'
+      - ' &8→ &#FFEE00KDR: &f%kdr% &8• &#FFEE00Bank: &f%bank%'
+      - ' &8→ &#FFEE00Allies: &f%allies% &8• &#FFEE00Rivals: &f%rivals%'
+      - ' &8→ &#FFEE00Created: &f%created% &8(&f%days%d&8)'
+      - ''
+      - '&#FF9E08Left click for the full clan panel'
+      - '&#FF9E08Right click for detailed statistics'
+    left_click_commands:
+      - '[menu] clan_info %name%'
+    right_click_commands:
+      - '[menu] clan_stats %name%'
+  empty:
+    material: PAPER
+    display_name: '&#FFA42D&lNo clans'
+    lore:
+      - '&7There is nothing to rank yet.'
+  previous:
+    material: ARROW
+    slot: 48
+    display_name: '&#54ADF4&lPrevious Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+  next:
+    material: ARROW
+    slot: 50
+    display_name: '&#54ADF4&lNext Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+
+items:
+  info:
+    material: NETHERITE_SWORD
+    slot: 45
+    display_name: '&#FFEE00&lTop KDR'
+    lore:
+      - '&7The best clans of the server'
+      - '&7sorted by kdr.'
+      - ''
+      - ' &8→ &#FFEE00Ranked clans: &f%total%'
+      - ' &8→ &#FFEE00Page: &f%page%&7/&f%pages%'
+
+  selected:
+    material: SHIELD
+    slot: 46
+    clan-banner: true
+    display_name: '&#FFEE00&lSelected Clan'
+    lore:
+      - '&7Opened with &f/clan open kdr <clan>'
+      - ''
+      - ' &8→ &#FFEE00Clan: &f%clan_name%'
+      - ' &8→ &#FFEE00KDR: &f%clan_value_kdr%'
+      - ' &8→ &#FFEE00Position: &f#%clan_rank_kdr%'
+      - ''
+      - '&#FF9E08Click for the full clan panel'
+    left_click_commands:
+      - '[menu] clan_info'
+
+  rankings:
+    material: DIAMOND
+    slot: 47
+    display_name: '&#FFEE00&lOther Rankings'
+    lore:
+      - '&7Points, levels, kills, deaths,'
+      - '&7KDR, members and bank.'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] tops'
+
+  back:
+    material: ARROW
+    slot: 49
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to the rankings.'
+    left_click_commands:
+      - '[menu] tops'
+
+  search:
+    material: NAME_TAG
+    slot: 51
+    display_name: '&#FFEE00&lSearch Clan'
+    lore:
+      - '&7Find a clan by writing its name.'
+      - ''
+      - '&#FF9E08Click and write the name in chat!'
+    left_click_commands:
+      - '[input] search kdr'
+
+  clans:
+    material: BOOKSHELF
+    slot: 52
+    display_name: '&#FFEE00&lAll Clans'
+    lore:
+      - '&7Browse every clan with full info.'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] clans'
+
+  close:
+    material: BARRIER
+    slot: 53
+    display_name: '&#FF2D2D&lClose'
+    lore:
+      - '&7Close this menu.'
+    left_click_commands:
+      - '[close]'
+
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-53
+```
+
+</details>
+
+<details>
+<summary>`members_top.yml`</summary>
+
+```yaml filename="menus/members_top.yml"
+menu_title: '&8Top Members | %page%/%pages%'
+size: 54
+
+content:
+  source: top_members
+  slots:
+    - 0-44
+  item:
+    material: PLAYER_HEAD
+    display_name: '&7[&#FFEE00#%position%&7] &#FFEE00&l%name%'
+    lore:
+      - '&7%description%'
+      - ''
+      - '&#54ADF4&l» Members: &f%value%'
+      - ''
+      - '&#54ADF4&l» Information:'
+      - ' &8→ &#FFEE00Tag: &r%tag%'
+      - ' &8→ &#FFEE00Leader: &f%leader%'
+      - ' &8→ &#FFEE00Members: &f%members%&7/&f%max_members% &8(&#56FF00%online% online&8)'
+      - ' &8→ &#FFEE00Level: &f%level%&7/&f%max_level% &8• &#FFEE00Points: &f%points%'
+      - ' &8→ &#FFEE00Kills: &f%kills% &8• &#FFEE00Deaths: &f%deaths%'
+      - ' &8→ &#FFEE00KDR: &f%kdr% &8• &#FFEE00Bank: &f%bank%'
+      - ' &8→ &#FFEE00Allies: &f%allies% &8• &#FFEE00Rivals: &f%rivals%'
+      - ' &8→ &#FFEE00Created: &f%created% &8(&f%days%d&8)'
+      - ''
+      - '&#FF9E08Left click for the full clan panel'
+      - '&#FF9E08Right click for detailed statistics'
+    left_click_commands:
+      - '[menu] clan_info %name%'
+    right_click_commands:
+      - '[menu] clan_stats %name%'
+  empty:
+    material: PAPER
+    display_name: '&#FFA42D&lNo clans'
+    lore:
+      - '&7There is nothing to rank yet.'
+  previous:
+    material: ARROW
+    slot: 48
+    display_name: '&#54ADF4&lPrevious Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+  next:
+    material: ARROW
+    slot: 50
+    display_name: '&#54ADF4&lNext Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+
+items:
+  info:
+    material: PLAYER_HEAD
+    slot: 45
+    display_name: '&#FFEE00&lTop Members'
+    lore:
+      - '&7The best clans of the server'
+      - '&7sorted by members.'
+      - ''
+      - ' &8→ &#FFEE00Ranked clans: &f%total%'
+      - ' &8→ &#FFEE00Page: &f%page%&7/&f%pages%'
+
+  selected:
+    material: SHIELD
+    slot: 46
+    clan-banner: true
+    display_name: '&#FFEE00&lSelected Clan'
+    lore:
+      - '&7Opened with &f/clan open members_top <clan>'
+      - ''
+      - ' &8→ &#FFEE00Clan: &f%clan_name%'
+      - ' &8→ &#FFEE00Members: &f%clan_value_members%'
+      - ' &8→ &#FFEE00Position: &f#%clan_rank_members%'
+      - ''
+      - '&#FF9E08Click for the full clan panel'
+    left_click_commands:
+      - '[menu] clan_info'
+
+  rankings:
+    material: DIAMOND
+    slot: 47
+    display_name: '&#FFEE00&lOther Rankings'
+    lore:
+      - '&7Points, levels, kills, deaths,'
+      - '&7KDR, members and bank.'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] tops'
+
+  back:
+    material: ARROW
+    slot: 49
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to the rankings.'
+    left_click_commands:
+      - '[menu] tops'
+
+  search:
+    material: NAME_TAG
+    slot: 51
+    display_name: '&#FFEE00&lSearch Clan'
+    lore:
+      - '&7Find a clan by writing its name.'
+      - ''
+      - '&#FF9E08Click and write the name in chat!'
+    left_click_commands:
+      - '[input] search members_top'
+
+  clans:
+    material: BOOKSHELF
+    slot: 52
+    display_name: '&#FFEE00&lAll Clans'
+    lore:
+      - '&7Browse every clan with full info.'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] clans'
+
+  close:
+    material: BARRIER
+    slot: 53
+    display_name: '&#FF2D2D&lClose'
+    lore:
+      - '&7Close this menu.'
+    left_click_commands:
+      - '[close]'
+
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-53
+```
+
+</details>
+
+### Banner
+
+<details>
+<summary>`banner_editor.yml`</summary>
+
+```yaml filename="menus/banner_editor.yml"
+menu_title: '&8Banner Editor | Clan: %aquaclan_name%'
+size: 36
+
+preview:
+  slot: 4
+  display_name: '&#FFEE00&lYour Banner'
+  lore:
+    - '&7A live preview of your design.'
+
+base-color:
+  slot: 10
+  display_name: '&#54ADF4&lBase Color'
+  lore:
+    - '&7Current: &f%color%'
+    - ''
+    - '&#FFEE00Click to change the base color'
+
+add-pattern:
+  slot: 16
+  material: LOOM
+  display_name: '&#56FF00&lAdd Pattern'
+  lore:
+    - '&7Layers: &f%layers%&7/&f%max%'
+    - ''
+    - '&#FFEE00Click to add a new shape'
+
+layer-slots:
+  - 19-25
+
+layer-item:
+  display_name: '&f%pattern% &7(%color%&7)'
+  lore:
+    - '&#FF2D2DClick to remove this layer'
+
+save:
+  slot: 30
+  material: LIME_DYE
+  display_name: '&#56FF00&lSave'
+  lore:
+    - '&7Save this banner to your clan.'
+
+cancel:
+  slot: 32
+  material: BARRIER
+  display_name: '&#FF2D2D&lCancel'
+  lore:
+    - '&7Discard changes and close.'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-35
+```
+
+</details>
+
+<details>
+<summary>`banner_colors.yml`</summary>
+
+```yaml filename="menus/banner_colors.yml"
+menu_title: '&8Pick a Color | Clan: %aquaclan_name%'
+size: 54
+
+color-slots:
+  - 10-16
+  - 19-25
+  - 28-29
+
+color-item:
+  display_name: '&f%color%'
+  lore:
+    - '&#FFEE00Click to select'
+
+cancel:
+  slot: 49
+  material: BARRIER
+  display_name: '&#FF2D2D&lCancel'
+  lore:
+    - '&7Back to the editor.'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-53
+```
+
+</details>
+
+<details>
+<summary>`banner_patterns.yml`</summary>
+
+```yaml filename="menus/banner_patterns.yml"
+menu_title: '&8Pick a Shape | Clan: %aquaclan_name%'
+size: 54
+
+pattern-slots:
+  - 10-16
+  - 19-25
+  - 28-34
+  - 37-43
+
+pattern-item:
+  display_name: '&f%pattern%'
+  lore:
+    - '&#FFEE00Click to select this shape'
+
+previous:
+  slot: 48
+  material: ARROW
+  display_name: '&#54ADF4&lPrevious Page'
+
+next:
+  slot: 50
+  material: ARROW
+  display_name: '&#54ADF4&lNext Page'
+
+cancel:
+  slot: 49
+  material: BARRIER
+  display_name: '&#FF2D2D&lCancel'
+  lore:
+    - '&7Back to the editor.'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-53
+```
+
+</details>

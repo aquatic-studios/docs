@@ -6,6 +6,7 @@ export default {
   configuration: nav('gear', 'Configuration'),
   levels: nav('chart', 'Levels'),
   menus: nav('grid', 'Menus'),
+  webhook: nav('send', 'Discord Webhook'),
   placeholders: nav('braces', 'Placeholders'),
   api: nav('code', 'Developer API')
 }

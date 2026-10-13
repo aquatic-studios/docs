@@ -135,9 +135,9 @@ clan:
   member-limits:
     default: 4
     permissions:
-      aquaclan.limit.vip: 8
-      aquaclan.limit.mvp: 12
-      aquaclan.limit.legend: 20
+      'aquaclan.limit.vip': 8
+      'aquaclan.limit.mvp': 12
+      'aquaclan.limit.legend': 20
 ```
 
 The **highest** value a player holds wins, and level rewards add on top.
@@ -148,10 +148,15 @@ The **highest** value a player holds wins, and level rewards add on top.
   tag:
     custom:
       enabled: true
-      permission: aquaclan.clan.tag.custom
+      permission: 'aquaclan.clan.tag.custom'
       min-length: 3
       max-length: 16
+      formats:
+        legacy: ''
+        hex: 'aquaclan.clan.tag.hex'
+        gradient: 'aquaclan.clan.tag.gradient'
 ```
 
 Length limits count only visible characters, so color codes do not eat into them. Legacy, hex and
-MiniMessage all work.
+MiniMessage all work, and each format can have its own permission. See
+[Configuration](/plugins/aquaclan/configuration/#custom-tag).

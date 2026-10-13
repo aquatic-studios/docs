@@ -9,16 +9,16 @@ import { Callout } from 'nextra/components'
 # AquaClan
 
 Clans with four ranks, invitations that survive restarts, homes, a shared bank, mail, alliances and
-rivalries, a leveling curve with rewards, custom banners and 35 editable menus.
+rivalries, a leveling curve with rewards, custom banners, Discord notices and 36 editable menus.
 
 | | |
 | --- | --- |
 | **Base command** | `/clan` |
 | **Aliases** | `/aquaclan`, `/aqclan`, `/aqc` |
-| **Minecraft** | `1.16+` |
+| **Minecraft** | `1.8+` |
 | **Folia** | Supported |
 | **Storage** | SQLite, MySQL, MariaDB or JSON |
-| **Soft-depend** | PlaceholderAPI, Vault |
+| **Soft-depend** | PlaceholderAPI, Vault, ItemsAdder, Oraxen, Nexo |
 | **Download** | [SpigotMC](https://www.spigotmc.org/resources/aquaclan-advanced-clan-system-1-8-1-26-2.136918/) |
 
 ## Ranks
@@ -57,9 +57,12 @@ Killing a rival is worth more. Killing an ally **costs** points.
 | --- | --- |
 | `config.yml` | Names, limits, economy, invites, chat input |
 | `level.yml` | The curve and the reward per level |
-| `webhook.yml` | Discord notice on create and disband |
+| `webhook.yml` | Discord notices for 15 clan events |
 | `messages.yml` | Every string |
-| `menus/*.yml` | 35 menus, one file each |
+| `menus/*.yml` | 36 menus, one file each |
+
+`config.yml`, `messages.yml`, `level.yml` and `webhook.yml` update themselves when a release adds
+options, without touching your changes.
 
 <Callout type="info">
   Almost everything is reachable from a menu. `/clan` opens the main one and `/clan short` a quick

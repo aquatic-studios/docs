@@ -1,6 +1,6 @@
 ---
 title: Configuration
-description: Names, limits, homes, invitations and the economy.
+description: Names, tags, limits, homes, invitations, the economy and config updates.
 ---
 
 import { Callout } from 'nextra/components'
@@ -10,11 +10,34 @@ import { Callout } from 'nextra/components'
 ## Names and tags
 
 ```yaml filename="config.yml"
+# Do not change this
+version: 1
+
+# tells the console when a newer version is on spigot, checked once on startup
+update-notify: true
+
+# where clan data is stored
+# type: SQLITE (default), MYSQL, MARIADB or JSON
+# to switch: /clan admin migrate <type>, then change type here and restart
+storage:
+  type: SQLITE
+  # only used by MYSQL and MARIADB
+  mysql:
+    host: localhost
+    port: 3306
+    database: aquaclan
+    username: root
+    password: ''
+    ssl: false
+
 clan:
+  # rules for clan names
   name:
     min-length: 3
     max-length: 10
+    # a name must match this regex
     pattern: '^[a-zA-Z0-9]+$'
+    # names nobody is allowed to use
     blacklist:
       - admin
       - staff
@@ -22,100 +45,124 @@ clan:
       - mod
       - server
   tag:
+    # color used when a clan has no custom tag
     default-color: '&#54ADF4'
-```
-
-| Key | Default | What it does |
-| --- | --- | --- |
-| `min-length` / `max-length` | `3` / `10` | Name length |
-| `pattern` | letters and digits | A name must match this regex |
-| `blacklist` | 5 words | Names nobody can use |
-| `tag.default-color` | `&#54ADF4` | Color when a clan has no custom tag |
-
-## Limits
-
-```yaml filename="config.yml"
+    # /clan custom tag <text> - supports legacy, hex (&#RRGGBB) and MiniMessage
+    custom:
+      enabled: true
+      permission: 'aquaclan.clan.tag.custom'
+      # length limits count only visible characters, color codes are ignored
+      min-length: 3
+      max-length: 16
+      max-raw-length: 256
+      formats:
+        legacy: ''
+        hex: 'aquaclan.clan.tag.hex'
+        bold: 'aquaclan.clan.tag.bold'
+        italic: 'aquaclan.clan.tag.italic'
+        underlined: 'aquaclan.clan.tag.underlined'
+        strikethrough: 'aquaclan.clan.tag.strikethrough'
+        obfuscated: 'aquaclan.clan.tag.obfuscated'
+        gradient: 'aquaclan.clan.tag.gradient'
+        rainbow: 'aquaclan.clan.tag.rainbow'
+        minimessage: 'aquaclan.clan.tag.minimessage'
+  # base member limit + per-permission overrides, the highest value wins
   member-limits:
     default: 4
     permissions:
-      aquaclan.limit.vip: 8
-      aquaclan.limit.mvp: 12
-      aquaclan.limit.legend: 20
+      'aquaclan.limit.vip': 8
+      'aquaclan.limit.mvp': 12
+      'aquaclan.limit.legend': 20
+  # max clan homes (level rewards can raise this)
   max-homes: 1
+  # max allies, 0 = unlimited (level rewards can raise this)
   max-allies: 5
+  # default friendly fire between members of the same clan
   friendly-fire: false
-```
-
-| Key | Default | What it does |
-| --- | --- | --- |
-| `member-limits.default` | `4` | Base member limit |
-| `member-limits.permissions` | 3 nodes | Overrides. The **highest** the player holds wins |
-| `max-homes` | `1` | Clan homes. Level rewards raise it |
-| `max-allies` | `5` | Allies. `0` is unlimited, level rewards raise it |
-| `friendly-fire` | `false` | Default friendly fire inside a clan |
-
-## Chat
-
-```yaml filename="config.yml"
   chat:
     enabled: true
     format: '&#54ADF4&lCLAN &7» %clan% &8• &f%player%&7: &f%message%'
-```
-
-Placeholders: `%clan%`, `%player%`, `%message%`.
-
-## Homes
-
-```yaml filename="config.yml"
   home:
     cooldown-seconds: 5
+    # delay before teleporting, cancelled if the player moves
     warmup-seconds: 3
     cancel-on-move: true
-```
-
-| Key | Default | What it does |
-| --- | --- | --- |
-| `cooldown-seconds` | `5` | Between teleports |
-| `warmup-seconds` | `3` | Delay before teleporting |
-| `cancel-on-move` | `true` | Moving during the warmup cancels it |
-
-## Create and disband
-
-```yaml filename="config.yml"
   create:
+    # cooldown after creating a clan
     cooldown-seconds: 60
   disband:
+    # require /clan disband confirm
     confirm: true
+    # disbanding starts the create cooldown to stop create/disband abuse
     cooldown-seconds: 300
-```
+  # banner designer, opened with /clan banner edit
+  banner:
+    permission: 'aquaclan.clan.leader.custom.banner'
+    # max pattern layers (hard cap 16)
+    max-layers: 6
 
-Disbanding starts the create cooldown, which is what stops create and disband abuse.
+placeholders:
+  # value of %aquaclan_has_clan%
+  has-clan:
+    with-clan: '&#56FF00Yes'
+    without-clan: '&#FF2D2DNo'
 
-## Invitations
+  # text used by the %aquaclan_<x>% placeholders when the player has no clan
+  # leave a value empty to show nothing at all
+  no-clan:
+    name: '&7No clan'
+    tag: '&7No clan'
+    nickname: '&7No clan'
+    description: '&7No description'
+    role: '&7None'
+    leader: '&7None'
+    created: '&7-'
 
-```yaml filename="config.yml"
+# points earned in combat, they raise the clan level (see level.yml)
+points:
+  per-kill: 10
+  per-death: 0
+  # extra points for killing a rival clan member
+  rival-kill-bonus: 5
+  # points lost for killing an ally clan member
+  ally-kill-penalty: 15
+
+# clan invitations, they survive restarts and reach offline players
 invites:
+  # how long an invitation stays valid, 0 = never expires
   expire-seconds: 604800
+  # max invitations a single player can hold at once, 0 = unlimited
   max-pending: 15
+  # max invitations one clan can have waiting for an answer, 0 = unlimited
   max-per-clan: 20
+  # tell a player about pending invitations when they join
   notify-on-join: true
-```
 
-| Key | Default | What it does |
-| --- | --- | --- |
-| `expire-seconds` | `604800` | How long one stays valid. `0` never expires |
-| `max-pending` | `15` | How many a player can hold. `0` unlimited |
-| `max-per-clan` | `20` | How many a clan can have waiting. `0` unlimited |
-| `notify-on-join` | `true` | Tells a player about pending invitations on join |
+# chat input used by the menus, the player writes the answer in chat
+chat-input:
+  # seconds the player has to answer before the request is cancelled
+  timeout-seconds: 60
+  # words that cancel the request
+  cancel-words:
+    - cancel
+    - cancelar
+  bossbar:
+    enabled: true
+    # PINK, BLUE, RED, GREEN, YELLOW, PURPLE or WHITE
+    color: BLUE
+    # PROGRESS, NOTCHED_6, NOTCHED_10, NOTCHED_12 or NOTCHED_20
+    style: PROGRESS
+  title:
+    enabled: true
+    fade-in: 5
+    stay: 60
+    fade-out: 10
+  sounds:
+    open: BLOCK_NOTE_BLOCK_PLING
+    success: ENTITY_PLAYER_LEVELUP
+    cancel: BLOCK_NOTE_BLOCK_BASS
 
-Invitations are stored in `invites.json`, survive restarts, reach offline players and are remapped
-or removed when a clan is renamed or disbanded.
-
-## Economy
-
-Needs Vault. Money is only removed, never created.
-
-```yaml filename="config.yml"
+# money sinks, needs Vault - money is only removed, never created
 economy:
   enabled: false
   create-cost: 500.0
@@ -123,35 +170,432 @@ economy:
     custom-tag: 1000.0
     rename: 750.0
     sethome: 250.0
+    # charged when a player takes a copy of the clan banner
     banner-give: 250.0
+    # charged when a player sends a clan invitation
     invite: 0.0
-```
 
-| Key | Charged when |
-| --- | --- |
-| `create-cost` | Creating a clan, from the command or the menu |
-| `custom-tag` | Setting a custom tag |
-| `rename` | Renaming |
-| `sethome` | Creating a home |
-| `banner-give` | Taking a copy of the clan banner |
-| `invite` | Sending an invitation |
+menu:
+  # max clans listed by the ranking menus
+  top-limit: 200
+  # shown on menu buttons that need a clan when the viewer has none
+  block-not-have-clan:
+    enabled: true
+    material: RED_STAINED_GLASS_PANE
+    display_name: '&#FF2D2D&lI need to create a clan'
+    lore:
+      - '&7You are not in a clan yet.'
+      - ''
+      - '&#FFEE00Create one with &f/clan create <name>'
 
-<Callout type="warning">
-  With `enabled: false` nothing is charged, whatever the costs say.
-</Callout>
-
-## Worlds
-
-```yaml filename="config.yml"
+# worlds where the plugin works, empty = every world
 worlds: []
 ```
 
-Worlds where the plugin works. Empty means every world.
+</details>
 
-## Updates
+<details>
+<summary>`messages.yml`</summary>
 
-```yaml filename="config.yml"
-update-notification: true
+```yaml filename="messages.yml"
+# Do not change this
+version: 1
+
+prefix: '&#54ADF4&lAquaClan &7»'
+
+general:
+  no-permission: '%prefix% &#FF2D2DYou do not have permission to do that.'
+  player-only: '%prefix% &#FF2D2DThis command can only be used in-game.'
+  player-not-found: '%prefix% &#FF2D2DPlayer &f%name% &#FF2D2Dwas not found.'
+  usage: '%prefix% &#FFA42DUsage: &f%usage%'
+
+clan:
+  not-in-clan: '%prefix% &#FF2D2DYou are not in a clan.'
+  already-in-clan: '%prefix% &#FF2D2DYou are already in a clan.'
+  not-leader: '%prefix% &#FF2D2DOnly the clan leader can do that.'
+  no-permission-rank: '%prefix% &#FF2D2DYour rank is too low to do that.'
+
+menu:
+  need-clan: '%prefix% &#FF2D2DYou need a clan first! Use &f/clan create <name>&#FF2D2D.'
+  not-found: '%prefix% &#FF2D2DThe menu &f%menu% &#FF2D2Ddoes not exist.'
+  available: '%prefix% &#54ADF4Menus: &f%menus%'
+
+# chat input, the player answers in chat instead of typing a command
+input:
+  none: '%prefix% &#FF2D2DThere is nothing waiting for your answer.'
+  cancelled: '%prefix% &#FFA42DRequest cancelled.'
+  expired: '%prefix% &#FF2D2DTime is up, the request was cancelled.'
+  empty: '%prefix% &#FF2D2DYou have to write something.'
+  unknown: '%prefix% &#FF2D2DUnknown chat request &f%type%&#FF2D2D.'
+  create:
+    title: '&#FFEE00&lWrite in chat!'
+    subtitle: '&7Type the name of your clan'
+    bossbar: '&#54ADF4Write the clan name in chat &7(%time%)'
+    prompt:
+      - ''
+      - '&#54ADF4&l» &#FFEE00Write the name of your new clan in the chat.'
+      - '&7Between &f%aquaclan_name_min% &7and &f%aquaclan_name_max% &7characters, letters and numbers only.'
+      - '<gray>Write <white>cancel</white> or <click:run_command:"/clan input cancel"><hover:show_text:"<#FF2D2D>Click to cancel"><#FF2D2D><bold>[Click here]</bold></hover></click><gray> to cancel.'
+      - ''
+  invite:
+    title: '&#FFEE00&lWrite in chat!'
+    subtitle: '&7Type the name of the player'
+    bossbar: '&#54ADF4Write the player name in chat &7(%time%)'
+    prompt:
+      - ''
+      - '&#54ADF4&l» &#FFEE00Write the name of the player you want to invite.'
+      - '&7The player can be online or offline.'
+      - '<gray>Write <white>cancel</white> or <click:run_command:"/clan input cancel"><hover:show_text:"<#FF2D2D>Click to cancel"><#FF2D2D><bold>[Click here]</bold></hover></click><gray> to cancel.'
+      - ''
+  search:
+    title: '&#FFEE00&lWrite in chat!'
+    subtitle: '&7Type the name of the clan'
+    bossbar: '&#54ADF4Write the clan name in chat &7(%time%)'
+    prompt:
+      - ''
+      - '&#54ADF4&l» &#FFEE00Write the name of the clan you are looking for.'
+      - '<gray>Write <white>cancel</white> or <click:run_command:"/clan input cancel"><hover:show_text:"<#FF2D2D>Click to cancel"><#FF2D2D><bold>[Click here]</bold></hover></click><gray> to cancel.'
+      - ''
+
+create:
+  success: '%prefix% &#56FF00Clan &f%clan% &#56FF00has been created!'
+  exists: '%prefix% &#FF2D2DA clan named &f%name% &#FF2D2Dalready exists.'
+  name-too-short: '%prefix% &#FF2D2DThe name must be at least &f%min% &#FF2D2Dcharacters.'
+  name-too-long: '%prefix% &#FF2D2DThe name can be at most &f%max% &#FF2D2Dcharacters.'
+  name-invalid: '%prefix% &#FF2D2DThat name contains invalid characters.'
+  name-blacklisted: '%prefix% &#FF2D2DThat name is not allowed.'
+  cost-failed: '%prefix% &#FF2D2DYou need &f%cost% &#FF2D2Dto create a clan.'
+  cooldown: '%prefix% &#FFA42DWait &f%seconds%s &#FFA42Dbefore creating a clan.'
+  charged: '%prefix% &#FFA42D%cost% &#FFA42Dwas taken from your balance.'
+
+disband:
+  success: '%prefix% &fClan &#54ADF4%clan% &fhas been disbanded.'
+  notify: '%prefix% &#FFA42DYour clan &f%clan% &#FFA42Dhas been disbanded.'
+  confirm: '%prefix% &#FF2D2DThis deletes your clan forever. Type &f/clan disband confirm'
+
+custom-tag:
+  disabled: '%prefix% &#FF2D2DCustom clan tags are disabled.'
+  cleared: '%prefix% &fCustom clan tag cleared.'
+  success: '%prefix% &#56FF00Clan tag set to &r%tag%'
+  too-short: '%prefix% &#FF2D2DThe tag must show at least &f%min% &#FF2D2Dcharacters.'
+  too-long: '%prefix% &#FF2D2DThe tag can show at most &f%max% &#FF2D2Dcharacters.'
+  no-interactive: '%prefix% &#FF2D2DClick/hover tags are not allowed in the clan tag.'
+  format-denied: '%prefix% &#FF2D2DYou cannot use &f%format% &#FF2D2Din the clan tag.'
+
+invite:
+  sent: '%prefix% &#56FF00You invited &f%name% &#56FF00to the clan.'
+  sent-offline: '%prefix% &#56FF00Invitation saved for &f%name%&#56FF00, they will see it when they join.'
+  received: '%prefix% &f%name% &#54ADF4invited you to &f%clan%&#54ADF4.'
+  target-has-clan: '%prefix% &#FF2D2D%name% &#FF2D2Dis already in a clan.'
+  full: '%prefix% &#FF2D2DThe clan is full &7(%max%)&#FF2D2D.'
+  self: '%prefix% &#FF2D2DYou cannot invite yourself.'
+  banned: '%prefix% &#FF2D2D%name% &#FF2D2Dis banned from your clan.'
+  already: '%prefix% &#FFA42D%name% &#FFA42Dalready has a pending invitation.'
+  disabled: '%prefix% &#FF2D2D%name% &#FF2D2Dhas clan invitations disabled.'
+  clan-limit: '%prefix% &#FF2D2DYour clan reached the invitation limit &7(%max%)&#FF2D2D.'
+  cost-failed: '%prefix% &#FF2D2DYou need &f%cost% &#FF2D2Dto send an invitation.'
+  revoked: '%prefix% &fThe invitation for &#54ADF4%name% &fwas cancelled.'
+  revoked-target: '%prefix% &#FFA42D%clan% &#FFA42Dcancelled your invitation.'
+  not-pending: '%prefix% &#FF2D2DThere is no pending invitation for &f%name%&#FF2D2D.'
+  never-expires: 'Never'
+  actions:
+    - '<gray>  <click:run_command:"/clan accept %clan%"><hover:show_text:"<#56FF00>Join %clan%"><#56FF00><bold>[Accept]</bold></hover></click><dark_gray> | <click:run_command:"/clan deny %clan%"><hover:show_text:"<#FF2D2D>Decline the invitation"><#FF2D2D><bold>[Deny]</bold></hover></click><dark_gray> | <click:run_command:"/clan invites"><hover:show_text:"<#54ADF4>Open your invitations"><#54ADF4><bold>[Menu]</bold></hover></click>'
+  pending-notify:
+    - ''
+    - '&#54ADF4&l» &#FFEE00You have &f%count% &#FFEE00pending clan invitation(s).'
+    - '<gray>  <click:run_command:"/clan invites"><hover:show_text:"<#54ADF4>Open your invitations"><#54ADF4><bold>[Open invitations]</bold></hover></click>'
+    - ''
+
+accept:
+  success: '%prefix% &#56FF00You joined the clan &f%clan%&#56FF00!'
+  none: '%prefix% &#FF2D2DYou have no pending invitations.'
+  multiple: '%prefix% &#FFA42DYou have &f%count% &#FFA42Dinvitations, pick one:'
+  multiple-line:
+    - '<gray>  <click:run_command:"/clan accept %clan%"><hover:show_text:"<#56FF00>Join %clan%"><#56FF00><bold>[Accept]</bold></hover></click><dark_gray> | <click:run_command:"/clan deny %clan%"><hover:show_text:"<#FF2D2D>Decline %clan%"><#FF2D2D><bold>[Deny]</bold></hover></click><dark_gray> | <#54ADF4>%clan% <gray>- <white>by %name% <dark_gray>(<gray>%members% members, level %level%<dark_gray>)'
+  expired: '%prefix% &#FF2D2DThat invitation is no longer valid.'
+  broadcast: '%prefix% &f%name% &#54ADF4joined the clan!'
+  not-open: '%prefix% &#FF2D2D%clan% &#FF2D2Dis not open to join without an invite.'
+
+deny:
+  success: '%prefix% &fInvitation declined.'
+  none: '%prefix% &#FF2D2DYou have no pending invitations.'
+  all: '%prefix% &f%count% &finvitation(s) declined.'
+  not-found: '%prefix% &#FF2D2DYou have no invitation from &f%clan%&#FF2D2D.'
+  notify: '%prefix% &#FFA42D%name% &#FFA42Ddeclined the invitation to &f%clan%&#FFA42D.'
+
+leave:
+  success: '%prefix% &fYou left the clan &#54ADF4%clan%&f.'
+  leader-must-disband: '%prefix% &#FF2D2DLeaders must transfer or disband the clan.'
+  broadcast: '%prefix% &f%name% &#FFA42Dleft the clan.'
+
+kick:
+  success: '%prefix% &fYou kicked &#54ADF4%name% &ffrom the clan.'
+  not-member: '%prefix% &#FF2D2D%name% &#FF2D2Dis not in your clan.'
+  cannot-self: '%prefix% &#FF2D2DYou cannot kick yourself.'
+  cannot-leader: '%prefix% &#FF2D2DYou cannot kick the leader.'
+  notified: '%prefix% &#FFA42DYou were kicked from &f%clan%&#FFA42D.'
+
+promote:
+  success: '%prefix% &#56FF00%name% &fis now &#54ADF4%role%&f.'
+  max: '%prefix% &#FF2D2D%name% &#FF2D2Dalready has the highest rank.'
+  invalid: '%prefix% &#FF2D2DCould not find member &f%name%&#FF2D2D.'
+
+demote:
+  success: '%prefix% &#FFA42D%name% &fis now &#54ADF4%role%&f.'
+  min: '%prefix% &#FF2D2D%name% &#FF2D2Dalready has the lowest rank.'
+  invalid: '%prefix% &#FF2D2DCould not find member &f%name%&#FF2D2D.'
+
+transfer:
+  success: '%prefix% &#56FF00You transferred the clan to &f%name%&#56FF00.'
+  received: '%prefix% &#56FF00You are now the leader of &f%clan%&#56FF00!'
+  invalid: '%prefix% &#FF2D2DCould not find member &f%name%&#FF2D2D.'
+
+info:
+  not-found: '%prefix% &#FF2D2DNo clan named &f%clan% &#FF2D2Dexists.'
+  format:
+    - ''
+    - '&#54ADF4&lClan Info'
+    - '&7%description%'
+    - ''
+    - '&#54ADF4Name: &f%clan%'
+    - '&#54ADF4Leader: &f%leader%'
+    - '&#54ADF4Level: &f%level% &8• &#54ADF4Points: &f%points% &7(%next% to next)'
+    - '&#54ADF4Bank: &f%bank%'
+    - '&#54ADF4Members: &f%online%&7/&f%members% &8(max %max%)'
+    - '&#54ADF4Allies: &f%allies% &8• &#54ADF4Rivals: &f%rivals%'
+    - '&#54ADF4Kills: &f%kills% &8• &#54ADF4Deaths: &f%deaths% &8• &#54ADF4KDR: &f%kdr%'
+    - '&#54ADF4Created: &f%created%'
+    - ''
+    - '&#54ADF4Roster: %members_list%'
+    - ''
+
+list:
+  empty: '%prefix% &#FFA42DThere are no clans yet.'
+  header: '&#54ADF4&lClans &7(%count%)'
+  line: '&#54ADF4%clan% &8• &fMembers: &7%members% &8• &fKills: &7%kills%'
+
+top:
+  unavailable: '%prefix% &#FF2D2DThe leaderboard menu is not available.'
+
+chat:
+  enabled: '%prefix% &#56FF00Clan chat enabled. Type in chat to talk to your clan.'
+  disabled: '%prefix% &#FFA42DClan chat disabled.'
+
+description:
+  success: '%prefix% &#56FF00Clan description updated.'
+  too-long: '%prefix% &#FF2D2DThe description can be at most &f%max% &#FF2D2Dcharacters.'
+
+home:
+  set: '%prefix% &#56FF00Home &f%name% &#56FF00has been set.'
+  deleted: '%prefix% &fHome &#54ADF4%name% &fhas been removed.'
+  none: '%prefix% &#FF2D2DThere is no home named &f%name%&#FF2D2D.'
+  teleported: '%prefix% &#56FF00Teleported to your clan home.'
+  world-missing: '%prefix% &#FF2D2DThe home world &f%world% &#FF2D2Dis not loaded.'
+  world-disabled: '%prefix% &#FF2D2DClans are disabled in this world.'
+  max: '%prefix% &#FF2D2DYour clan reached the home limit &7(%max%)&#FF2D2D.'
+  cooldown: '%prefix% &#FFA42DWait &f%seconds%s &#FFA42Dbefore teleporting again.'
+  already-queued: '%prefix% &#FFA42DYou are already teleporting.'
+  warmup: '%prefix% &#54ADF4Teleporting in &f%seconds%s&#54ADF4, don''t move!'
+  cancelled: '%prefix% &#FF2D2DTeleport cancelled, you moved.'
+  view: '%prefix% &#54ADF4Home &f%name% &8• &7%location%'
+  list-empty: '%prefix% &#FFA42DYour clan has no homes yet.'
+  list-header: '&#54ADF4&lClan Homes &7(%count%/%max%)'
+  list-line: '&#54ADF4%name% &8• &7%world%'
+
+member:
+  online: '&#56FF00●'
+  offline: '&#FF2D2D●'
+  list-header: '&#54ADF4&lMembers of %clan% &7(%count%)'
+  list-line: '%status% &f%name% &8- &#54ADF4%role%'
+  search-line: '&#54ADF4%name% &7- &f%role%'
+  search-empty: '%prefix% &#FFA42DNo members matched &f%query%&#FFA42D.'
+
+relation:
+  self: '%prefix% &#FF2D2DYou cannot set your own clan as %type%.'
+  not-found: '%prefix% &#FF2D2DNo clan named &f%clan% &#FF2D2Dexists.'
+  already: '%prefix% &#FF2D2D%clan% &#FF2D2Dis already your %type%.'
+  no-request: '%prefix% &#FF2D2DNo %type% request from &f%clan%&#FF2D2D.'
+  request-sent: '%prefix% &#56FF00Sent a %type% request to &f%clan%&#56FF00.'
+  request-received: '%prefix% &f%clan% &#54ADF4wants to be your %type%. &7/clan %type% accept %clan%'
+  established: '%prefix% &#56FF00%clan% &#56FF00is now your %type%!'
+  removed: '%prefix% &#FFA42D%clan% &#FFA42Dis no longer your %type%.'
+  not-related: '%prefix% &#FF2D2D%clan% &#FF2D2Dis not your %type%.'
+  denied: '%prefix% &fDeclined the %type% request from &#54ADF4%clan%&f.'
+  list-header: '&#54ADF4&l%type% list of %clan% &7(%count%)'
+  list-line: '&#54ADF4- &f%clan%'
+  list-empty: '%prefix% &#FFA42D%clan% has no %type% relations.'
+  max-allies: '%prefix% &#FF2D2D%clan% &#FF2D2Dreached the ally limit &7(%max%)&#FF2D2D.'
+
+ff:
+  enabled: '%prefix% &#FFA42DFriendly fire is now &f&lON&#FFA42D for your clan.'
+  disabled: '%prefix% &#56FF00Friendly fire is now &f&lOFF&#56FF00 for your clan.'
+
+ban:
+  success: '%prefix% &fBanned &#54ADF4%name% &ffrom the clan.'
+  removed: '%prefix% &fUnbanned &#54ADF4%name%&f.'
+  not-banned: '%prefix% &#FF2D2D%name% &#FF2D2Dis not banned.'
+  cannot: '%prefix% &#FF2D2DYou cannot ban &f%name%&#FF2D2D.'
+  you-are-banned: '%prefix% &#FF2D2DYou are banned from &f%clan%&#FF2D2D.'
+
+nickname:
+  success: '%prefix% &#56FF00Clan nickname set to &f%nickname%&#56FF00.'
+  cleared: '%prefix% &fClan nickname cleared.'
+  too-long: '%prefix% &#FF2D2DThe nickname can be at most &f%max% &#FF2D2Dcharacters.'
+
+cancel:
+  done: '%prefix% &fPending invitations cleared.'
+
+settings:
+  enabled: '&#56FF00ON'
+  disabled: '&#FF2D2DOFF'
+  header: '&#54ADF4&lSettings &7- %clan%'
+  line: '&#54ADF4%key%&7: %value%'
+  updated: '%prefix% &#56FF00%key% &fis now %value%&f.'
+  unknown-key: '%prefix% &#FF2D2DUnknown setting &f%key%&#FF2D2D.'
+
+admin:
+  deleted: '%prefix% &#56FF00Deleted clan &f%clan%&#56FF00.'
+  not-a-number: '%prefix% &#FF2D2D%value% &#FF2D2Dis not a number.'
+  points: '%prefix% &f%clan% &#54ADF4→ Points: &f%points% &8• &#54ADF4Level: &f%level%'
+  already-in-clan: '%prefix% &#FF2D2D%name% &#FF2D2Dis already in a clan.'
+  forcejoined: '%prefix% &#56FF00Added &f%name% &#56FF00to &f%clan%&#56FF00.'
+  kdr-reset: '%prefix% &#56FF00Reset kills/deaths for &f%clan%&#56FF00.'
+  verified: '%prefix% &#56FF00%clan% &#56FF00is now verified.'
+  unverified: '%prefix% &#FFA42D%clan% &#FFA42Dis no longer verified.'
+  slots: '%prefix% &f%clan% &#54ADF4→ Slots: &f%slots%'
+  player-kdr-reset: '%prefix% &#56FF00Reset stats for &f%name%&#56FF00.'
+  chatspy-on: '%prefix% &#56FF00Clan chat spy enabled.'
+  chatspy-off: '%prefix% &#FFA42DClan chat spy disabled.'
+  globalff-on: '%prefix% &#FFA42DGlobal friendly fire is now ON.'
+  globalff-off: '%prefix% &#56FF00Global friendly fire is now OFF.'
+  migrate-usage: '%prefix% &#FFA42DUsage: &f/clan admin migrate <sqlite|mysql|mariadb|json>'
+  migrate-start: '%prefix% &#54ADF4Migrating &f%count% &#54ADF4clan(s) to &f%type%&#54ADF4...'
+  migrate-done: '%prefix% &#56FF00Migrated &f%count% &#56FF00clan(s) to &f%type%&#56FF00. Set storage.type and restart to use it.'
+  migrate-failed: '%prefix% &#FF2D2DMigration to &f%type% &#FF2D2Dfailed. Check the console.'
+  help:
+    - ''
+    - '&#54ADF4&lAquaClan &7- &fAdmin Commands'
+    - ''
+    - '&#54ADF4/clan admin reload &7- &fReload configuration'
+    - '&#54ADF4/clan admin delete <tag> &7- &fDelete a clan'
+    - '&#54ADF4/clan admin addpoints/setpoints/removepoints <tag> <n> &7- &fManage points'
+    - '&#54ADF4/clan admin addslot/setslot/removeslot <tag> <n> &7- &fManage slots'
+    - '&#54ADF4/clan admin forcejoin <player> <tag> &7- &fAdd a player to a clan'
+    - '&#54ADF4/clan admin changetag <tag> <newtag> &7- &fRename a clan'
+    - '&#54ADF4/clan admin resetclankdr <tag> · resetplayerkdr <player> &7- &fReset stats'
+    - '&#54ADF4/clan admin verify <tag> · chatspy · globalff &7- &fToggles'
+    - '&#54ADF4/clan admin migrate <sqlite|mysql|mariadb|json> &7- &fMove data between storages'
+    - ''
+
+bank:
+  no-economy: '%prefix% &#FF2D2DNo economy plugin is installed.'
+  invalid-amount: '%prefix% &#FF2D2DEnter a valid amount.'
+  not-enough-money: '%prefix% &#FF2D2DYou do not have enough money.'
+  not-enough-funds: '%prefix% &#FF2D2DThe clan bank does not have that much.'
+  deposited: '%prefix% &#56FF00Deposited &f%amount%&#56FF00. Balance: &f%balance%'
+  withdrew: '%prefix% &#56FF00Withdrew &f%amount%&#56FF00. Balance: &f%balance%'
+  balance: '%prefix% &#54ADF4Clan bank: &f%balance%'
+
+mail:
+  sent: '%prefix% &#56FF00Mail sent to your clan.'
+  notify: '%prefix% &#54ADF4New clan mail from &f%name%&#54ADF4. &7/clan mail read'
+  empty: '%prefix% &#FFA42DYour clan mailbox is empty.'
+  header: '&#54ADF4&lClan Mail &7(%count%)'
+  line: '&#54ADF4%from% &8[%date%]&7: &f%text%'
+  cleared: '%prefix% &fMailbox cleared.'
+
+logger:
+  empty: '%prefix% &#FFA42DNo activity recorded yet.'
+  header: '&#54ADF4&lActivity Log'
+  line: '&8[%time%] &f%text%'
+  cleared: '%prefix% &fActivity log cleared.'
+
+regroup:
+  opened: '%prefix% &#56FF00Regroup opened. Members can /clan regroup accept.'
+  sent: '%prefix% &f%name% &#54ADF4started a regroup. &7/clan regroup accept'
+  none: '%prefix% &#FF2D2DThere is no active regroup.'
+  denied: '%prefix% &fRegroup ignored.'
+
+banner:
+  hold-banner: '%prefix% &#FF2D2DHold a banner in your main hand.'
+  failed: '%prefix% &#FF2D2DCould not process that banner.'
+  uploaded: '%prefix% &#56FF00Clan banner uploaded!'
+  none: '%prefix% &#FFA42D%clan% has no banner.'
+  given: '%prefix% &#56FF00A copy of the &f%clan% &#56FF00banner was added to your inventory.'
+  deleted: '%prefix% &fClan banner removed.'
+  give-cost-failed: '%prefix% &#FF2D2DYou need &f%cost% &#FF2D2Dto get a copy of the banner.'
+  no-permission: '%prefix% &#FF2D2DOnly the clan leader with permission can design the banner.'
+  editor:
+    saved: '%prefix% &#56FF00Your clan banner has been saved!'
+    cancelled: '%prefix% &#FFA42DBanner editing cancelled.'
+    max-layers: '%prefix% &#FF2D2DThe banner can have at most &f%max% &#FF2D2Dlayers.'
+
+profile:
+  no-clan: 'None'
+  no-invites: '%prefix% &#FFA42DYou have no pending invitations.'
+  invite-line: '%prefix% &#54ADF4Pending invite from &f%clan%&#54ADF4. &7/clan accept'
+  invites-header: '&#54ADF4&lYour invitations &7(%count%)'
+  invites-line:
+    - '<gray>  <click:run_command:"/clan accept %clan%"><hover:show_text:"<#56FF00>Join %clan%"><#56FF00><bold>[Accept]</bold></hover></click><dark_gray> | <click:run_command:"/clan deny %clan%"><hover:show_text:"<#FF2D2D>Decline %clan%"><#FF2D2D><bold>[Deny]</bold></hover></click><dark_gray> | <#54ADF4>%clan% <gray>- <white>by %name% <dark_gray>(<gray>%date%<dark_gray>)'
+  keys:
+    clan_invites: 'Clan invitations'
+    invite_alerts: 'Invitation alerts'
+    pvp_alerts: 'Combat alerts'
+    mail_alerts: 'Mail alerts'
+  unknown-key: '%prefix% &#FF2D2DUnknown profile setting &f%key%&#FF2D2D.'
+  updated: '%prefix% &#56FF00%key% &fis now %value%&f.'
+  skin-updated: '%prefix% &#56FF00Your skin has been refreshed.'
+  format:
+    - '&#54ADF4&lProfile &8| &f%name%'
+    - '&#54ADF4Clan: &f%clan% &8• &#54ADF4Role: &f%role%'
+    - '&#54ADF4Kills: &f%kills% &8• &#54ADF4Deaths: &f%deaths% &8• &#54ADF4KDR: &f%kdr%'
+    - '&#54ADF4First seen: &f%first_seen%'
+
+role:
+  none: '&7none'
+  header: '&#54ADF4&lRole Permissions &7- %clan%'
+  line: '&#54ADF4%role%&7: %permissions%'
+  updated: '%prefix% &#56FF00%role% &f→ %permission% = %value%&f.'
+  synced: '%prefix% &#56FF00Role permissions reset to defaults.'
+  cannot-edit-leader: '%prefix% &#FF2D2DThe leader always has every permission.'
+  unknown-permission: '%prefix% &#FF2D2DUnknown permission &f%permission%&#FF2D2D.'
+
+rename:
+  success: '%prefix% &#56FF00Clan renamed from &f%old% &#56FF00to &f%clan%&#56FF00.'
+
+reload:
+  success: '%prefix% &#56FF00Configuration reloaded.'
+
+help:
+  format:
+    - ''
+    - '&#54ADF4&lAquaClan &7- &fCommands'
+    - ''
+    - '&#54ADF4/clan &7- &fOpen the clan menu'
+    - '&#54ADF4/clan short &7- &fOpen the quick menu'
+    - '&#54ADF4/clan open <menu> [clan] &7- &fOpen any menu'
+    - '&#54ADF4/clan create [tag] &7- &fCreate a clan'
+    - '&#54ADF4/clan invites &7- &fOpen your invitations'
+    - '&#54ADF4/clan invite [player] · revoke <player> &7- &fInvitations'
+    - '&#54ADF4/clan disband &7- &fDelete your clan'
+    - '&#54ADF4/clan member invite/kick/list/search &7- &fManage members'
+    - '&#54ADF4/clan accept · deny · cancel &7- &fInvitations'
+    - '&#54ADF4/clan promote/demote <player> &7- &fChange a rank'
+    - '&#54ADF4/clan transfer <player> &7- &fGive leadership away'
+    - '&#54ADF4/clan home create/delete/list/teleport/view &7- &fHomes'
+    - '&#54ADF4/clan ally add/remove/accept/deny/list &7- &fAlliances'
+    - '&#54ADF4/clan rival add/remove/accept/deny/list &7- &fRivalries'
+    - '&#54ADF4/clan settings view/set · role view/set/sync &7- &fConfig'
+    - '&#54ADF4/clan bank deposit/withdraw/balance &7- &fClan bank'
+    - '&#54ADF4/clan mail send/read/clear &7- &fClan mail'
+    - '&#54ADF4/clan banner edit/upload/view/delete &7- &fClan banner'
+    - '&#54ADF4/clan regroup send/accept &7- &fRally the clan'
+    - '&#54ADF4/clan profile view/set &7- &fPlayer profile'
+    - '&#54ADF4/clan ff · ban/unban <player> · logger &7- &fModeration'
+    - '&#54ADF4/clan modtag <tag> · nickname <name> &7- &fRename'
+    - '&#54ADF4/clan description <text> &7- &fSet the description'
+    - '&#54ADF4/clan info [tag] · list · top · chat &7- &fInfo'
+    - ''
 ```
 
-Checks Spigot once on startup and tells the console. Players with `aquaclan.admin` get a chat notice.
+</details>

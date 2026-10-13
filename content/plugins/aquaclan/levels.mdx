@@ -12,37 +12,38 @@ Clans earn points in combat and level up. Everything lives in `level.yml`.
 ## The curve
 
 ```yaml filename="level.yml"
+# Do not change this
+version: 1
+
+# clan leveling curve
+# points needed for a level = base * (level - 1) * exponent
 points:
   base: 50.0
   exponent: 1.0
+  # clans stop leveling here
   max-level: 21
-```
 
-Points needed for a level are `base * (level - 1) * exponent`. Clans stop leveling at `max-level`.
-
-## Earning points
-
-```yaml filename="config.yml"
-points:
-  per-kill: 10
-  per-death: 0
-  rival-kill-bonus: 5
-  ally-kill-penalty: 15
-```
-
-| Key | Default | What it does |
-| --- | --- | --- |
-| `per-kill` | `10` | Points for a kill |
-| `per-death` | `0` | Points lost on death |
-| `rival-kill-bonus` | `5` | Extra for killing a rival |
-| `ally-kill-penalty` | `15` | Lost for killing an ally |
-
-## Rewards
-
-Granted once, the first time a clan reaches that level.
-
-```yaml filename="level.yml"
+# rewards granted once, the first time a clan reaches each level
+# placeholders: %clan%, %leader%, %level%
+# benefits stack across levels (extra homes / member slots / allies)
 rewards:
+  '2':
+    broadcast: '&#FFEE00&l%clan% &#54ADF4reached level &#FFEE00&l2&#54ADF4!'
+    commands:
+      - 'give %leader% diamond 8'
+    benefits:
+      extra-homes: 1
+      extra-slots: 2
+      extra-allies: 1
+  '5':
+    broadcast: '&#FFEE00&l%clan% &#54ADF4is now level &#FFEE00&l5&#54ADF4!'
+    commands:
+      - 'give %leader% diamond_block 2'
+      - 'give %leader% experience_bottle 16'
+    benefits:
+      extra-homes: 1
+      extra-slots: 2
+      extra-allies: 1
   '10':
     broadcast: '&#FFEE00&l%clan% &#54ADF4hit level &#FFEE00&l10&#56FF00!'
     commands:
@@ -51,21 +52,22 @@ rewards:
       extra-homes: 1
       extra-slots: 3
       extra-allies: 2
+  '15':
+    broadcast: '&#FFEE00&l%clan% &#54ADF4reached level &#FFEE00&l15&#56FF00!'
+    commands:
+      - 'give %leader% netherite_block 1'
+    benefits:
+      extra-homes: 2
+      extra-slots: 3
+      extra-allies: 2
+  '20':
+    broadcast: '&#FFEE00&l%clan% &#54ADF4is now &#FFEE00&lMAX LEVEL &#54ADF4(&#FFEE00&l20&#54ADF4)!'
+    commands:
+      - 'give %leader% nether_star 1'
+    benefits:
+      extra-homes: 2
+      extra-slots: 4
+      extra-allies: 3
 ```
 
-| Key | What it does |
-| --- | --- |
-| `broadcast` | Announced to the server |
-| `commands` | Run as console |
-| `benefits.extra-homes` | Extra clan homes |
-| `benefits.extra-slots` | Extra member slots |
-| `benefits.extra-allies` | Extra allies |
-
-Placeholders: `%clan%`, `%leader%`, `%level%`.
-
-<Callout type="info">
-  Benefits **stack** across levels. A clan at level 15 has the extra homes, slots and allies from
-  levels 2, 5, 10 and 15 added together, on top of the base values in `config.yml`.
-</Callout>
-
-You do not need an entry for every level. Only the ones you define grant anything.
+</details>

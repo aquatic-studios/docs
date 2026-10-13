@@ -1,0 +1,297 @@
+---
+title: Discord Webhook
+description: Post a Discord embed for every clan event.
+---
+
+import { Callout } from 'nextra/components'
+
+# Discord Webhook
+
+`webhook.yml` posts an embed when something happens to a clan. Off by default.
+
+```yaml filename="webhook.yml"
+# Do not change this
+version: 1
+
+# discord notifications for clan activity
+# create a webhook in your channel settings and paste its url below
+enabled: false
+url: ''
+
+# name and avatar the messages are posted with, every event can override them
+username: 'AquaClan'
+avatar: 'https://mc-heads.net/avatar/MHF_Question/128'
+
+# value of %server%
+server: 'My Server'
+# name used when the console does something
+console-name: 'Console'
+# allow @everyone, @here and role pings inside the messages
+allow-mentions: false
+
+# every event supports: enabled, url, username, avatar, content and embed
+# colors use hex ('#54ADF4') or decimal (5549556)
+# clan placeholders: %clan%, %clan_tag%, %clan_nickname%, %clan_description%, %leader%, %leader_uuid%,
+# %members%, %level%, %points%, %kills%, %deaths%, %kdr%, %bank%, %allies%, %rivals%, %homes%, %server%
+events:
+  create:
+    enabled: true
+    content: ''
+    embed:
+      author:
+        name: '%player%'
+        icon: 'https://mc-heads.net/avatar/%player%/64'
+      title: '🏰 Clan created'
+      description: '**%player%** founded the clan **%clan%**'
+      color: '#56FF00'
+      thumbnail: 'https://mc-heads.net/avatar/%player%/128'
+      image: ''
+      fields:
+        - name: 'Clan'
+          value: '%clan%'
+          inline: true
+        - name: 'Tag'
+          value: '%clan_tag%'
+          inline: true
+        - name: 'Leader'
+          value: '%leader%'
+          inline: true
+      footer:
+        text: '%server% • AquaClan'
+        icon: ''
+      timestamp: true
+
+  disband:
+    enabled: true
+    content: ''
+    embed:
+      author:
+        name: '%player%'
+        icon: 'https://mc-heads.net/avatar/%player%/64'
+      title: '💥 Clan disbanded'
+      description: 'The clan **%clan%** was disbanded by **%player%**'
+      color: '#FF2D2D'
+      thumbnail: 'https://mc-heads.net/avatar/%leader%/128'
+      fields:
+        - name: 'Leader'
+          value: '%leader%'
+          inline: true
+        - name: 'Members'
+          value: '%members%'
+          inline: true
+        - name: 'Level'
+          value: '%level%'
+          inline: true
+        - name: 'Kills'
+          value: '%kills%'
+          inline: true
+        - name: 'Deaths'
+          value: '%deaths%'
+          inline: true
+        - name: 'Bank'
+          value: '%bank%'
+          inline: true
+      footer:
+        text: '%server% • AquaClan'
+      timestamp: true
+
+  join:
+    enabled: true
+    embed:
+      author:
+        name: '%player%'
+        icon: 'https://mc-heads.net/avatar/%player%/64'
+      title: '➕ New member'
+      description: '**%player%** joined **%clan%**'
+      color: '#54ADF4'
+      fields:
+        - name: 'Members'
+          value: '%members%'
+          inline: true
+        - name: 'Leader'
+          value: '%leader%'
+          inline: true
+      footer:
+        text: '%server% • AquaClan'
+      timestamp: true
+
+  leave:
+    enabled: true
+    embed:
+      author:
+        name: '%player%'
+        icon: 'https://mc-heads.net/avatar/%player%/64'
+      title: '➖ Member left'
+      description: '**%player%** is no longer part of **%clan%**'
+      color: '#FFA42D'
+      fields:
+        - name: 'Members'
+          value: '%members%'
+          inline: true
+      footer:
+        text: '%server% • AquaClan'
+      timestamp: true
+
+  rename:
+    enabled: true
+    embed:
+      title: '✏️ Clan renamed'
+      description: '**%old_name%** is now known as **%new_name%**'
+      color: '#FFEE00'
+      thumbnail: 'https://mc-heads.net/avatar/%leader%/128'
+      fields:
+        - name: 'Before'
+          value: '%old_name%'
+          inline: true
+        - name: 'After'
+          value: '%new_name%'
+          inline: true
+      footer:
+        text: '%server% • AquaClan'
+      timestamp: true
+
+  tag:
+    enabled: true
+    embed:
+      title: '🏷️ Clan tag changed'
+      description: '**%clan%** changed its tag'
+      color: '#FFEE00'
+      fields:
+        - name: 'Before'
+          value: '%old_tag%'
+          inline: true
+        - name: 'After'
+          value: '%new_tag%'
+          inline: true
+      footer:
+        text: '%server% • AquaClan'
+      timestamp: true
+
+  role:
+    enabled: true
+    embed:
+      author:
+        name: '%player%'
+        icon: 'https://mc-heads.net/avatar/%player%/64'
+      title: '🎖️ Role updated'
+      description: '**%player%** is now **%new_role%** in **%clan%**'
+      color: '#B36BFF'
+      fields:
+        - name: 'Before'
+          value: '%old_role%'
+          inline: true
+        - name: 'After'
+          value: '%new_role%'
+          inline: true
+      footer:
+        text: '%server% • AquaClan'
+      timestamp: true
+
+  level-up:
+    enabled: true
+    content: ''
+    embed:
+      title: '⭐ Level up!'
+      description: '**%clan%** reached level **%new_level%**'
+      color: '#FFEE00'
+      thumbnail: 'https://mc-heads.net/avatar/%leader%/128'
+      fields:
+        - name: 'Level'
+          value: '%old_level% → %new_level%'
+          inline: true
+        - name: 'Points'
+          value: '%points%'
+          inline: true
+        - name: 'Members'
+          value: '%members%'
+          inline: true
+      footer:
+        text: '%server% • AquaClan'
+      timestamp: true
+
+  ally-add:
+    enabled: true
+    embed:
+      title: '🤝 New alliance'
+      description: '**%clan%** and **%other%** are now allies'
+      color: '#56FF00'
+      fields:
+        - name: '%clan%'
+          value: 'Leader: %leader%'
+          inline: true
+        - name: '%other%'
+          value: 'Leader: %other_leader%'
+          inline: true
+      footer:
+        text: '%server% • AquaClan'
+      timestamp: true
+
+  ally-remove:
+    enabled: true
+    embed:
+      title: '💔 Alliance broken'
+      description: '**%clan%** and **%other%** are no longer allies'
+      color: '#FFA42D'
+      footer:
+        text: '%server% • AquaClan'
+      timestamp: true
+
+  rival-add:
+    enabled: true
+    embed:
+      title: '⚔️ New rivalry'
+      description: '**%clan%** and **%other%** are now rivals'
+      color: '#FF2D2D'
+      fields:
+        - name: '%clan%'
+          value: 'Level %level% • %members% members'
+          inline: true
+        - name: '%other%'
+          value: 'Level %other_level% • %other_members% members'
+          inline: true
+      footer:
+        text: '%server% • AquaClan'
+      timestamp: true
+
+  rival-remove:
+    enabled: true
+    embed:
+      title: '🕊️ Rivalry ended'
+      description: '**%clan%** and **%other%** are no longer rivals'
+      color: '#54ADF4'
+      footer:
+        text: '%server% • AquaClan'
+      timestamp: true
+
+  home-create:
+    enabled: false
+    embed:
+      title: '🏠 Clan home set'
+      description: '**%clan%** set the home **%home%**'
+      color: '#54ADF4'
+      footer:
+        text: '%server% • AquaClan'
+      timestamp: true
+
+  banner-change:
+    enabled: false
+    embed:
+      title: '🚩 Clan banner updated'
+      description: '**%clan%** has a new banner'
+      color: '#54ADF4'
+      footer:
+        text: '%server% • AquaClan'
+      timestamp: true
+
+  banner-delete:
+    enabled: false
+    embed:
+      title: '🚩 Clan banner removed'
+      description: '**%clan%** removed its banner'
+      color: '#FFA42D'
+      footer:
+        text: '%server% • AquaClan'
+      timestamp: true
+```
+
+</details>

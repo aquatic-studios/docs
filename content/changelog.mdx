@@ -9,6 +9,18 @@ Release notes for every plugin, newest first.
 
 ## AquaClan
 
+### 1.2.0
+
+- Added per-format permissions for clan tags under `clan.tag.custom.formats`: legacy, hex, bold, italic, underlined, strikethrough, obfuscated, gradient, rainbow and minimessage.
+- Added ItemsAdder, Oraxen and Nexo items plus `custom-model-data` to every menu button.
+- Added an optional `filler` to every menu with its own material, name, lore, model data and slots.
+- Added slot ranges, so a slot list can be written as `- 0-44` or `[10-16, 19-25]`.
+- Added automatic config updates. `config.yml`, `messages.yml`, `level.yml` and `webhook.yml` carry a `version` and new options are added on startup without touching your values, comments or menus.
+- Reworked the Discord webhook with 15 events, each with its own channel, name, avatar and fully custom embed. Mentions are blocked by default through `allow-mentions`.
+- Changed `update-notification` to `update-notify`. The old name is still read.
+- Fixed member limit permissions never applying.
+- Removed `embed-color` from `webhook.yml`, every event has its own color now.
+
 ### 1.1.1
 
 [Aug 20, 2026](https://www.spigotmc.org/resources/aquaclan-advanced-clan-system-1-8-1-26-2.136918/update?update=652740)
