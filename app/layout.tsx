@@ -5,6 +5,7 @@ import { getPageMap } from 'nextra/page-map'
 
 import { LastUpdated } from '../components/last-updated'
 import { NavbarTabs } from '../components/navbar-tabs'
+import { SidebarState } from '../components/sidebar-state'
 
 import '@fontsource-variable/inter'
 import 'nextra-theme-docs/style.css'
@@ -89,12 +90,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         backgroundColor={{ light: '#ffffff', dark: '#0d1117' }}
       />
       <body>
+        <SidebarState />
         <Layout
           navbar={navbar}
           pageMap={await getPageMap()}
           docsRepositoryBase="https://github.com/aquatic-studios/docs/tree/main"
           footer={footer}
-          sidebar={{ defaultMenuCollapseLevel: 1, autoCollapse: true, toggleButton: false }}
+          sidebar={{ defaultMenuCollapseLevel: 1, toggleButton: false }}
           lastUpdated={<LastUpdated />}
           editLink={null}
           feedback={{ content: null }}
