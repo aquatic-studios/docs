@@ -1,34 +1,35 @@
 :root {
   --as-bg: #ffffff;
-  --as-header: #f7f7f8;
-  --as-surface: #f4f4f5;
-  --as-surface-hover: #ebebed;
-  --as-code: #fafafa;
-  --as-code-inline: rgba(24, 24, 27, 0.06);
-  --as-border: #e4e4e7;
-  --as-border-strong: #d4d4d8;
-  --as-text: #3f3f46;
-  --as-strong: #18181b;
-  --as-muted: #6b6b73;
-  --as-faint: #a1a1aa;
-  --as-accent: #0a6ad6;
-  --as-accent-soft: rgba(10, 106, 214, 0.12);
+  --as-header: #f6f8fa;
+  --as-header-hover: #eaeef2;
+  --as-surface: #f6f8fa;
+  --as-surface-hover: #eaeef2;
+  --as-code: #f6f8fa;
+  --as-code-inline: rgba(129, 139, 152, 0.12);
+  --as-border: #d1d9e0;
+  --as-border-strong: #c3ccd5;
+  --as-text: #1f2328;
+  --as-strong: #1f2328;
+  --as-muted: #59636e;
+  --as-faint: #8c959f;
+  --as-accent: #0969da;
+  --as-accent-soft: rgba(9, 105, 218, 0.1);
 
-  --as-info-bg: #f4f4f5;
-  --as-info-border: #e4e4e7;
-  --as-info-text: #3f3f46;
-  --as-info-icon: #6b6b73;
-  --as-warn-bg: #fdf8e8;
-  --as-warn-border: #f2e2ad;
-  --as-warn-text: #6f4a07;
-  --as-warn-icon: #b7791f;
-  --as-error-bg: #fdf2f1;
-  --as-error-border: #f6d0cc;
-  --as-error-text: #8f1d15;
-  --as-error-icon: #d92d20;
+  --as-info-bg: #f6f8fa;
+  --as-info-border: #d1d9e0;
+  --as-info-text: #1f2328;
+  --as-info-icon: #59636e;
+  --as-warn-bg: #fff8c5;
+  --as-warn-border: #eed888;
+  --as-warn-text: #3b2300;
+  --as-warn-icon: #9a6700;
+  --as-error-bg: #ffebe9;
+  --as-error-border: #ffcecb;
+  --as-error-text: #5f0b0b;
+  --as-error-icon: #d1242f;
 
-  --as-scroll: #d4d4d8;
-  --as-scroll-hover: #b4b4bb;
+  --as-scroll: #d1d9e0;
+  --as-scroll-hover: #afb8c1;
 
   --as-sans: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
   --as-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
@@ -38,36 +39,37 @@
 }
 
 .dark {
-  --as-bg: #1e1e22;
-  --as-header: #26262a;
-  --as-surface: #2a2a2f;
-  --as-surface-hover: #333338;
-  --as-code: #19191c;
-  --as-code-inline: rgba(255, 255, 255, 0.075);
-  --as-border: #313136;
-  --as-border-strong: #3d3d43;
-  --as-text: #d4d4d9;
-  --as-strong: #f5f5f7;
-  --as-muted: #a1a1a7;
-  --as-faint: #6e6e75;
-  --as-accent: #66b2ff;
-  --as-accent-soft: rgba(102, 178, 255, 0.14);
+  --as-bg: #0d1117;
+  --as-header: #010409;
+  --as-header-hover: #151b23;
+  --as-surface: #151b23;
+  --as-surface-hover: #212830;
+  --as-code: #151b23;
+  --as-code-inline: rgba(101, 108, 118, 0.2);
+  --as-border: #30363d;
+  --as-border-strong: #3d444d;
+  --as-text: #d1d7e0;
+  --as-strong: #f0f6fc;
+  --as-muted: #9198a1;
+  --as-faint: #656c76;
+  --as-accent: #4493f8;
+  --as-accent-soft: rgba(56, 139, 253, 0.15);
 
-  --as-info-bg: #29292e;
-  --as-info-border: #38383e;
-  --as-info-text: #d0d0d5;
-  --as-info-icon: #a1a1a7;
-  --as-warn-bg: #2c281c;
-  --as-warn-border: #463c20;
-  --as-warn-text: #f0d58e;
-  --as-warn-icon: #e9b53d;
-  --as-error-bg: #2f1f1f;
-  --as-error-border: #4d2c2a;
-  --as-error-text: #f4aaa4;
-  --as-error-icon: #ee6b61;
+  --as-info-bg: #151b23;
+  --as-info-border: #30363d;
+  --as-info-text: #d1d7e0;
+  --as-info-icon: #9198a1;
+  --as-warn-bg: #1f1c13;
+  --as-warn-border: #4a3a12;
+  --as-warn-text: #eac54f;
+  --as-warn-icon: #d29922;
+  --as-error-bg: #22161a;
+  --as-error-border: #5a2629;
+  --as-error-text: #ffa198;
+  --as-error-icon: #f85149;
 
-  --as-scroll: #36363c;
-  --as-scroll-hover: #48484f;
+  --as-scroll: #30363d;
+  --as-scroll-hover: #3d444d;
 }
 
 :root {
@@ -182,7 +184,7 @@ samp {
 
 .as-links a:hover {
   color: var(--as-strong);
-  background: var(--as-surface);
+  background: var(--as-header-hover);
 }
 
 .nextra-hamburger {
@@ -281,9 +283,9 @@ samp {
   width: 100%;
   height: 2.5rem;
   padding-left: 2.375rem;
-  border: 1px solid var(--as-border);
+  border: 1px solid var(--as-border-strong);
   border-radius: 8px;
-  background: var(--as-bg);
+  background: transparent;
   font-size: 0.875rem;
   color: var(--as-strong);
   box-shadow: none;
@@ -300,7 +302,7 @@ samp {
 
 .nextra-search input:focus {
   border-color: var(--as-accent);
-  background: var(--as-bg);
+  background: transparent;
   outline: none;
   box-shadow: none;
 }
@@ -310,9 +312,9 @@ samp {
   margin: 0;
   top: 50%;
   transform: translateY(-50%);
-  border: 1px solid var(--as-border);
+  border: 1px solid var(--as-border-strong);
   border-radius: 5px;
-  background: var(--as-surface);
+  background: transparent;
   font-family: var(--as-sans);
   font-size: 0.6875rem;
   font-weight: 500;
@@ -707,6 +709,79 @@ div.nextra-code button {
 div.nextra-code button:hover {
   background: var(--as-surface-hover);
   color: var(--as-strong);
+}
+
+article details {
+  margin-top: 1rem;
+  padding: 0;
+  border: 1px solid var(--as-border);
+  border-radius: 10px;
+  background: transparent;
+  box-shadow: none;
+}
+
+article details + details {
+  margin-top: 0.75rem;
+}
+
+article details > summary {
+  padding: 0.75rem 1rem 0.75rem 0.625rem;
+  border-radius: 0;
+  background: transparent;
+  color: var(--as-muted);
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+article details > summary:hover {
+  background: var(--as-surface);
+  color: var(--as-strong);
+}
+
+article details > summary > svg {
+  margin-inline: 0 0.5rem;
+}
+
+article details > summary > h3 {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--as-strong);
+}
+
+article details > summary > h3 > * {
+  margin: 0;
+}
+
+article details > summary > h3 code.nextra-code:not([class*='twoslash-']) {
+  padding: 0;
+  background: transparent;
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+article details[data-expanded] > summary {
+  border-bottom: 1px solid var(--as-border);
+}
+
+article details > div {
+  padding: 0;
+}
+
+article details > div > * {
+  padding: 0;
+}
+
+article details div.nextra-code {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+}
+
+article details > div > div > :not(div.nextra-code) {
+  padding-inline: 1rem;
 }
 
 article [role='tablist'] {

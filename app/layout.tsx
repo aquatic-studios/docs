@@ -85,8 +85,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="en" dir="ltr" suppressHydrationWarning>
       <Head
-        color={{ hue: 211, saturation: 100, lightness: { light: 42, dark: 70 } }}
-        backgroundColor={{ light: '#ffffff', dark: '#1e1e22' }}
+        color={{ hue: 211, saturation: 100, lightness: { light: 45, dark: 62 } }}
+        backgroundColor={{ light: '#ffffff', dark: '#0d1117' }}
       />
       <body>
         <Layout
