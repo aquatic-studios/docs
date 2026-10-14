@@ -10,6 +10,12 @@ import { Callout, Tabs } from 'nextra/components'
 Resolves a skin, crops the `8×8` face and turns it into chat text, an inline font glyph, a native
 `1.21.9` head component or a player head item. Async by default, no runtime dependencies of its own.
 
+| | |
+| --- | --- |
+| **Minecraft** | `1.16+` chat, `1.8+` items, `1.21.9+` native components |
+| **Java** | `17` |
+| **Source** | [senkex/HeadRender](https://github.com/senkex/HeadRender) |
+
 <Callout type="error">
   Relocate the package when you bundle it. Two plugins shading different versions of
   `com.github.senkex.headrender` will clash on the classpath. See [Shading](#shading).

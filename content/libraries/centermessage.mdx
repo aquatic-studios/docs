@@ -11,6 +11,13 @@ Centers chat messages. Mix legacy `&` and `§`, hex `&#RRGGBB`, Spigot hex `§x�
 MiniMessage tags in the same string: color codes never push the text off center, only visible glyphs
 count toward the padding. Static facade, no `onEnable` hook, no config files.
 
+| | |
+| --- | --- |
+| **Minecraft** | `1.16+` |
+| **Java** | `8` bytecode |
+| **Platforms** | Spigot, Paper, Folia, BungeeCord, Velocity |
+| **Source** | [senkex/CenterMessage](https://github.com/senkex/CenterMessage) |
+
 The centering engine is dependency free. Legacy and hex input is measured and padded with pure
 `java.*`, so `CenterMessage.center(...)` runs with nothing on the classpath. Adventure and
 MiniMessage load lazily, only when you use a tag or the `Component` API.
