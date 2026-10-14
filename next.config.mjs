@@ -7,8 +7,8 @@ const withNextra = nextra({
   mdxOptions: {
     rehypePrettyCodeOptions: {
       theme: {
-        light: 'github-light',
-        dark: 'night-owl'
+        light: 'github-light-default',
+        dark: 'github-dark-default'
       }
     }
   }
