@@ -1,6 +1,6 @@
 ---
 title: Configuration
-description: Names, limits, teleport, listings, notifications and chat input.
+description: Names, limits, teleport, ratings, listings, notifications and chat input.
 ---
 
 import { Callout } from 'nextra/components'
@@ -116,6 +116,33 @@ teleport:
 
 The order of checks is ban, privacy, password, cooldown, fee, then the countdown. Each step has its
 own bypass permission.
+
+## Ratings
+
+```yaml filename="config.yml"
+rating:
+  enabled: true
+  comments: true
+  comment-max-length: 80
+  require-visit: true
+  block-self: true
+  change-cooldown-hours: 24
+  minimum-for-top: 3
+  reviews-shown: 45
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `enabled` | `true` | Off hides the rate menus and blocks every rating |
+| `comments` | `true` | Lets players write a review next to the stars |
+| `comment-max-length` | `80` | Characters per review |
+| `require-visit` | `true` | Only players who travelled to the warp can rate it |
+| `block-self` | `true` | Owners cannot rate their own warps |
+| `change-cooldown-hours` | `24` | Wait before a player can change a rating they already left. `0` disables it |
+| `minimum-for-top` | `3` | Ratings a warp needs to rank in the top rated menu, so a single 5 star cannot win |
+| `reviews-shown` | `45` | Newest reviews kept per warp, minimum 9 |
+
+Staff with `aquawarps.admin` skip `require-visit` and the cooldown.
 
 ## Listings
 

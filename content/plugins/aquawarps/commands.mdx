@@ -13,7 +13,8 @@ Base `/aquawarps`. Aliases: `/pwarp`, `/pwarps`, `/playerwarps`, `/aqwarps`, `/a
 
 | Command | Permission | What it does |
 | --- | --- | --- |
-| `/aquawarps` | `aquawarps.command` | Opens the main menu |
+| `/aquawarps` | `aquawarps.command` | Opens the main menu. From the console it prints the help |
+| `/aquawarps help` | `aquawarps.command` | Every command you can use |
 | `/aquawarps list [category]` | `aquawarps.list` | Browse menu, filtered to a category if given. Alias `browse` |
 | `/aquawarps search [text]` | `aquawarps.search` | Filters by name, owner or tag. Alias `find` |
 | `/aquawarps top` | `aquawarps.top` | Rankings. Aliases `tops`, `ranking` |
@@ -84,6 +85,9 @@ Trusting a banned player unbans them, and banning a trusted one untrusts them.
 | `/aquawarps rate <warp> <1-5> [review]` | `aquawarps.rate` | Stars, with an optional written review. Aliases `vote`, `review` |
 | `/aquawarps promote <warp> [tier]` | `aquawarps.promote` | Buys a promotion. Without a tier it opens the menu. Aliases `promotion`, `boost` |
 | `/aquawarps report <warp> [reason]` | `aquawarps.report` | Reports it. Without a reason it opens the menu |
+
+Who can rate, how often and how long a review can be is set in
+[Configuration](./configuration#ratings).
 
 ## Chat input
 

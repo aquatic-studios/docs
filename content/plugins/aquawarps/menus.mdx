@@ -1,23 +1,13 @@
 ---
 title: Menus
-description: Thirty menu files, the buttons inside them and the actions they run.
+description: Edit any of the 30 menus, their items, textures, filler, lists and actions.
 ---
 
 import { Callout } from 'nextra/components'
 
 # Menus
 
-One file per menu in `menus/`. Same shape in all of them.
-
-```
-main · browse · categories · trending · newest · all_warps · my_warps · favorites
-tops · top_rated · top_visits · top_favorites · top_level · sort
-passport · stamps · admin · reports
-warp_edit · warp_info · warp_icons · warp_particles · warp_categories
-warp_promote · warp_rate · warp_reviews · warp_report · warp_trusted
-warp_bans · warp_delete
-```
-
+Every menu is one file in `menus/`. Same shape in all of them, so learning one is learning all 30.
 Open any of them with `/aquawarps open <menu> [warp]`.
 
 ## Structure
@@ -44,23 +34,113 @@ items:
 | --- | --- |
 | `menu_title` | GUI title |
 | `size` | Slots, a multiple of 9 |
-| `material` | Any material of your version |
-| `slot` | Where it goes |
-| `display_name` | Item name |
-| `lore` | Item lore |
+| `permission` | Node needed to open the menu |
+| `material` | Any material of your version, or a custom item |
+| `slot` / `slots` | Position, zero indexed. `slots` places the same item in many |
 | `amount` | Stack size |
+| `custom-model-data` | Model data for resource packs |
 | `glow` | Enchant glint |
-| `model_data` | Custom model data |
-| `head` | Player name or `%viewer%`, needs `PLAYER_HEAD` |
-| `permission` | Hides the button from players without it |
-
-Clicks: `left_click_commands`, `right_click_commands`, `shift_left_click_commands`,
-`shift_right_click_commands`.
+| `display_name` / `lore` | Item text, placeholders work |
+| `left_click_commands` | Actions on left click |
+| `right_click_commands` | Actions on right click |
+| `shift_left_click_commands` | Actions on shift + left click. Falls back to left click |
+| `shift_right_click_commands` | Actions on shift + right click. Falls back to right click |
 
 <Callout type="info">
   A lore line that renders to `<skip>` is dropped instead of printed. That is how optional lines
   disappear cleanly, like the description of a category that has none.
 </Callout>
+
+## Item options
+
+| Option | What it does |
+| --- | --- |
+| `permission` | Node needed to see it |
+| `head` | Renders a player head. A name, `%viewer%` or `%warp_owner%`, needs `PLAYER_HEAD` |
+| `requires-warp` | Marks a button that only makes sense with a warp behind the menu |
+| `no-warp` | A whole replacement item shown instead when the menu has no warp |
+
+```yaml
+  travel:
+    material: ENDER_PEARL
+    slot: 13
+    requires-warp: true
+    display_name: '&#FFEE00&lTravel'
+    left_click_commands:
+      - '[warp] %warp_name%'
+    no-warp:
+      material: BARRIER
+      display_name: '&#FF2D2D&lNo warp selected'
+      lore:
+        - '&7Open this menu from a warp.'
+```
+
+## Custom textures
+
+Any button takes an ItemsAdder, Oraxen or Nexo item as its material, or a vanilla item with
+`custom-model-data`.
+
+```yaml filename="menus/main.yml"
+  browse:
+    material: itemsadder:aquawarps:browse_icon
+    slot: 10
+
+  categories:
+    material: oraxen:warp_categories
+    slot: 11
+
+  favorites:
+    material: PAPER
+    custom-model-data: 1001
+    slot: 12
+```
+
+| Material | Plugin |
+| --- | --- |
+| `itemsadder:namespace:id` or `ia:namespace:id` | ItemsAdder |
+| `oraxen:id` | Oraxen |
+| `nexo:id` | Nexo |
+
+<Callout type="info">
+  If the plugin is not installed or the id does not exist, the button falls back to a vanilla item
+  instead of breaking the menu.
+</Callout>
+
+## Slots
+
+Every `slots` list takes single numbers and ranges.
+
+```yaml filename="menus/sort.yml"
+  slots:
+    - 10-16
+    - 19-25
+```
+
+`[0-44]`, `[0-8, 36-44]` and `0-8, 36-44` work too.
+
+## Filler
+
+Every menu has an optional filler that covers empty slots.
+
+```yaml filename="menus/main.yml"
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-44
+```
+
+| Key | What it does |
+| --- | --- |
+| `enabled` | Turns it on. Off by default |
+| `material` | Any material or custom item |
+| `display_name` / `lore` | Item text |
+| `custom-model-data` | Model data for resource packs |
+| `slots` | Where it goes. Empty fills every free slot |
+
+It never covers a button, and in paged menus it leaves the list slots alone.
 
 ## Lists
 
@@ -70,7 +150,8 @@ paged across the slots you give it.
 ```yaml filename="menus/browse.yml"
 content:
   source: warps
-  slots: [0, 1, 2, 3, 4, 5, 6, 7, 8]
+  slots:
+    - 0-44
   item:
     material: GRASS_BLOCK
     display_name: '%promotion_prefix%&#FFEE00&l%name%'
@@ -81,6 +162,9 @@ content:
       - '[warp] %name%'
     right_click_commands:
       - '[menu] warp_info %name%'
+    shift_left_click_commands:
+      - '[favorite] %name%'
+      - '[refresh]'
   empty:
     material: STRUCTURE_VOID
     display_name: '&#FFA42D&lNo warps'
@@ -95,10 +179,13 @@ content:
 | Key | What it does |
 | --- | --- |
 | `source` | Where the entries come from |
-| `slots` | Slots they fill, in order |
+| `slots` | Slots they fill, in order. Without it the three middle rows are used |
 | `item` | Template for one entry |
-| `empty` | Shown when there is nothing |
-| `previous` / `next` | Page arrows |
+| `empty` | Shown in the middle when there is nothing |
+| `previous` / `next` | Page arrows, only drawn when there is a page to go to |
+
+A list menu can still have normal `items` around it, and they read `%page%`, `%pages%` and
+`%total%`.
 
 ### Sources
 
@@ -119,63 +206,2928 @@ content:
 | `milestones` / `stamps` | Passport contents |
 | `sort_modes` | The sort options |
 
+### Entry placeholders
+
+Each source fills its own values in the entry.
+
+| Source | Placeholders |
+| --- | --- |
+| Warp lists | Every [warp placeholder](#warp-placeholders) |
+| `categories` | `%id%` `%name%` `%material%` `%description%` `%count%` `%visits%` `%locked%` |
+| `reviews` | `%player%` `%stars%` `%value%` `%comment%` `%date%` |
+| `trusted` / `banned` | `%player%` `%uuid%` `%date%` |
+| `promotion_tiers` | `%id%` `%name%` `%material%` `%duration%` `%price%` `%priority%` `%balance%` |
+| `icons` | `%id%` `%name%` `%material%` `%selected%` |
+| `particles` | `%id%` `%name%` `%selected%` |
+| `report_reasons` | `%reason%` |
+| `reports` | `%id%` `%name%` `%owner%` `%reporter%` `%reason%` `%date%` `%total%` |
+| `milestones` | `%amount%` `%pearls%` `%extra%` `%missing%` `%state%` `%material%` |
+| `sort_modes` | `%id%` `%name%` `%selected%` `%material%` |
+
+## Warp placeholders
+
+Inside a warp list every entry has these without a prefix:
+
+```
+%name% %id% %owner% %description% %category% %category_id%
+%stars% %rating% %votes% %your_rating% %favorite%
+%visits% %visits_short% %recent_visits% %unique_visits% %favorites% %trend%
+%level% %level_bar% %experience% %experience_next%
+%tags% %tag_count% %icon% %particle%
+%world% %x% %y% %z% %access% %access_list% %state% %state_list% %fee%
+%created% %created_ago% %promotion% %promotion_prefix%
+%trusted_count% %banned_count% %reports% %pearls_today% %featured% %hidden%
+```
+
+A menu opened for one warp, like `warp_edit` or `warp_info`, reaches the same values with a `%warp_`
+prefix, for example `%warp_name%`. Any `%aquawarps_*%` from [Placeholders](./placeholders) works
+everywhere.
+
+<Callout type="warning">
+  A command that still holds an unresolved `%warp_*%` is skipped instead of running broken, so a menu
+  opened without a warp never acts on the wrong one.
+</Callout>
+
 ## Actions
 
-Generic:
-
-| Action | Does |
+| Action | What it does |
 | --- | --- |
-| `[menu] <name> [warp]` | Opens another menu |
-| `[close]` | Closes |
-| `[refresh]` | Redraws it in place |
+| `[menu] <name> [warp]` | Opens another menu, for that warp if given |
+| `[close]` | Closes the GUI |
+| `[refresh]` | Redraws the menu without closing it |
 | `[player] <command>` | Runs a command as the player |
-| `[console] <command>` | Runs it from the console |
-| `[message] <text>` | Sends a line |
-| `[sound] <sound>` | Plays a sound |
+| `[console] <command>` | Runs it as console |
+| `[message] <text>` | Sends a message |
+| `[sound] <SOUND>` | Plays a sound |
 
-AquaWarps:
+AquaWarps actions take the warp of the menu when no name is given.
 
-| Action | Does |
+| Action | What it does |
 | --- | --- |
-| `[warp] <name>` | Travels there |
+| `[warp] [name]` | Travels there |
 | `[random]` | Travels to a warp never visited |
-| `[favorite] <name>` | Saves or unsaves |
-| `[rate] <name> <1-5>` | Leaves stars |
-| `[unrate]` | Removes the rating |
-| `[reviews]` | Opens the reviews |
-| `[promote] <tier>` | Buys a promotion |
-| `[icon] <material>` / `[hand-icon]` | Sets the icon |
+| `[favorite] [name]` | Saves or unsaves |
+| `[rate] [name] <1-5>` | Leaves stars |
+| `[unrate] [name]` | Removes the rating |
+| `[reviews] [name]` | Opens the reviews |
+| `[promote] [name] <tier>` | Buys a promotion |
+| `[icon] [name] <material>` / `[hand-icon]` | Sets the icon, or uses the item in hand |
 | `[particle] <particle>` | Sets the arrival effect |
-| `[category] <name> <category>` | Files it |
+| `[category] [name] <category>` | Files the warp. With no warp behind the menu it filters `browse` instead |
 | `[access]` | Cycles public, password, private |
 | `[toggle]` | Opens or closes the warp |
 | `[clear-password]` / `[clear-description]` / `[remove-tag]` | Clears one thing |
 | `[relocate]` | Moves it here |
 | `[delete]` | Deletes it |
-| `[trust]` / `[untrust]` / `[ban]` / `[unban]` | Visitor lists |
+| `[untrust] [name] <player>` / `[unban] [name] <player>` | Removes a player from a visitor list |
 | `[report] <reason>` | Reports it |
-| `[sort] next\|previous` | Changes the order |
+| `[sort] <mode>\|next\|previous` | Changes the order |
 | `[filter] <category>\|clear` | Changes the filter |
 | `[clear-search]` | Drops the search |
 | `[buy-slot]` | Buys a warp slot |
 | `[feature]` / `[hide]` | Staff flags |
-| `[resolve]` / `[resolve-delete]` | Closes a report, optionally deleting the warp |
+| `[resolve] <id>` / `[resolve-delete] <id>` | Closes a report, optionally deleting the warp |
 | `[input] <type> [menu]` | Asks in chat, then reopens that menu |
 
-`[input]` accepts `create`, `search`, `rename`, `description`, `tag`, `password`, `fee`, `comment`,
-`trust`, `ban` and `purge`.
+## Chat input
 
-## Placeholders inside a menu
+`[input]` asks the player to type the answer in chat, which is how warps get created, renamed and
+described without a command.
 
-Any `%aquawarps_*%` works everywhere. Inside a `content` item the warp's own values are available
-without a prefix:
+| Type | Asks for |
+| --- | --- |
+| `create` | A name, then opens `warp_edit` for the new warp |
+| `search` | Search text, then reopens `browse` unless another menu is given |
+| `rename` | A new name |
+| `description` | A description line |
+| `tag` | A tag |
+| `password` | A password, and switches the warp to `PASSWORD` |
+| `fee` | An entry fee |
+| `comment` | A written review next to the stars |
+| `trust` / `ban` | A player for that list |
+| `purge` | Days of inactivity, staff only |
 
+```yaml filename="menus/warp_edit.yml"
+    left_click_commands:
+      - '[input] rename warp_edit'
 ```
-%name% %owner% %description% %category% %stars% %rating% %votes%
-%visits% %unique_visits% %favorites% %level% %level_bar% %tags%
-%world% %x% %y% %z% %access% %state% %fee% %created_ago%
-%promotion% %promotion_prefix% %your_rating% %favorite%
+
+Timeout, cancel words, bossbar and sounds are set in [Configuration](./configuration#chat-input).
+
+## Default files
+
+Every menu as it ships with the plugin.
+
+### Main
+
+<details>
+<summary>`main.yml`</summary>
+
+```yaml filename="menus/main.yml"
+menu_title: '&8AquaWarps'
+size: 45
+
+items:
+  browse:
+    material: COMPASS
+    slot: 10
+    display_name: '&#FFEE00&lBrowse Warps'
+    lore:
+      - '&7Walk through every warp the'
+      - '&7community has published.'
+      - ''
+      - '&#54ADF4Total warps: &f%aquawarps_total%'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] browse'
+
+  categories:
+    material: CHEST
+    slot: 11
+    display_name: '&#FFEE00&lCategories'
+    lore:
+      - '&7Filter by theme: shops, farms,'
+      - '&7minigames and more.'
+      - ''
+      - '&#54ADF4Categories: &f%aquawarps_categories%'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] categories'
+
+  trending:
+    material: HEART_OF_THE_SEA
+    slot: 12
+    display_name: '&#FFEE00&lThe Current'
+    lore:
+      - '&7The warps everyone is visiting'
+      - '&7right now, ranked live.'
+      - ''
+      - '&#54ADF4Promoted: &f%aquawarps_promoted%'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] trending'
+
+  tops:
+    material: GOLDEN_HORSE_ARMOR
+    slot: 13
+    display_name: '&#FFEE00&lRankings'
+    lore:
+      - '&7Best rated, most visited, most'
+      - '&7saved and highest level warps.'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] tops'
+
+  random:
+    material: ENDER_PEARL
+    slot: 14
+    display_name: '&#FFEE00&lDrift Away'
+    lore:
+      - '&7The current takes you to a warp'
+      - '&7you have never visited.'
+      - ''
+      - '&#FF9E08Click to travel'
+    left_click_commands:
+      - '[random]'
+
+  favorites:
+    material: NETHER_STAR
+    slot: 15
+    display_name: '&#FFEE00&lFavourites'
+    lore:
+      - '&7The warps you saved.'
+      - ''
+      - '&#54ADF4Saved: &f%aquawarps_favorites%'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] favorites'
+
+  my_warps:
+    material: WRITABLE_BOOK
+    slot: 16
+    display_name: '&#FFEE00&lMy Warps'
+    lore:
+      - '&7Create, edit and promote'
+      - '&7your own warps.'
+      - ''
+      - '&#54ADF4Warps: &f%aquawarps_warps%&7/&f%aquawarps_limit%'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] my_warps'
+
+  passport:
+    material: FILLED_MAP
+    slot: 21
+    display_name: '&#FFEE00&lPassport'
+    lore:
+      - '&7Every new warp you visit leaves'
+      - '&7a stamp in your passport.'
+      - ''
+      - '&#54ADF4Stamps: &f%aquawarps_stamps%'
+      - '&#54ADF4Rank: %aquawarps_rank%'
+      - '&#54ADF4Next: %aquawarps_next_rank%'
+      - '%aquawarps_rank_progress%'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] passport'
+
+  search:
+    material: SPYGLASS
+    slot: 22
+    display_name: '&#FFEE00&lSearch'
+    lore:
+      - '&7Look for a warp by name,'
+      - '&7owner or tag.'
+      - ''
+      - '&#54ADF4Current filter: &f%aquawarps_search%'
+      - ''
+      - '&#FF9E08Left click to write'
+      - '&#FF9E08Right click to clear'
+    left_click_commands:
+      - '[input] search browse'
+    right_click_commands:
+      - '[clear-search]'
+      - '[refresh]'
+
+  pearls:
+    material: PRISMARINE_SHARD
+    slot: 23
+    display_name: '&#FFEE00&l%aquawarps_currency%'
+    lore:
+      - '&7You earn pearls when players visit,'
+      - '&7rate or save your warps.'
+      - ''
+      - '&#54ADF4Balance: &f%aquawarps_pearls%'
+      - '&#54ADF4Extra slots: &f%aquawarps_extra_slots%&7/&f%aquawarps_max_extra_slots%'
+      - ''
+      - '&7Spend them on promotions and slots.'
+
+  profile:
+    material: PLAYER_HEAD
+    slot: 39
+    head: '%viewer%'
+    display_name: '&#FFEE00&lYour Logbook'
+    lore:
+      - '&7Everything you have done so far.'
+      - ''
+      - '&#54ADF4Warps: &f%aquawarps_warps%&7/&f%aquawarps_limit%'
+      - '&#54ADF4Pearls: &f%aquawarps_pearls%'
+      - '&#54ADF4Stamps: &f%aquawarps_stamps%'
+      - '&#54ADF4Rank: %aquawarps_rank%'
+      - '&#54ADF4Visits received: &f%aquawarps_visits%'
+      - '&#54ADF4Favourites: &f%aquawarps_favorites%'
+
+  close:
+    material: BARRIER
+    slot: 40
+    display_name: '&#FF2D2D&lClose'
+    lore:
+      - '&7Close this menu.'
+    left_click_commands:
+      - '[close]'
+
+  admin:
+    material: COMPARATOR
+    slot: 41
+    permission: 'aquawarps.admin'
+    display_name: '&#FF2D2D&lAdministration'
+    lore:
+      - '&7Staff panel.'
+      - ''
+      - '&#54ADF4Pending reports: &f%aquawarps_reports%'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] admin'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-44
 ```
 
-Buttons outside the list reach the same values with a `%warp_` prefix, for example `%warp_name%` in
-`warp_edit.yml`. Paged menus also expose `%page%`, `%pages%` and `%total%`.
+</details>
+
+### Browsing
+
+<details>
+<summary>`browse.yml`</summary>
+
+```yaml filename="menus/browse.yml"
+menu_title: '&8Warps'
+size: 54
+
+content:
+  source: warps
+  slots:
+    - 0-44
+  item:
+    material: GRASS_BLOCK
+    display_name: '%promotion_prefix%&#FFEE00&l%name%'
+    lore:
+      - '&7by &f%owner%'
+      - ''
+      - '&7%description%'
+      - ''
+      - '&#54ADF4Category: %category%'
+      - '&#54ADF4Rating: %stars% &7(%votes%)'
+      - '&#54ADF4Visits: &f%visits% &8| &#54ADF4Saved: &f%favorites%'
+      - '&#54ADF4Level: &f%level% &8%level_bar%'
+      - '&#54ADF4Tags: %tags%'
+      - '&#54ADF4World: &f%world%'
+      - '%promotion%'
+      - ''
+      - '&#FF9E08Left click to travel'
+      - '&#FF9E08Right click for details'
+      - '&#FF9E08Shift + left click to save'
+    left_click_commands:
+      - '[warp] %name%'
+    right_click_commands:
+      - '[menu] warp_info %name%'
+    shift_left_click_commands:
+      - '[favorite] %name%'
+      - '[refresh]'
+  empty:
+    material: STRUCTURE_VOID
+    display_name: '&#FFA42D&lNo warps'
+    lore:
+      - '&7Nothing matches these filters yet.'
+  previous:
+    material: ARROW
+    slot: 48
+    display_name: '&#54ADF4&lPrevious Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+  next:
+    material: ARROW
+    slot: 50
+    display_name: '&#54ADF4&lNext Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+
+
+items:
+  info:
+    material: PAPER
+    slot: 45
+    display_name: '&#54ADF4&lResults'
+    lore:
+      - '&7Showing page &f%page%&7/&f%pages%'
+      - '&7Total warps: &f%total%'
+
+  sort:
+    material: HOPPER
+    slot: 47
+    display_name: '&#FFEE00&lSort by'
+    lore:
+      - '&7Choose how the warps are ordered.'
+      - ''
+      - '&#54ADF4Order:'
+      - '%aquawarps_sort_list%'
+      - ''
+      - '&#FF9E08Click to change'
+    left_click_commands:
+      - '[sort] next'
+      - '[refresh]'
+
+  filter:
+    material: CHEST
+    slot: 51
+    display_name: '&#FFEE00&lCategory'
+    lore:
+      - '&7Current: %aquawarps_filter%'
+      - ''
+      - '&#FF9E08Left click to pick a category'
+      - '&#FF9E08Right click to clear'
+    left_click_commands:
+      - '[menu] categories'
+    right_click_commands:
+      - '[filter] clear'
+      - '[refresh]'
+
+  search:
+    material: SPYGLASS
+    slot: 52
+    display_name: '&#FFEE00&lSearch'
+    lore:
+      - '&7Filter: &f%aquawarps_search%'
+      - ''
+      - '&#FF9E08Left click to write'
+      - '&#FF9E08Right click to clear'
+    left_click_commands:
+      - '[input] search browse'
+    right_click_commands:
+      - '[clear-search]'
+      - '[refresh]'
+
+  close:
+    material: BARRIER
+    slot: 53
+    display_name: '&#FF2D2D&lClose'
+    lore:
+      - '&7Close this menu.'
+    left_click_commands:
+      - '[close]'
+  back:
+    material: BOOK
+    slot: 49
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to the main menu.'
+    left_click_commands:
+      - '[menu] main'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-53
+```
+
+</details>
+
+<details>
+<summary>`categories.yml`</summary>
+
+```yaml filename="menus/categories.yml"
+menu_title: '&8Categories'
+size: 54
+
+content:
+  source: categories
+  slots:
+    - 0-44
+  item:
+    material: PAPER
+    display_name: '&#FFEE00&l%name%'
+    lore:
+      - '&7%description%'
+      - ''
+      - '&#54ADF4Warps: &f%count%'
+      - '&#54ADF4Total visits: &f%visits%'
+      - '%locked%'
+      - ''
+      - '&#FF9E08Click to browse'
+    left_click_commands:
+      - '[filter] %id%'
+      - '[menu] browse'
+  empty:
+    material: PAPER
+    display_name: '&#FFA42D&lNo categories'
+    lore:
+      - '&7Nothing is configured in categories.yml.'
+  previous:
+    material: ARROW
+    slot: 48
+    display_name: '&#54ADF4&lPrevious Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+  next:
+    material: ARROW
+    slot: 50
+    display_name: '&#54ADF4&lNext Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+
+
+items:
+  back:
+    material: BOOK
+    slot: 49
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to the main menu.'
+    left_click_commands:
+      - '[menu] main'
+  all:
+    material: COMPASS
+    slot: 47
+    display_name: '&#FFEE00&lAll Categories'
+    lore:
+      - '&7Browse every warp on the server.'
+      - ''
+      - '&#54ADF4Total: &f%aquawarps_total%'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[filter] clear'
+      - '[menu] browse'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-53
+```
+
+</details>
+
+<details>
+<summary>`trending.yml`</summary>
+
+```yaml filename="menus/trending.yml"
+menu_title: '&8The Current'
+size: 54
+
+content:
+  source: trending
+  slots:
+    - 0-44
+  item:
+    material: GRASS_BLOCK
+    display_name: '%promotion_prefix%&#FFEE00&l%name%'
+    lore:
+      - '&7by &f%owner%'
+      - ''
+      - '&7%description%'
+      - ''
+      - '&#54ADF4Category: %category%'
+      - '&#54ADF4Rating: %stars% &7(%votes%)'
+      - '&#54ADF4Visits: &f%visits% &8| &#54ADF4Saved: &f%favorites%'
+      - '&#54ADF4Level: &f%level% &8%level_bar%'
+      - '&#54ADF4Tags: %tags%'
+      - '&#54ADF4World: &f%world%'
+      - '%promotion%'
+      - ''
+      - '&#FF9E08Left click to travel'
+      - '&#FF9E08Right click for details'
+      - '&#FF9E08Shift + left click to save'
+    left_click_commands:
+      - '[warp] %name%'
+    right_click_commands:
+      - '[menu] warp_info %name%'
+    shift_left_click_commands:
+      - '[favorite] %name%'
+      - '[refresh]'
+  empty:
+    material: STRUCTURE_VOID
+    display_name: '&#FFA42D&lNo warps'
+    lore:
+      - '&7Nothing matches these filters yet.'
+  previous:
+    material: ARROW
+    slot: 48
+    display_name: '&#54ADF4&lPrevious Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+  next:
+    material: ARROW
+    slot: 50
+    display_name: '&#54ADF4&lNext Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+
+
+items:
+  back:
+    material: BOOK
+    slot: 49
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to the main menu.'
+    left_click_commands:
+      - '[menu] main'
+  info:
+    material: HEART_OF_THE_SEA
+    slot: 45
+    display_name: '&#FFEE00&lThe Current'
+    lore:
+      - '&7Ranked by recent visits, unique'
+      - '&7visitors, ratings and favourites.'
+      - ''
+      - '&7Total warps: &f%total%'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-53
+```
+
+</details>
+
+<details>
+<summary>`newest.yml`</summary>
+
+```yaml filename="menus/newest.yml"
+menu_title: '&8Newest Warps'
+size: 54
+
+content:
+  source: newest
+  slots:
+    - 0-44
+  item:
+    material: GRASS_BLOCK
+    display_name: '%promotion_prefix%&#FFEE00&l%name%'
+    lore:
+      - '&7by &f%owner%'
+      - ''
+      - '&7%description%'
+      - ''
+      - '&#54ADF4Category: %category%'
+      - '&#54ADF4Rating: %stars% &7(%votes%)'
+      - '&#54ADF4Visits: &f%visits% &8| &#54ADF4Saved: &f%favorites%'
+      - '&#54ADF4Level: &f%level% &8%level_bar%'
+      - '&#54ADF4Tags: %tags%'
+      - '&#54ADF4World: &f%world%'
+      - '%promotion%'
+      - ''
+      - '&#FF9E08Left click to travel'
+      - '&#FF9E08Right click for details'
+      - '&#FF9E08Shift + left click to save'
+    left_click_commands:
+      - '[warp] %name%'
+    right_click_commands:
+      - '[menu] warp_info %name%'
+    shift_left_click_commands:
+      - '[favorite] %name%'
+      - '[refresh]'
+  empty:
+    material: STRUCTURE_VOID
+    display_name: '&#FFA42D&lNo warps'
+    lore:
+      - '&7Nothing matches these filters yet.'
+  previous:
+    material: ARROW
+    slot: 48
+    display_name: '&#54ADF4&lPrevious Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+  next:
+    material: ARROW
+    slot: 50
+    display_name: '&#54ADF4&lNext Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+
+
+items:
+  back:
+    material: BOOK
+    slot: 49
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to the previous menu.'
+    left_click_commands:
+      - '[menu] tops'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-53
+```
+
+</details>
+
+<details>
+<summary>`all_warps.yml`</summary>
+
+```yaml filename="menus/all_warps.yml"
+menu_title: '&8All Warps'
+permission: 'aquawarps.admin'
+size: 54
+
+content:
+  source: all_warps
+  slots:
+    - 0-44
+  item:
+    material: GRASS_BLOCK
+    display_name: '%promotion_prefix%&#FFEE00&l%name%'
+    lore:
+      - '&7by &f%owner%'
+      - ''
+      - '&7%description%'
+      - ''
+      - '&#54ADF4Category: %category%'
+      - '&#54ADF4Rating: %stars% &7(%votes%)'
+      - '&#54ADF4Visits: &f%visits% &8| &#54ADF4Saved: &f%favorites%'
+      - '&#54ADF4Level: &f%level% &8%level_bar%'
+      - '&#54ADF4Tags: %tags%'
+      - '&#54ADF4World: &f%world%'
+      - '%promotion%'
+      - ''
+      - '&#FF9E08Left click to travel'
+      - '&#FF9E08Right click for details'
+      - '&#FF9E08Shift + left click to save'
+    left_click_commands:
+      - '[warp] %name%'
+    right_click_commands:
+      - '[menu] warp_info %name%'
+    shift_left_click_commands:
+      - '[favorite] %name%'
+      - '[refresh]'
+  empty:
+    material: STRUCTURE_VOID
+    display_name: '&#FFA42D&lNo warps'
+    lore:
+      - '&7Nothing matches these filters yet.'
+  previous:
+    material: ARROW
+    slot: 48
+    display_name: '&#54ADF4&lPrevious Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+  next:
+    material: ARROW
+    slot: 50
+    display_name: '&#54ADF4&lNext Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+
+
+items:
+  info:
+    material: PAPER
+    slot: 45
+    display_name: '&#FF2D2D&lStaff View'
+    lore:
+      - '&7Private and hidden warps are'
+      - '&7visible here.'
+      - ''
+      - '&7Page &f%page%&7/&f%pages%'
+      - '&7Total warps: &f%total%'
+
+  back:
+    material: BOOK
+    slot: 49
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to the staff panel.'
+    left_click_commands:
+      - '[menu] admin'
+
+  close:
+    material: BARRIER
+    slot: 53
+    display_name: '&#FF2D2D&lClose'
+    lore:
+      - '&7Close this menu.'
+    left_click_commands:
+      - '[close]'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-53
+```
+
+</details>
+
+<details>
+<summary>`my_warps.yml`</summary>
+
+```yaml filename="menus/my_warps.yml"
+menu_title: '&8My Warps'
+size: 54
+
+content:
+  source: my_warps
+  slots:
+    - 0-44
+  item:
+    material: GRASS_BLOCK
+    display_name: '%promotion_prefix%&#FFEE00&l%name%'
+    lore:
+      - '&7%description%'
+      - ''
+      - '&#54ADF4Category: %category%'
+      - '&#54ADF4Rating: %stars% &7(%votes%)'
+      - '&#54ADF4Visits: &f%visits% &8| &#54ADF4Saved: &f%favorites%'
+      - '&#54ADF4Level: &f%level% &8%level_bar%'
+      - '&#54ADF4Privacy: %access% &8| &#54ADF4State: %state%'
+      - '&#54ADF4Fee: %fee%'
+      - '%promotion%'
+      - ''
+      - '&#FF9E08Left click to edit'
+      - '&#FF9E08Right click to travel'
+    left_click_commands:
+      - '[menu] warp_edit %name%'
+    right_click_commands:
+      - '[warp] %name%'
+  empty:
+    material: WRITABLE_BOOK
+    display_name: '&#FFA42D&lNo warps yet'
+    lore:
+      - '&7Create your first one with the'
+      - '&7button below.'
+  previous:
+    material: ARROW
+    slot: 48
+    display_name: '&#54ADF4&lPrevious Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+  next:
+    material: ARROW
+    slot: 50
+    display_name: '&#54ADF4&lNext Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+
+
+items:
+  back:
+    material: BOOK
+    slot: 49
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to the main menu.'
+    left_click_commands:
+      - '[menu] main'
+  create:
+    material: EMERALD
+    slot: 47
+    display_name: '&#56FF00&lCreate Warp'
+    lore:
+      - '&7Create a warp where you stand.'
+      - ''
+      - '&#54ADF4Slots: &f%aquawarps_warps%&7/&f%aquawarps_limit%'
+      - '&#54ADF4Cost: &f%aquawarps_create_cost%'
+      - ''
+      - '&#FF9E08Click to create'
+    left_click_commands:
+      - '[input] create my_warps'
+
+  buy_slot:
+    material: ENDER_CHEST
+    slot: 51
+    display_name: '&#FFEE00&lBuy Slot'
+    lore:
+      - '&7Buy one more warp slot.'
+      - ''
+      - '&#54ADF4Extra slots: &f%aquawarps_extra_slots%&7/&f%aquawarps_max_extra_slots%'
+      - '&#54ADF4Price: &f%aquawarps_slot_cost%'
+      - ''
+      - '&#FF9E08Click to buy'
+    left_click_commands:
+      - '[buy-slot]'
+      - '[refresh]'
+
+  close:
+    material: BARRIER
+    slot: 53
+    display_name: '&#FF2D2D&lClose'
+    lore:
+      - '&7Close this menu.'
+    left_click_commands:
+      - '[close]'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-53
+```
+
+</details>
+
+<details>
+<summary>`favorites.yml`</summary>
+
+```yaml filename="menus/favorites.yml"
+menu_title: '&8Favourites'
+size: 54
+
+content:
+  source: favorites
+  slots:
+    - 0-44
+  item:
+    material: GRASS_BLOCK
+    display_name: '%promotion_prefix%&#FFEE00&l%name%'
+    lore:
+      - '&7by &f%owner%'
+      - ''
+      - '&7%description%'
+      - ''
+      - '&#54ADF4Category: %category%'
+      - '&#54ADF4Rating: %stars% &7(%votes%)'
+      - '&#54ADF4Visits: &f%visits% &8| &#54ADF4Saved: &f%favorites%'
+      - '&#54ADF4Level: &f%level% &8%level_bar%'
+      - '&#54ADF4Tags: %tags%'
+      - '&#54ADF4World: &f%world%'
+      - '%promotion%'
+      - ''
+      - '&#FF9E08Left click to travel'
+      - '&#FF9E08Right click for details'
+      - '&#FF9E08Shift + left click to save'
+    left_click_commands:
+      - '[warp] %name%'
+    right_click_commands:
+      - '[menu] warp_info %name%'
+    shift_left_click_commands:
+      - '[favorite] %name%'
+      - '[refresh]'
+  empty:
+    material: NETHER_STAR
+    display_name: '&#FFA42D&lNo favourites'
+    lore:
+      - '&7Shift + left click a warp to save it.'
+  previous:
+    material: ARROW
+    slot: 48
+    display_name: '&#54ADF4&lPrevious Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+  next:
+    material: ARROW
+    slot: 50
+    display_name: '&#54ADF4&lNext Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+
+
+items:
+  back:
+    material: BOOK
+    slot: 49
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to the main menu.'
+    left_click_commands:
+      - '[menu] main'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-53
+```
+
+</details>
+
+<details>
+<summary>`sort.yml`</summary>
+
+```yaml filename="menus/sort.yml"
+menu_title: '&8Sort Warps'
+size: 45
+
+content:
+  source: sort_modes
+  slots:
+    - 10-16
+    - 19-25
+  item:
+    material: GRAY_DYE
+    display_name: '&#FFEE00&l%name%'
+    lore:
+      - '%selected%'
+      - ''
+      - '&#FF9E08Click to use this order'
+    left_click_commands:
+      - '[sort] %id%'
+      - '[menu] browse'
+  previous:
+    material: ARROW
+    slot: 38
+    display_name: '&#54ADF4&lPrevious Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+  next:
+    material: ARROW
+    slot: 42
+    display_name: '&#54ADF4&lNext Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+
+
+items:
+  back:
+    material: BOOK
+    slot: 40
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to the previous menu.'
+    left_click_commands:
+      - '[menu] browse'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-44
+```
+
+</details>
+
+### Rankings
+
+<details>
+<summary>`tops.yml`</summary>
+
+```yaml filename="menus/tops.yml"
+menu_title: '&8Rankings'
+size: 36
+
+items:
+  rated:
+    material: SUNFLOWER
+    slot: 10
+    display_name: '&#FFEE00&lBest Rated'
+    lore:
+      - '&7The warps the community loves.'
+      - ''
+      - '&#54ADF4Top warp: &f%aquawarps_top_rating_1_name%'
+      - '&#54ADF4Rating: &f%aquawarps_top_rating_1_rating%'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] top_rated'
+
+  visits:
+    material: ENDER_EYE
+    slot: 11
+    display_name: '&#FFEE00&lMost Visited'
+    lore:
+      - '&7The busiest warps on the server.'
+      - ''
+      - '&#54ADF4Top warp: &f%aquawarps_top_visits_1_name%'
+      - '&#54ADF4Visits: &f%aquawarps_top_visits_1_visits%'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] top_visits'
+
+  favorites:
+    material: NETHER_STAR
+    slot: 12
+    display_name: '&#FFEE00&lMost Saved'
+    lore:
+      - '&7The warps players keep coming back to.'
+      - ''
+      - '&#54ADF4Top warp: &f%aquawarps_top_favorites_1_name%'
+      - '&#54ADF4Saved: &f%aquawarps_top_favorites_1_favorites%'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] top_favorites'
+
+  level:
+    material: EXPERIENCE_BOTTLE
+    slot: 13
+    display_name: '&#FFEE00&lHighest Level'
+    lore:
+      - '&7Warps grow with every visit,'
+      - '&7rating and favourite.'
+      - ''
+      - '&#54ADF4Top warp: &f%aquawarps_top_level_1_name%'
+      - '&#54ADF4Level: &f%aquawarps_top_level_1_level%'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] top_level'
+
+  newest:
+    material: CLOCK
+    slot: 14
+    display_name: '&#FFEE00&lNewest'
+    lore:
+      - '&7The warps that just opened.'
+      - ''
+      - '&#54ADF4Total warps: &f%aquawarps_total%'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] newest'
+
+  trending:
+    material: HEART_OF_THE_SEA
+    slot: 15
+    display_name: '&#FFEE00&lThe Current'
+    lore:
+      - '&7What is hot right now.'
+      - ''
+      - '&#54ADF4Top warp: &f%aquawarps_top_trending_1_name%'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] trending'
+
+  back:
+    material: BOOK
+    slot: 31
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to the main menu.'
+    left_click_commands:
+      - '[menu] main'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-35
+```
+
+</details>
+
+<details>
+<summary>`top_rated.yml`</summary>
+
+```yaml filename="menus/top_rated.yml"
+menu_title: '&8Best Rated'
+size: 54
+
+content:
+  source: top_rated
+  slots:
+    - 0-44
+  item:
+    material: GRASS_BLOCK
+    display_name: '%promotion_prefix%&#FFEE00&l%name%'
+    lore:
+      - '&7by &f%owner%'
+      - ''
+      - '&7%description%'
+      - ''
+      - '&#54ADF4Category: %category%'
+      - '&#54ADF4Rating: %stars% &7(%votes%)'
+      - '&#54ADF4Visits: &f%visits% &8| &#54ADF4Saved: &f%favorites%'
+      - '&#54ADF4Level: &f%level% &8%level_bar%'
+      - '&#54ADF4Tags: %tags%'
+      - '&#54ADF4World: &f%world%'
+      - '%promotion%'
+      - ''
+      - '&#FF9E08Left click to travel'
+      - '&#FF9E08Right click for details'
+      - '&#FF9E08Shift + left click to save'
+    left_click_commands:
+      - '[warp] %name%'
+    right_click_commands:
+      - '[menu] warp_info %name%'
+    shift_left_click_commands:
+      - '[favorite] %name%'
+      - '[refresh]'
+  empty:
+    material: STRUCTURE_VOID
+    display_name: '&#FFA42D&lNo warps'
+    lore:
+      - '&7Nothing matches these filters yet.'
+  previous:
+    material: ARROW
+    slot: 48
+    display_name: '&#54ADF4&lPrevious Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+  next:
+    material: ARROW
+    slot: 50
+    display_name: '&#54ADF4&lNext Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+
+
+items:
+  back:
+    material: BOOK
+    slot: 49
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to the previous menu.'
+    left_click_commands:
+      - '[menu] tops'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-53
+```
+
+</details>
+
+<details>
+<summary>`top_visits.yml`</summary>
+
+```yaml filename="menus/top_visits.yml"
+menu_title: '&8Most Visited'
+size: 54
+
+content:
+  source: top_visits
+  slots:
+    - 0-44
+  item:
+    material: GRASS_BLOCK
+    display_name: '%promotion_prefix%&#FFEE00&l%name%'
+    lore:
+      - '&7by &f%owner%'
+      - ''
+      - '&7%description%'
+      - ''
+      - '&#54ADF4Category: %category%'
+      - '&#54ADF4Rating: %stars% &7(%votes%)'
+      - '&#54ADF4Visits: &f%visits% &8| &#54ADF4Saved: &f%favorites%'
+      - '&#54ADF4Level: &f%level% &8%level_bar%'
+      - '&#54ADF4Tags: %tags%'
+      - '&#54ADF4World: &f%world%'
+      - '%promotion%'
+      - ''
+      - '&#FF9E08Left click to travel'
+      - '&#FF9E08Right click for details'
+      - '&#FF9E08Shift + left click to save'
+    left_click_commands:
+      - '[warp] %name%'
+    right_click_commands:
+      - '[menu] warp_info %name%'
+    shift_left_click_commands:
+      - '[favorite] %name%'
+      - '[refresh]'
+  empty:
+    material: STRUCTURE_VOID
+    display_name: '&#FFA42D&lNo warps'
+    lore:
+      - '&7Nothing matches these filters yet.'
+  previous:
+    material: ARROW
+    slot: 48
+    display_name: '&#54ADF4&lPrevious Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+  next:
+    material: ARROW
+    slot: 50
+    display_name: '&#54ADF4&lNext Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+
+
+items:
+  back:
+    material: BOOK
+    slot: 49
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to the previous menu.'
+    left_click_commands:
+      - '[menu] tops'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-53
+```
+
+</details>
+
+<details>
+<summary>`top_favorites.yml`</summary>
+
+```yaml filename="menus/top_favorites.yml"
+menu_title: '&8Most Saved'
+size: 54
+
+content:
+  source: top_favorites
+  slots:
+    - 0-44
+  item:
+    material: GRASS_BLOCK
+    display_name: '%promotion_prefix%&#FFEE00&l%name%'
+    lore:
+      - '&7by &f%owner%'
+      - ''
+      - '&7%description%'
+      - ''
+      - '&#54ADF4Category: %category%'
+      - '&#54ADF4Rating: %stars% &7(%votes%)'
+      - '&#54ADF4Visits: &f%visits% &8| &#54ADF4Saved: &f%favorites%'
+      - '&#54ADF4Level: &f%level% &8%level_bar%'
+      - '&#54ADF4Tags: %tags%'
+      - '&#54ADF4World: &f%world%'
+      - '%promotion%'
+      - ''
+      - '&#FF9E08Left click to travel'
+      - '&#FF9E08Right click for details'
+      - '&#FF9E08Shift + left click to save'
+    left_click_commands:
+      - '[warp] %name%'
+    right_click_commands:
+      - '[menu] warp_info %name%'
+    shift_left_click_commands:
+      - '[favorite] %name%'
+      - '[refresh]'
+  empty:
+    material: STRUCTURE_VOID
+    display_name: '&#FFA42D&lNo warps'
+    lore:
+      - '&7Nothing matches these filters yet.'
+  previous:
+    material: ARROW
+    slot: 48
+    display_name: '&#54ADF4&lPrevious Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+  next:
+    material: ARROW
+    slot: 50
+    display_name: '&#54ADF4&lNext Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+
+
+items:
+  back:
+    material: BOOK
+    slot: 49
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to the previous menu.'
+    left_click_commands:
+      - '[menu] tops'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-53
+```
+
+</details>
+
+<details>
+<summary>`top_level.yml`</summary>
+
+```yaml filename="menus/top_level.yml"
+menu_title: '&8Highest Level'
+size: 54
+
+content:
+  source: top_level
+  slots:
+    - 0-44
+  item:
+    material: GRASS_BLOCK
+    display_name: '%promotion_prefix%&#FFEE00&l%name%'
+    lore:
+      - '&7by &f%owner%'
+      - ''
+      - '&7%description%'
+      - ''
+      - '&#54ADF4Category: %category%'
+      - '&#54ADF4Rating: %stars% &7(%votes%)'
+      - '&#54ADF4Visits: &f%visits% &8| &#54ADF4Saved: &f%favorites%'
+      - '&#54ADF4Level: &f%level% &8%level_bar%'
+      - '&#54ADF4Tags: %tags%'
+      - '&#54ADF4World: &f%world%'
+      - '%promotion%'
+      - ''
+      - '&#FF9E08Left click to travel'
+      - '&#FF9E08Right click for details'
+      - '&#FF9E08Shift + left click to save'
+    left_click_commands:
+      - '[warp] %name%'
+    right_click_commands:
+      - '[menu] warp_info %name%'
+    shift_left_click_commands:
+      - '[favorite] %name%'
+      - '[refresh]'
+  empty:
+    material: STRUCTURE_VOID
+    display_name: '&#FFA42D&lNo warps'
+    lore:
+      - '&7Nothing matches these filters yet.'
+  previous:
+    material: ARROW
+    slot: 48
+    display_name: '&#54ADF4&lPrevious Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+  next:
+    material: ARROW
+    slot: 50
+    display_name: '&#54ADF4&lNext Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+
+
+items:
+  back:
+    material: BOOK
+    slot: 49
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to the previous menu.'
+    left_click_commands:
+      - '[menu] tops'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-53
+```
+
+</details>
+
+### Warp
+
+<details>
+<summary>`warp_info.yml`</summary>
+
+```yaml filename="menus/warp_info.yml"
+menu_title: '&8Warp Info'
+size: 45
+
+items:
+  display:
+    material: GRASS_BLOCK
+    slot: 13
+    display_name: '%warp_promotion_prefix%&#FFEE00&l%warp_name%'
+    lore:
+      - '&7%warp_description%'
+      - ''
+      - '&#54ADF4Category: %warp_category%'
+      - '&#54ADF4Tags: %warp_tags%'
+      - '&#54ADF4World: &f%warp_world%'
+      - '&#54ADF4Privacy: %warp_access% &8| &#54ADF4State: %warp_state%'
+      - '&#54ADF4Entry fee: %warp_fee%'
+      - '%warp_promotion%'
+
+  owner:
+    material: PLAYER_HEAD
+    slot: 4
+    head: '%warp_owner%'
+    display_name: '&#FFEE00&l%warp_owner%'
+    lore:
+      - '&7Owner of this warp.'
+      - ''
+      - '&#54ADF4Created: &f%warp_created%'
+      - '&#54ADF4Trusted players: &f%warp_trusted_count%'
+
+  stats:
+    material: PAPER
+    slot: 22
+    display_name: '&#FFEE00&lStatistics'
+    lore:
+      - '&#54ADF4Visits: &f%warp_visits%'
+      - '&#54ADF4Unique visitors: &f%warp_unique_visits%'
+      - '&#54ADF4Last 7 days: &f%warp_recent_visits%'
+      - '&#54ADF4Saved by: &f%warp_favorites%'
+      - '&#54ADF4Rating: %warp_stars% &7(%warp_votes%)'
+      - '&#54ADF4Level: &f%warp_level% &8%warp_level_bar%'
+      - '&#54ADF4Experience: &f%warp_experience%&7/&f%warp_experience_next%'
+      - '&#54ADF4Trending position: &f%warp_trend%'
+
+  teleport:
+    material: ENDER_PEARL
+    slot: 29
+    display_name: '&#56FF00&lTravel'
+    lore:
+      - '&7Take the current to this warp.'
+      - ''
+      - '&#54ADF4Entry fee: %warp_fee%'
+      - ''
+      - '&#FF9E08Click to travel'
+    left_click_commands:
+      - '[warp] %warp_name%'
+
+  favorite:
+    material: NETHER_STAR
+    slot: 30
+    display_name: '&#FFEE00&lFavourite'
+    lore:
+      - '&7State: %warp_favorite%'
+      - ''
+      - '&#FF9E08Click to toggle'
+    left_click_commands:
+      - '[favorite] %warp_name%'
+      - '[refresh]'
+
+  rate:
+    material: SUNFLOWER
+    slot: 32
+    display_name: '&#FFEE00&lRate'
+    lore:
+      - '&7Average: %warp_stars% &7(%warp_votes%)'
+      - '&7Your vote: %warp_your_rating%'
+      - ''
+      - '&#FF9E08Click to rate'
+    left_click_commands:
+      - '[menu] warp_rate %warp_name%'
+
+  reviews:
+    material: BOOK
+    slot: 33
+    display_name: '&#FFEE00&lReviews'
+    lore:
+      - '&7Read what other visitors think.'
+      - ''
+      - '&#54ADF4Reviews: &f%warp_votes%'
+      - ''
+      - '&#FF9E08Click to read'
+    left_click_commands:
+      - '[reviews] %warp_name%'
+
+  report:
+    material: REDSTONE_TORCH
+    slot: 35
+    display_name: '&#FF2D2D&lReport'
+    lore:
+      - '&7Tell the staff if this warp'
+      - '&7breaks the rules.'
+      - ''
+      - '&#FF9E08Click to report'
+    left_click_commands:
+      - '[menu] warp_report %warp_name%'
+
+  edit:
+    material: WRITABLE_BOOK
+    slot: 31
+    display_name: '&#FFEE00&lEdit Warp'
+    lore:
+      - '&7Manage this warp.'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] warp_edit %warp_name%'
+
+  back:
+    material: BOOK
+    slot: 36
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to the warp list.'
+    left_click_commands:
+      - '[menu] browse'
+
+  close:
+    material: BARRIER
+    slot: 44
+    display_name: '&#FF2D2D&lClose'
+    lore:
+      - '&7Close this menu.'
+    left_click_commands:
+      - '[close]'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-44
+```
+
+</details>
+
+<details>
+<summary>`warp_edit.yml`</summary>
+
+```yaml filename="menus/warp_edit.yml"
+menu_title: '&8Edit Warp'
+size: 54
+
+items:
+  display:
+    material: GRASS_BLOCK
+    slot: 4
+    display_name: '%warp_promotion_prefix%&#FFEE00&l%warp_name%'
+    lore:
+      - '&7%warp_description%'
+      - ''
+      - '&#54ADF4Category: %warp_category%'
+      - '&#54ADF4Rating: %warp_stars% &7(%warp_votes%)'
+      - '&#54ADF4Visits: &f%warp_visits% &8| &#54ADF4Saved: &f%warp_favorites%'
+      - '&#54ADF4Level: &f%warp_level% &8%warp_level_bar%'
+
+  rename:
+    material: NAME_TAG
+    slot: 10
+    display_name: '&#FFEE00&lRename'
+    lore:
+      - '&7Current: &f%warp_name%'
+      - ''
+      - '&#FF9E08Click to write a new name'
+    left_click_commands:
+      - '[input] rename warp_edit'
+
+  description:
+    material: WRITABLE_BOOK
+    slot: 11
+    display_name: '&#FFEE00&lDescription'
+    lore:
+      - '&7%warp_description%'
+      - ''
+      - '&#FF9E08Left click to add a line'
+      - '&#FF2D2DRight click to clear'
+    left_click_commands:
+      - '[input] description warp_edit'
+    right_click_commands:
+      - '[clear-description] %warp_name%'
+      - '[refresh]'
+
+  category:
+    material: CHEST
+    slot: 12
+    display_name: '&#FFEE00&lCategory'
+    lore:
+      - '&7Current: %warp_category%'
+      - ''
+      - '&#FF9E08Click to change'
+    left_click_commands:
+      - '[menu] warp_categories %warp_name%'
+
+  icon:
+    material: ITEM_FRAME
+    slot: 13
+    display_name: '&#FFEE00&lIcon'
+    lore:
+      - '&7Current: &f%warp_icon%'
+      - ''
+      - '&#FF9E08Left click to pick from a list'
+      - '&#FF9E08Right click to use the item in hand'
+    left_click_commands:
+      - '[menu] warp_icons %warp_name%'
+    right_click_commands:
+      - '[hand-icon] %warp_name%'
+      - '[refresh]'
+
+  relocate:
+    material: COMPASS
+    slot: 14
+    display_name: '&#FFEE00&lRelocate'
+    lore:
+      - '&7Move the warp to where you stand.'
+      - ''
+      - '&#54ADF4World: &f%warp_world%'
+      - ''
+      - '&#FF9E08Click to relocate'
+    left_click_commands:
+      - '[relocate] %warp_name%'
+      - '[refresh]'
+
+  tags:
+    material: OAK_SIGN
+    slot: 15
+    display_name: '&#FFEE00&lTags'
+    lore:
+      - '&7Tags: %warp_tags%'
+      - ''
+      - '&#54ADF4Used: &f%warp_tag_count%'
+      - ''
+      - '&#FF9E08Left click to add a tag'
+      - '&#FF2D2DRight click to remove the last one'
+    left_click_commands:
+      - '[input] tag warp_edit'
+    right_click_commands:
+      - '[remove-tag] %warp_name%'
+      - '[refresh]'
+
+  access:
+    material: IRON_DOOR
+    slot: 16
+    display_name: '&#FFEE00&lPrivacy'
+    lore:
+      - '&7Who is allowed to enter your warp.'
+      - ''
+      - '&#54ADF4Privacy:'
+      - '%warp_access_list%'
+      - ''
+      - '&#FF9E08Click to change'
+    left_click_commands:
+      - '[access] %warp_name%'
+      - '[refresh]'
+
+  password:
+    material: TRIPWIRE_HOOK
+    slot: 19
+    display_name: '&#FFEE00&lPassword'
+    lore:
+      - '&7Privacy: %warp_access%'
+      - ''
+      - '&#FF9E08Left click to set a password'
+      - '&#FF2D2DRight click to remove it'
+    left_click_commands:
+      - '[input] password warp_edit'
+    right_click_commands:
+      - '[clear-password] %warp_name%'
+      - '[refresh]'
+
+  fee:
+    material: GOLD_INGOT
+    slot: 20
+    display_name: '&#FFEE00&lEntry Fee'
+    lore:
+      - '&7Current: %warp_fee%'
+      - ''
+      - '&#FF9E08Click to change'
+    left_click_commands:
+      - '[input] fee warp_edit'
+
+  state:
+    material: LEVER
+    slot: 21
+    display_name: '&#FFEE00&lOpen to public'
+    lore:
+      - '&7Close it while you are building.'
+      - ''
+      - '&#54ADF4State:'
+      - '%warp_state_list%'
+      - ''
+      - '&#FF9E08Click to change'
+    left_click_commands:
+      - '[toggle] %warp_name%'
+      - '[refresh]'
+
+  trusted:
+    material: PLAYER_HEAD
+    slot: 22
+    display_name: '&#FFEE00&lTrusted Players'
+    lore:
+      - '&7They can enter even when the warp'
+      - '&7is private or closed.'
+      - ''
+      - '&#54ADF4Total: &f%warp_trusted_count%'
+      - ''
+      - '&#FF9E08Click to manage'
+    left_click_commands:
+      - '[menu] warp_trusted %warp_name%'
+
+  bans:
+    material: BARRIER
+    slot: 23
+    display_name: '&#FF2D2D&lBanned Players'
+    lore:
+      - '&7They can never enter this warp.'
+      - ''
+      - '&#54ADF4Total: &f%warp_banned_count%'
+      - ''
+      - '&#FF9E08Click to manage'
+    left_click_commands:
+      - '[menu] warp_bans %warp_name%'
+
+  particles:
+    material: FIREWORK_ROCKET
+    slot: 24
+    display_name: '&#FFEE00&lArrival Effect'
+    lore:
+      - '&7Current: &f%warp_particle%'
+      - ''
+      - '&#FF9E08Click to change'
+    left_click_commands:
+      - '[menu] warp_particles %warp_name%'
+
+  promote:
+    material: NAUTILUS_SHELL
+    slot: 25
+    display_name: '&#FFEE00&lPromote'
+    lore:
+      - '&7%warp_promotion%'
+      - ''
+      - '&7Promoted warps sit on top of'
+      - '&7every list on the server.'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] warp_promote %warp_name%'
+
+  stats:
+    material: PAPER
+    slot: 31
+    display_name: '&#FFEE00&lStatistics'
+    lore:
+      - '&#54ADF4Visits: &f%warp_visits%'
+      - '&#54ADF4Unique visitors: &f%warp_unique_visits%'
+      - '&#54ADF4Last 7 days: &f%warp_recent_visits%'
+      - '&#54ADF4Saved by: &f%warp_favorites%'
+      - '&#54ADF4Rating: %warp_stars% &7(%warp_votes%)'
+      - '&#54ADF4Level: &f%warp_level% &8%warp_level_bar%'
+      - '&#54ADF4Pearls today: &f%warp_pearls_today%'
+      - '&#54ADF4Reports: &f%warp_reports%'
+
+  reviews:
+    material: BOOK
+    slot: 30
+    display_name: '&#FFEE00&lReviews'
+    lore:
+      - '&7Read what your visitors think.'
+      - ''
+      - '&#54ADF4Reviews: &f%warp_votes%'
+      - ''
+      - '&#FF9E08Click to read'
+    left_click_commands:
+      - '[reviews] %warp_name%'
+
+  visit:
+    material: ENDER_PEARL
+    slot: 32
+    display_name: '&#56FF00&lVisit'
+    lore:
+      - '&7Travel to your own warp.'
+      - ''
+      - '&#FF9E08Click to travel'
+    left_click_commands:
+      - '[warp] %warp_name%'
+
+  delete:
+    material: LAVA_BUCKET
+    slot: 40
+    display_name: '&#FF2D2D&lDelete Warp'
+    lore:
+      - '&7This cannot be undone.'
+      - ''
+      - '&#FF9E08Click to confirm'
+    left_click_commands:
+      - '[menu] warp_delete %warp_name%'
+
+  back:
+    material: BOOK
+    slot: 45
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to your warps.'
+    left_click_commands:
+      - '[menu] my_warps'
+
+  close:
+    material: BARRIER
+    slot: 53
+    display_name: '&#FF2D2D&lClose'
+    lore:
+      - '&7Close this menu.'
+    left_click_commands:
+      - '[close]'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-53
+```
+
+</details>
+
+<details>
+<summary>`warp_icons.yml`</summary>
+
+```yaml filename="menus/warp_icons.yml"
+menu_title: '&8Warp Icon'
+size: 54
+
+content:
+  source: icons
+  slots:
+    - 0-44
+  item:
+    material: PAPER
+    display_name: '&#FFEE00&l%name%'
+    lore:
+      - '%selected%'
+      - ''
+      - '&#FF9E08Click to use this icon'
+    left_click_commands:
+      - '[icon] %warp_name% %id%'
+      - '[refresh]'
+  previous:
+    material: ARROW
+    slot: 48
+    display_name: '&#54ADF4&lPrevious Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+  next:
+    material: ARROW
+    slot: 50
+    display_name: '&#54ADF4&lNext Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+
+
+items:
+  hand:
+    material: ITEM_FRAME
+    slot: 47
+    display_name: '&#56FF00&lUse item in hand'
+    lore:
+      - '&7Hold any item and click here.'
+      - ''
+      - '&#FF9E08Click to apply'
+    left_click_commands:
+      - '[hand-icon] %warp_name%'
+      - '[refresh]'
+  back:
+    material: BOOK
+    slot: 49
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to the previous menu.'
+    left_click_commands:
+      - '[menu] warp_edit %warp_name%'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-53
+```
+
+</details>
+
+<details>
+<summary>`warp_particles.yml`</summary>
+
+```yaml filename="menus/warp_particles.yml"
+menu_title: '&8Arrival Effect'
+size: 54
+
+content:
+  source: particles
+  slots:
+    - 10-16
+    - 19-25
+    - 28-34
+  item:
+    material: FIREWORK_ROCKET
+    display_name: '&#FFEE00&l%name%'
+    lore:
+      - '%selected%'
+      - ''
+      - '&#FF9E08Click to use this effect'
+    left_click_commands:
+      - '[particle] %warp_name% %id%'
+      - '[refresh]'
+  previous:
+    material: ARROW
+    slot: 48
+    display_name: '&#54ADF4&lPrevious Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+  next:
+    material: ARROW
+    slot: 50
+    display_name: '&#54ADF4&lNext Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+
+
+items:
+  back:
+    material: BOOK
+    slot: 49
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to the previous menu.'
+    left_click_commands:
+      - '[menu] warp_edit %warp_name%'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-53
+```
+
+</details>
+
+<details>
+<summary>`warp_categories.yml`</summary>
+
+```yaml filename="menus/warp_categories.yml"
+menu_title: '&8Warp Category'
+size: 54
+
+content:
+  source: categories
+  slots:
+    - 0-44
+  item:
+    material: PAPER
+    display_name: '&#FFEE00&l%name%'
+    lore:
+      - '&7%description%'
+      - ''
+      - '&#54ADF4Warps: &f%count%'
+      - '%locked%'
+      - ''
+      - '&#FF9E08Click to use this category'
+    left_click_commands:
+      - '[category] %warp_name% %id%'
+      - '[menu] warp_edit %warp_name%'
+  empty:
+    material: PAPER
+    display_name: '&#FFA42D&lNo categories'
+    lore:
+      - '&7Nothing is configured in categories.yml.'
+  previous:
+    material: ARROW
+    slot: 48
+    display_name: '&#54ADF4&lPrevious Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+  next:
+    material: ARROW
+    slot: 50
+    display_name: '&#54ADF4&lNext Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+
+items:
+  back:
+    material: BOOK
+    slot: 49
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to the warp editor.'
+    left_click_commands:
+      - '[menu] warp_edit %warp_name%'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-53
+```
+
+</details>
+
+<details>
+<summary>`warp_promote.yml`</summary>
+
+```yaml filename="menus/warp_promote.yml"
+menu_title: '&8Promote Warp'
+size: 27
+
+content:
+  source: promotion_tiers
+  slots:
+    - 10-16
+  item:
+    material: NAUTILUS_SHELL
+    display_name: '%name%'
+    lore:
+      - '&7Puts your warp on top of every list.'
+      - ''
+      - '&#54ADF4Duration: &f%duration%'
+      - '&#54ADF4Price: &f%price%'
+      - '&#54ADF4Priority: &f%priority%'
+      - ''
+      - '&#54ADF4Your balance: &f%balance%'
+      - ''
+      - '&#FF9E08Click to buy'
+    left_click_commands:
+      - '[promote] %warp_name% %id%'
+      - '[refresh]'
+  empty:
+    material: BARRIER
+    display_name: '&#FFA42D&lNo tiers'
+    lore:
+      - '&7Nothing is configured in config.yml.'
+  previous:
+    material: ARROW
+    slot: 18
+    display_name: '&#54ADF4&lPrevious Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+  next:
+    material: ARROW
+    slot: 26
+    display_name: '&#54ADF4&lNext Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+
+
+items:
+  status:
+    material: CLOCK
+    slot: 4
+    display_name: '&#FFEE00&lCurrent Status'
+    lore:
+      - '%warp_promotion%'
+      - ''
+      - '&#54ADF4Warp: &f%warp_name%'
+      - '&#54ADF4Level: &f%warp_level%'
+  back:
+    material: BOOK
+    slot: 22
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to the previous menu.'
+    left_click_commands:
+      - '[menu] warp_edit %warp_name%'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-26
+```
+
+</details>
+
+<details>
+<summary>`warp_rate.yml`</summary>
+
+```yaml filename="menus/warp_rate.yml"
+menu_title: '&8Rate Warp'
+size: 27
+
+items:
+  display:
+    material: SUNFLOWER
+    slot: 4
+    display_name: '&#FFEE00&l%warp_name%'
+    lore:
+      - '&7by &f%warp_owner%'
+      - ''
+      - '&#54ADF4Average: %warp_stars% &f%warp_rating%'
+      - '&#54ADF4Votes: &f%warp_votes%'
+      - '&#54ADF4Your vote: %warp_your_rating%'
+
+  one:
+    material: LIGHT_GRAY_DYE
+    slot: 11
+    display_name: '&#FFEE00&l1 star'
+    lore:
+      - '&7Not worth the trip.'
+      - ''
+      - '&#FF9E08Click to vote'
+    left_click_commands:
+      - '[rate] %warp_name% 1'
+      - '[refresh]'
+
+  two:
+    material: LIGHT_GRAY_DYE
+    slot: 12
+    display_name: '&#FFEE00&l2 stars'
+    lore:
+      - '&7Could be better.'
+      - ''
+      - '&#FF9E08Click to vote'
+    left_click_commands:
+      - '[rate] %warp_name% 2'
+      - '[refresh]'
+
+  three:
+    material: YELLOW_DYE
+    slot: 13
+    display_name: '&#FFEE00&l3 stars'
+    lore:
+      - '&7Solid warp.'
+      - ''
+      - '&#FF9E08Click to vote'
+    left_click_commands:
+      - '[rate] %warp_name% 3'
+      - '[refresh]'
+
+  four:
+    material: YELLOW_DYE
+    slot: 14
+    display_name: '&#FFEE00&l4 stars'
+    lore:
+      - '&7Really good.'
+      - ''
+      - '&#FF9E08Click to vote'
+    left_click_commands:
+      - '[rate] %warp_name% 4'
+      - '[refresh]'
+
+  five:
+    material: YELLOW_DYE
+    slot: 15
+    display_name: '&#FFEE00&l5 stars'
+    lore:
+      - '&7A must visit.'
+      - ''
+      - '&#FF9E08Click to vote'
+    left_click_commands:
+      - '[rate] %warp_name% 5'
+      - '[refresh]'
+
+  comment:
+    material: WRITABLE_BOOK
+    slot: 21
+    display_name: '&#FFEE00&lWrite a review'
+    lore:
+      - '&7Tell others what you found there.'
+      - ''
+      - '&#FF9E08Click to write'
+    left_click_commands:
+      - '[input] comment warp_rate'
+
+  remove:
+    material: BARRIER
+    slot: 23
+    display_name: '&#FF2D2D&lRemove my vote'
+    lore:
+      - '&7Take your rating back.'
+      - ''
+      - '&#FF9E08Click to remove'
+    left_click_commands:
+      - '[unrate] %warp_name%'
+      - '[refresh]'
+
+  back:
+    material: BOOK
+    slot: 18
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to the warp.'
+    left_click_commands:
+      - '[menu] warp_info %warp_name%'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-26
+```
+
+</details>
+
+<details>
+<summary>`warp_reviews.yml`</summary>
+
+```yaml filename="menus/warp_reviews.yml"
+menu_title: '&8Reviews'
+size: 54
+
+content:
+  source: reviews
+  slots:
+    - 0-44
+  item:
+    material: PLAYER_HEAD
+    display_name: '&#FFEE00&l%player%'
+    lore:
+      - '%stars%'
+      - '&f%comment%'
+      - ''
+      - '&8%date%'
+  empty:
+    material: BOOK
+    display_name: '&#FFA42D&lNo reviews yet'
+    lore:
+      - '&7Be the first one to rate this warp.'
+  previous:
+    material: ARROW
+    slot: 48
+    display_name: '&#54ADF4&lPrevious Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+  next:
+    material: ARROW
+    slot: 50
+    display_name: '&#54ADF4&lNext Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+
+
+items:
+  summary:
+    material: SUNFLOWER
+    slot: 45
+    display_name: '&#FFEE00&lSummary'
+    lore:
+      - '&#54ADF4Average: %warp_stars% &f%warp_rating%'
+      - '&#54ADF4Votes: &f%warp_votes%'
+      - '&#54ADF4Visits: &f%warp_visits%'
+      - '&#54ADF4Saved by: &f%warp_favorites%'
+
+  rate:
+    material: NAME_TAG
+    slot: 47
+    display_name: '&#FFEE00&lRate this warp'
+    lore:
+      - '&7Your vote: %warp_your_rating%'
+      - ''
+      - '&#FF9E08Click to rate'
+    left_click_commands:
+      - '[menu] warp_rate %warp_name%'
+  back:
+    material: BOOK
+    slot: 49
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to the previous menu.'
+    left_click_commands:
+      - '[menu] warp_info %warp_name%'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-53
+```
+
+</details>
+
+<details>
+<summary>`warp_report.yml`</summary>
+
+```yaml filename="menus/warp_report.yml"
+menu_title: '&8Report Warp'
+size: 27
+
+content:
+  source: report_reasons
+  slots:
+    - 10-16
+  item:
+    material: PAPER
+    display_name: '&#FF2D2D&l%reason%'
+    lore:
+      - '&7Send this report to the staff.'
+      - ''
+      - '&#FF9E08Click to send'
+    left_click_commands:
+      - '[report] %reason%'
+  previous:
+    material: ARROW
+    slot: 18
+    display_name: '&#54ADF4&lPrevious Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+  next:
+    material: ARROW
+    slot: 26
+    display_name: '&#54ADF4&lNext Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+
+
+items:
+  back:
+    material: BOOK
+    slot: 22
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to the previous menu.'
+    left_click_commands:
+      - '[menu] warp_info %warp_name%'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-26
+```
+
+</details>
+
+<details>
+<summary>`warp_trusted.yml`</summary>
+
+```yaml filename="menus/warp_trusted.yml"
+menu_title: '&8Trusted Players'
+size: 54
+
+content:
+  source: trusted
+  slots:
+    - 0-44
+  item:
+    material: PLAYER_HEAD
+    display_name: '&#FFEE00&l%player%'
+    lore:
+      - '&#54ADF4Last seen: &f%date%'
+      - ''
+      - '&#FF2D2DClick to remove'
+    left_click_commands:
+      - '[untrust] %warp_name% %player%'
+      - '[refresh]'
+  empty:
+    material: LIGHT_GRAY_STAINED_GLASS_PANE
+    display_name: '&#FFA42D&lNobody is trusted'
+    lore:
+      - '&7Use the button below to add players.'
+  previous:
+    material: ARROW
+    slot: 48
+    display_name: '&#54ADF4&lPrevious Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+  next:
+    material: ARROW
+    slot: 50
+    display_name: '&#54ADF4&lNext Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+
+
+items:
+  add:
+    material: EMERALD
+    slot: 47
+    display_name: '&#56FF00&lTrust a player'
+    lore:
+      - '&7Trusted players can enter even'
+      - '&7when the warp is private or closed.'
+      - ''
+      - '&#FF9E08Click to write the name'
+    left_click_commands:
+      - '[input] trust warp_trusted'
+  back:
+    material: BOOK
+    slot: 49
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to the previous menu.'
+    left_click_commands:
+      - '[menu] warp_edit %warp_name%'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-53
+```
+
+</details>
+
+<details>
+<summary>`warp_bans.yml`</summary>
+
+```yaml filename="menus/warp_bans.yml"
+menu_title: '&8Banned Players'
+size: 54
+
+content:
+  source: banned
+  slots:
+    - 0-44
+  item:
+    material: PLAYER_HEAD
+    display_name: '&#FF2D2D&l%player%'
+    lore:
+      - '&#54ADF4Last seen: &f%date%'
+      - ''
+      - '&#FF9E08Click to unban'
+    left_click_commands:
+      - '[unban] %warp_name% %player%'
+      - '[refresh]'
+  empty:
+    material: LIGHT_GRAY_STAINED_GLASS_PANE
+    display_name: '&#56FF00&lNobody is banned'
+    lore:
+      - '&7Use the button below to ban players.'
+  previous:
+    material: ARROW
+    slot: 48
+    display_name: '&#54ADF4&lPrevious Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+  next:
+    material: ARROW
+    slot: 50
+    display_name: '&#54ADF4&lNext Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+
+
+items:
+  add:
+    material: BARRIER
+    slot: 47
+    display_name: '&#FF2D2D&lBan a player'
+    lore:
+      - '&7Banned players cannot visit'
+      - '&7this warp at all.'
+      - ''
+      - '&#FF9E08Click to write the name'
+    left_click_commands:
+      - '[input] ban warp_bans'
+  back:
+    material: BOOK
+    slot: 49
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to the previous menu.'
+    left_click_commands:
+      - '[menu] warp_edit %warp_name%'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-53
+```
+
+</details>
+
+<details>
+<summary>`warp_delete.yml`</summary>
+
+```yaml filename="menus/warp_delete.yml"
+menu_title: '&8Delete Warp'
+size: 27
+
+items:
+  info:
+    material: PAPER
+    slot: 13
+    display_name: '&#FF2D2D&lDelete %warp_name%?'
+    lore:
+      - '&7You are about to delete &f%warp_name%'
+      - '&7with &f%warp_visits% &7visits and'
+      - '&f%warp_votes% &7ratings.'
+      - ''
+      - '&#FF2D2DThis cannot be undone.'
+
+  accept:
+    material: LIME_CONCRETE
+    slot: 11
+    display_name: '&#56FF00&lConfirm'
+    lore:
+      - '&7Delete this warp forever.'
+    left_click_commands:
+      - '[delete] %warp_name%'
+
+  cancel:
+    material: RED_CONCRETE
+    slot: 15
+    display_name: '&#FF2D2D&lCancel'
+    lore:
+      - '&7Keep the warp.'
+    left_click_commands:
+      - '[menu] warp_edit %warp_name%'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-26
+```
+
+</details>
+
+### Passport
+
+<details>
+<summary>`passport.yml`</summary>
+
+```yaml filename="menus/passport.yml"
+menu_title: '&8Passport'
+size: 54
+
+content:
+  source: milestones
+  slots:
+    - 19-25
+    - 28-34
+  item:
+    material: GRAY_DYE
+    display_name: '&#FFEE00&l%amount% warps'
+    lore:
+      - '&#54ADF4Reward: &f%pearls% pearls'
+      - '%extra%'
+      - ''
+      - '%state%'
+  empty:
+    material: FILLED_MAP
+    display_name: '&#FFA42D&lNo milestones'
+    lore:
+      - '&7Nothing is configured in config.yml.'
+  previous:
+    material: ARROW
+    slot: 48
+    display_name: '&#54ADF4&lPrevious Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+  next:
+    material: ARROW
+    slot: 50
+    display_name: '&#54ADF4&lNext Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+
+
+items:
+  back:
+    material: BOOK
+    slot: 49
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to the main menu.'
+    left_click_commands:
+      - '[menu] main'
+  summary:
+    material: FILLED_MAP
+    slot: 4
+    display_name: '&#FFEE00&lTravel Log'
+    lore:
+      - '&#54ADF4Stamps: &f%aquawarps_stamps%'
+      - '&#54ADF4Rank: %aquawarps_rank%'
+      - '&#54ADF4Next rank: %aquawarps_next_rank%'
+      - '&#54ADF4Pearls: &f%aquawarps_pearls%'
+      - ''
+      - '%aquawarps_rank_progress%'
+
+  recent:
+    material: CLOCK
+    slot: 47
+    display_name: '&#FFEE00&lRecent Stamps'
+    lore:
+      - '&7The last warps you discovered.'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] stamps'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-53
+```
+
+</details>
+
+<details>
+<summary>`stamps.yml`</summary>
+
+```yaml filename="menus/stamps.yml"
+menu_title: '&8Recent Stamps'
+size: 54
+
+content:
+  source: stamps
+  slots:
+    - 0-44
+  item:
+    material: GRASS_BLOCK
+    display_name: '%promotion_prefix%&#FFEE00&l%name%'
+    lore:
+      - '&7by &f%owner%'
+      - ''
+      - '&7%description%'
+      - ''
+      - '&#54ADF4Category: %category%'
+      - '&#54ADF4Rating: %stars% &7(%votes%)'
+      - '&#54ADF4Visits: &f%visits% &8| &#54ADF4Saved: &f%favorites%'
+      - '&#54ADF4Level: &f%level% &8%level_bar%'
+      - '&#54ADF4Tags: %tags%'
+      - '&#54ADF4World: &f%world%'
+      - '%promotion%'
+      - ''
+      - '&#FF9E08Left click to travel'
+      - '&#FF9E08Right click for details'
+      - '&#FF9E08Shift + left click to save'
+    left_click_commands:
+      - '[warp] %name%'
+    right_click_commands:
+      - '[menu] warp_info %name%'
+    shift_left_click_commands:
+      - '[favorite] %name%'
+      - '[refresh]'
+  empty:
+    material: STRUCTURE_VOID
+    display_name: '&#FFA42D&lNo warps'
+    lore:
+      - '&7Nothing matches these filters yet.'
+  previous:
+    material: ARROW
+    slot: 48
+    display_name: '&#54ADF4&lPrevious Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+  next:
+    material: ARROW
+    slot: 50
+    display_name: '&#54ADF4&lNext Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+
+
+items:
+  back:
+    material: BOOK
+    slot: 49
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to the previous menu.'
+    left_click_commands:
+      - '[menu] passport'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-53
+```
+
+</details>
+
+### Staff
+
+<details>
+<summary>`admin.yml`</summary>
+
+```yaml filename="menus/admin.yml"
+menu_title: '&8Administration'
+permission: 'aquawarps.admin'
+size: 45
+
+items:
+  reports:
+    material: REDSTONE_TORCH
+    slot: 10
+    permission: 'aquawarps.admin'
+    display_name: '&#FF2D2D&lReports'
+    lore:
+      - '&7Review what players reported.'
+      - ''
+      - '&#54ADF4Pending: &f%aquawarps_reports%'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] reports'
+
+  all_warps:
+    material: COMPASS
+    slot: 11
+    permission: 'aquawarps.admin'
+    display_name: '&#FFEE00&lAll Warps'
+    lore:
+      - '&7Every warp, private and hidden'
+      - '&7ones included.'
+      - ''
+      - '&#54ADF4Total: &f%aquawarps_total%'
+      - ''
+      - '&#FF9E08Click to open'
+    left_click_commands:
+      - '[menu] all_warps'
+
+  stats:
+    material: PAPER
+    slot: 12
+    permission: 'aquawarps.admin'
+    display_name: '&#FFEE00&lStatistics'
+    lore:
+      - '&#54ADF4Warps: &f%aquawarps_total%'
+      - '&#54ADF4Promoted: &f%aquawarps_promoted%'
+      - '&#54ADF4Hidden: &f%aquawarps_hidden%'
+      - '&#54ADF4Categories: &f%aquawarps_categories%'
+      - '&#54ADF4Pending reports: &f%aquawarps_reports%'
+
+  purge:
+    material: LAVA_BUCKET
+    slot: 13
+    permission: 'aquawarps.admin'
+    display_name: '&#FF2D2D&lPurge Inactive'
+    lore:
+      - '&7Delete warps whose owners have'
+      - '&7not logged in for a long time.'
+      - ''
+      - '&#FF9E08Click to write the days'
+    left_click_commands:
+      - '[input] purge admin'
+
+  back:
+    material: BOOK
+    slot: 40
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to the main menu.'
+    left_click_commands:
+      - '[menu] main'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-44
+```
+
+</details>
+
+<details>
+<summary>`reports.yml`</summary>
+
+```yaml filename="menus/reports.yml"
+menu_title: '&8Reports'
+permission: 'aquawarps.admin'
+size: 54
+
+content:
+  source: reports
+  slots:
+    - 0-44
+  item:
+    material: PAPER
+    display_name: '&#FF2D2D&l%name%'
+    lore:
+      - '&#54ADF4Owner: &f%owner%'
+      - '&#54ADF4Reported by: &f%reporter%'
+      - '&#54ADF4Reason: &f%reason%'
+      - '&#54ADF4Reports on this warp: &f%total%'
+      - '&8%date%'
+      - ''
+      - '&#FF9E08Left click to visit the warp'
+      - '&#56FF00Right click to resolve'
+      - '&#FF2D2DShift + right click to delete the warp'
+    left_click_commands:
+      - '[warp] %name%'
+    right_click_commands:
+      - '[resolve] %id%'
+      - '[refresh]'
+    shift_right_click_commands:
+      - '[resolve-delete] %id%'
+      - '[refresh]'
+  empty:
+    material: LIME_STAINED_GLASS_PANE
+    display_name: '&#56FF00&lNo pending reports'
+    lore:
+      - '&7Everything is quiet around here.'
+  previous:
+    material: ARROW
+    slot: 48
+    display_name: '&#54ADF4&lPrevious Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+  next:
+    material: ARROW
+    slot: 50
+    display_name: '&#54ADF4&lNext Page'
+    lore:
+      - '&7Page &f%page%&7/&f%pages%'
+
+
+items:
+  back:
+    material: BOOK
+    slot: 49
+    display_name: '&#54ADF4&lBack'
+    lore:
+      - '&7Return to the previous menu.'
+    left_click_commands:
+      - '[menu] admin'
+
+filler:
+  enabled: false
+  material: BLACK_STAINED_GLASS_PANE
+  display_name: ' '
+  custom-model-data: 0
+  slots:
+    - 0-53
+```
+
+</details>
