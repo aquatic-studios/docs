@@ -1,0 +1,258 @@
+---
+title: Configuration
+description: Graves, protection, death rules, pickup, teleport, storage, worlds, denied items and sounds.
+---
+
+import { Callout } from 'nextra/components'
+
+# Configuration
+
+Everything lives in `config.yml` and applies with `/aquagraves reload`, except the options marked as
+needing a restart.
+
+## Graves
+
+```yaml filename="config.yml"
+grave:
+  despawn-time-seconds: 300
+  despawn-when-empty: true
+  drop-items-on-despawn: true
+  dropped-item-velocity: true
+  limit: 3
+  limit-reached: REMOVE_OLDEST
+  max-interact-distance: 6.0
+  allow-deposits: true
+  close-gui-when-far: true
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `despawn-time-seconds` | `300` | How long a grave stays. `-1` never despawns |
+| `despawn-when-empty` | `true` | Removes it once the last item and the last xp point are taken |
+| `drop-items-on-despawn` | `true` | Drops what is left when it despawns. Off deletes it |
+| `dropped-item-velocity` | `true` | Off keeps dropped items on the grave block instead of flying around |
+| `limit` | `3` | Graves one player can own at once. `-1` disables it |
+| `limit-reached` | `REMOVE_OLDEST` | What happens when a player at the limit dies |
+| `max-interact-distance` | `6.0` | Blocks a player can be from a grave to open or loot it |
+| `allow-deposits` | `true` | Off makes graves take only |
+| `close-gui-when-far` | `true` | Closes the grave GUI when the player walks out of range |
+
+| `limit-reached` | Does |
+| --- | --- |
+| `REMOVE_OLDEST` | Removes the oldest grave, its contents drop, and the new one spawns |
+| `DENY` | No new grave, the items drop on the ground like vanilla |
+
+`aquagraves.limit.<amount>` and `aquagraves.limit.unlimited` override `limit` per rank.
+
+## Protection
+
+Graves behave like a locked chest for a while, so nobody can camp a corpse the second someone dies.
+
+```yaml filename="config.yml"
+protection:
+  enabled: true
+  duration-seconds: 120
+  on-expire: UNLOCK
+  notify-owner: true
+  always-owner-only: false
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `enabled` | `true` | Off makes every grave public from the start |
+| `duration-seconds` | `120` | How long it stays locked to its owner. `0` locks it for its whole life |
+| `on-expire` | `UNLOCK` | What happens when the lock runs out |
+| `notify-owner` | `true` | Tells the owner when their grave unlocks |
+| `always-owner-only` | `false` | Keeps the grave owner only even after it unlocks |
+
+| `on-expire` | Does |
+| --- | --- |
+| `UNLOCK` | Anyone can open and loot it for the rest of its life |
+| `REMOVE` | It despawns instead, following `drop-items-on-despawn` |
+
+`aquagraves.protection.<seconds>` extends the lock per rank, and `aquagraves.bypass.protection`
+ignores it.
+
+## Death
+
+```yaml filename="config.yml"
+death:
+  store-items: true
+  store-xp: true
+  xp-keep-percentage: 1.0
+  override-keep-inventory: false
+  override-keep-level: false
+  listener-priority: HIGHEST
+  disabled-worlds:
+    - example_world
+  blacklisted-death-causes:
+    - VOID
+  item-order:
+    - ARMOR
+    - HAND
+    - OFFHAND
+  send-coordinates: true
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `store-items` | `true` | Keeps the drops inside the grave |
+| `store-xp` | `true` | Keeps the dropped experience inside the grave |
+| `xp-keep-percentage` | `1.0` | Share of that experience the player gets back. `0.5` is half |
+| `override-keep-inventory` | `false` | Takes the items even when another plugin or `keepInventory` wants to keep them |
+| `override-keep-level` | `false` | Same for experience levels |
+| `listener-priority` | `HIGHEST` | When the death listener runs. Needs a restart |
+| `disabled-worlds` | `example_world` | Worlds with no graves, case sensitive |
+| `blacklisted-death-causes` | `VOID` | [Death causes](https://hub.spigotmc.org/javadocs/spigot/org/bukkit/event/entity/EntityDamageEvent.DamageCause.html) that never leave a grave |
+| `item-order` | armor, hand, offhand | Which items go first in the grave. `ARMOR`, `HAND`, `OFFHAND` |
+| `send-coordinates` | `true` | Sends the death coordinates to the player |
+
+<Callout type="info">
+  If graves spawn empty, another plugin is taking the drops first. Lower `listener-priority` to
+  `HIGH`, `NORMAL`, `LOW` or `LOWEST` and restart.
+</Callout>
+
+## Pickup
+
+```yaml filename="config.yml"
+pickup:
+  instant-pickup: true
+  instant-pickup-only-own: false
+  auto-equip-armor: true
+  xp-on-interact: true
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `instant-pickup` | `true` | Shift + right click takes everything, no GUI |
+| `instant-pickup-only-own` | `false` | Only the owner may do that, the rest use the GUI |
+| `auto-equip-armor` | `true` | Puts armor and the elytra straight back on empty armor slots |
+| `xp-on-interact` | `true` | Gives the stored experience back the moment the grave is touched |
+
+Whatever does not fit in the inventory stays in the grave.
+
+## Teleport
+
+```yaml filename="config.yml"
+teleport:
+  enabled: true
+  only-own: true
+  cooldown-seconds: 30
+  warmup-seconds: 3
+  cancel-on-move: true
+  cancel-on-damage: true
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `enabled` | `true` | Off disables `/aquagraves tp` |
+| `only-own` | `true` | Players can only travel to their own graves. `aquagraves.teleport.others` ignores it |
+| `cooldown-seconds` | `30` | Wait between teleports. `0` disables it, `aquagraves.bypass.cooldown` ignores it |
+| `warmup-seconds` | `3` | Seconds standing still before the teleport. `0` is instant |
+| `cancel-on-move` / `cancel-on-damage` | `true` | What interrupts the warmup |
+
+## Storage
+
+```yaml filename="config.yml"
+storage:
+  save-interval-seconds: 60
+  save-on-change: true
+  save-coalesce-ticks: 100
+  backups:
+    enabled: true
+    keep-per-player: 5
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `save-on-change` | `true` | Writes shortly after a grave is opened, looted or closed |
+| `save-coalesce-ticks` | `100` | How long changes pile up before one write. `100` is 5 seconds |
+| `save-interval-seconds` | `60` | Only used with `save-on-change` off. `-1` saves on shutdown only |
+| `backups.enabled` | `true` | Keeps the contents of removed graves for `/aquagraves restore` |
+| `backups.keep-per-player` | `5` | Removed graves remembered per player, the oldest is dropped |
+
+<Callout type="warning">
+  Keep `save-on-change` on. It is what stops a crash from duplicating items. Every change inside the
+  window rides along with the same write, so a hundred players looting at once still cost one write.
+</Callout>
+
+Graves are stored in `graves.dat` and backups in `backups.dat`, both inside the plugin folder.
+
+## Worlds
+
+```yaml filename="config.yml"
+spawn-height-limits:
+  world:
+    min: -64
+    max: 319
+  world_nether:
+    min: 0
+    max: 255
+  world_the_end:
+    min: 0
+    max: 255
+
+world-name:
+  world: "Overworld"
+  world_nether: "The Nether"
+  world_the_end: "The End"
+```
+
+`spawn-height-limits` keeps graves out of the void and under the build limit. Worlds not listed use
+the limits of their dimension.
+
+`world-name` is what `%world%` prints. Worlds not listed keep their real name, case sensitive.
+
+## Denied items
+
+Items destroyed on death that never show up in a grave.
+
+```yaml filename="config.yml"
+denied-section:
+  items:
+    - BARRIER
+    - BEDROCK
+  names:
+    - "&cSoulbound"
+```
+
+`items` matches materials, `names` matches any item whose name contains that text.
+
+## Sounds
+
+```yaml filename="config.yml"
+sounds:
+  spawn: "entity.wither.spawn"
+  open: "block.chest.open"
+  pickup: "entity.item.pickup"
+  unlock: "block.chest.locked"
+  despawn: "block.fire.extinguish"
+  volume: 0.6
+  pitch: 1.4
+```
+
+Namespaced keys, not the old enum names. `""` disables one.
+
+## Commands
+
+```yaml filename="config.yml"
+command-aliases:
+  - aquagraves
+  - agraves
+  - graves
+  - grave
+
+update-notify: true
+debug: false
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `command-aliases` | 4 labels | Labels registered, the first is the main one. Needs a restart |
+| `update-notify` | `true` | Checks SpigotMC on startup and tells staff with `aquagraves.update` on join |
+| `debug` | `false` | Extra console output, only when asked to |
+
+## Config updates
+
+`config.yml` and `messages.yml` carry a `version` at the bottom. When a release adds options they
+are added on startup, keeping your values. Leave `version` alone.

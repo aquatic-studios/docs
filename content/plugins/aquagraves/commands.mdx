@@ -1,0 +1,83 @@
+---
+title: Commands
+description: Every AquaGraves command and permission.
+---
+
+import { Callout } from 'nextra/components'
+
+# Commands
+
+Base `/aquagraves`. Aliases: `/agraves`, `/graves`, `/grave`. The labels are set in
+[`command-aliases`](./configuration#commands).
+
+| Command | Permission | What it does |
+| --- | --- | --- |
+| `/aquagraves` | | Version and author |
+| `/aquagraves help` | | Command list |
+| `/aquagraves tp [player] [#]` | `aquagraves.teleport` | Travels to a grave. Without a number, the newest one |
+| `/aquagraves list [player] [page]` | `aquagraves.list` | Graves of a player, 8 per page. Click a line to travel |
+| `/aquagraves near [radius]` | `aquagraves.near` | Graves around you. Default `32`, max `512` |
+| `/aquagraves info` | `aquagraves.info` | Details of the grave closest to you, within 8 blocks |
+| `/aquagraves remove [player\|all]` | `aquagraves.remove` | Removes graves. Without arguments, the closest one |
+| `/aquagraves restore <player> [#]` | `aquagraves.restore` | Hands back the contents of a removed grave |
+| `/aquagraves purge` | `aquagraves.purge` | Deletes every grave without dropping anything. Backups are kept |
+| `/aquagraves stats` | `aquagraves.stats` | Graves, items, backups, holograms and platform |
+| `/aquagraves reload` | `aquagraves.reload` | Reloads `config.yml` and `messages.yml` |
+
+`#` is the position in `/aquagraves list`, where `1` is the newest grave.
+
+<Callout type="error">
+  `/aquagraves purge` needs `/aquagraves purge confirm` within 30 seconds. Every grave and its items
+  are gone for good.
+</Callout>
+
+## Removing and restoring
+
+`remove` drops the contents on the ground and keeps a [backup](./configuration#storage). A grave
+that expires, unlocks into removal or gets replaced by the limit keeps one too. A grave emptied by
+its owner does not. `restore`
+gives that backup to the owner if they are online, or to you if they are not. A backup is used up
+once restored, so the same grave can never be handed back twice.
+
+<Callout type="warning">
+  A grave that expired already dropped its items in the world. Restoring it gives them out a second
+  time, so check before you run it.
+</Callout>
+
+## Permissions
+
+| Permission | Default | Grants |
+| --- | --- | --- |
+| `aquagraves.use` | everyone | Getting a grave on death. Without it items drop like vanilla |
+| `aquagraves.teleport` | everyone | `/aquagraves tp` to your own graves |
+| `aquagraves.teleport.others` | op | Travelling to other players' graves |
+| `aquagraves.list` | everyone | `/aquagraves list` for yourself |
+| `aquagraves.list.others` | op | Listing other players' graves |
+| `aquagraves.near` | op | `/aquagraves near` |
+| `aquagraves.info` | op | `/aquagraves info` |
+| `aquagraves.remove` | op | `/aquagraves remove` |
+| `aquagraves.restore` | op | `/aquagraves restore` |
+| `aquagraves.purge` | op | `/aquagraves purge` |
+| `aquagraves.stats` | op | `/aquagraves stats` |
+| `aquagraves.reload` | op | `/aquagraves reload` |
+| `aquagraves.update` | op | The update notice on join |
+| `aquagraves.admin` | op | Everything above and every bypass |
+
+## Per rank
+
+| Permission | Does |
+| --- | --- |
+| `aquagraves.limit.<amount>` | Graves a player can own at once |
+| `aquagraves.limit.unlimited` | No limit |
+| `aquagraves.protection.<seconds>` | How long their graves stay locked |
+
+The **highest** node wins, they do not add up. Players with none use `grave.limit` and
+`protection.duration-seconds`.
+
+## Bypasses
+
+| Permission | Ignores |
+| --- | --- |
+| `aquagraves.bypass.protection` | Locked graves, and `always-owner-only` |
+| `aquagraves.bypass.cooldown` | The wait between teleports |
+| `aquagraves.bypass.*` | Both |

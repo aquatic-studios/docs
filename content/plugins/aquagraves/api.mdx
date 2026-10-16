@@ -1,0 +1,158 @@
+---
+title: Developer API
+description: Read and create graves from another plugin and listen to its events.
+---
+
+import { Callout, Tabs } from 'nextra/components'
+
+# Developer API
+
+AquaGraves registers `AquaGravesAPI` as a Bukkit service. Grab it once your plugin enables.
+
+```yaml filename="plugin.yml"
+softdepend: [AquaGraves]
+```
+
+<Callout type="warning">
+  Depend on it at compile time only. The plugin ships the implementation at runtime, so shading it
+  will break your add on.
+</Callout>
+
+## Install
+
+<Tabs items={['Gradle (Kotlin)', 'Maven']}>
+  <Tabs.Tab>
+```kotlin filename="build.gradle.kts"
+repositories {
+    maven("https://jitpack.io")
+}
+
+dependencies {
+    compileOnly("com.github.aquatic-studios:AquaGraves:VERSION")
+}
+```
+  </Tabs.Tab>
+  <Tabs.Tab>
+```xml filename="pom.xml"
+<repository>
+    <id>jitpack.io</id>
+    <url>https://jitpack.io</url>
+</repository>
+
+<dependency>
+    <groupId>com.github.aquatic-studios</groupId>
+    <artifactId>AquaGraves</artifactId>
+    <version>VERSION</version>
+    <scope>provided</scope>
+</dependency>
+```
+  </Tabs.Tab>
+</Tabs>
+
+## Getting it
+
+```java
+AquaGravesAPI api = AquaGravesAPI.get();
+if (api == null) return;
+```
+
+`get()` returns `null` while AquaGraves is not enabled.
+
+## Reading
+
+| Method | Returns |
+| --- | --- |
+| `graves()` | Every grave in the world |
+| `gravesOf(UUID owner)` / `gravesOf(OfflinePlayer owner)` | That player's graves, newest first |
+| `graveCount()` | How many graves exist |
+| `grave(UUID id)` | One by id, or `null` |
+| `graveAt(Location location)` | The grave at that block, or `null` |
+| `gravesNear(Location center, double radius)` | Graves around a point, closest first |
+| `graveLimit(Player player)` | Their limit, `-1` when unlimited |
+| `protectionSeconds(Player player)` | How long their graves stay locked |
+
+```java
+for (Grave grave : api.gravesOf(player)) {
+    getLogger().info(grave.ownerName() + " " + grave.itemCount() + " items at " + grave.location());
+}
+```
+
+## Writing
+
+```java
+Grave grave = api.createGrave(
+        location,
+        player,
+        items,
+        250,
+        120);
+```
+
+| Method | Does |
+| --- | --- |
+| `createGrave(location, owner, items, storedXp, protectionSeconds)` | Spawns a grave. A `protectionSeconds` of `0` or less locks it for its whole life |
+| `removeGrave(grave)` | Removes it with the `PLUGIN` reason, dropping its contents |
+
+## Grave
+
+| Method | Returns |
+| --- | --- |
+| `id()` | Its id |
+| `ownerId()` / `ownerName()` / `owner()` | The owner |
+| `world()` / `location()` | Where it is |
+| `createdAt()` | When it spawned, in milliseconds |
+| `inventory()` | The inventory behind the GUI |
+| `storedXp()` | Experience inside |
+| `itemCount()` / `stackCount()` / `isEmpty()` | What is inside |
+| `remainingMillis()` | Time until it despawns |
+| `isProtected()` | Whether it is still locked |
+| `isRemoved()` | Whether it is gone |
+| `canAccess(Player player)` | Whether that player may open it |
+| `open(Player player)` | Opens the GUI for them |
+| `loot(Player player)` | Gives them everything at once |
+| `remove(RemoveReason reason)` | Removes it |
+
+## Remove reasons
+
+| Reason | Drops the contents | Keeps a backup |
+| --- | --- | --- |
+| `EXPIRED` | Yes | Yes |
+| `PROTECTION_EXPIRED` | Yes | Yes |
+| `EMPTIED` | No | No |
+| `LIMIT` | Yes | Yes |
+| `COMMAND` | Yes | Yes |
+| `PURGE` | No | Yes |
+| `PLUGIN` | Yes | Yes |
+
+Drops follow `drop-items-on-despawn`, and backups need `storage.backups.enabled`.
+
+## Events
+
+| Event | Fires | Cancellable |
+| --- | --- | --- |
+| `GravePreSpawnEvent` | A player died and a grave is about to spawn | Yes |
+| `GraveSpawnEvent` | The grave spawned from a death. Not fired by `createGrave` | No |
+| `GraveOpenEvent` | A player opens the GUI | Yes |
+| `GraveLootEvent` | A player takes everything with shift + right click | Yes |
+| `GraveUnlockEvent` | The protection ran out and the grave opened to everyone. Not fired with `on-expire: REMOVE` | No |
+
+| Event | Gives |
+| --- | --- |
+| `GravePreSpawnEvent` | `getPlayer()`, `getLocation()`, `setLocation(Location)` |
+| `GraveSpawnEvent` | `getPlayer()`, `getGrave()` |
+| `GraveOpenEvent` / `GraveLootEvent` | `getPlayer()`, `getGrave()` |
+| `GraveUnlockEvent` | `getGrave()` |
+
+Every event except `GravePreSpawnEvent` extends `GraveEvent`.
+
+```java
+@EventHandler
+public void onPreSpawn(GravePreSpawnEvent event) {
+    if (event.getLocation().getWorld().getName().equals("arena")) {
+        event.setCancelled(true);
+    }
+}
+```
+
+Cancelling `GravePreSpawnEvent` leaves the drops to vanilla, and `setLocation` moves the grave
+somewhere else.

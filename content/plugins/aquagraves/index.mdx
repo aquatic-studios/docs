@@ -1,0 +1,46 @@
+---
+title: AquaGraves
+description: Graves that keep a player's items and experience safe where they died.
+asIndexPage: true
+---
+
+import { Callout } from 'nextra/components'
+
+# AquaGraves
+
+When a player dies their items and experience go into a grave instead of the ground. The grave is a
+floating head with a hologram, locked to its owner for a while, and it despawns on its own after a
+set time.
+
+**Soft-depend:** PlaceholderAPI
+
+## A grave
+
+1. A player dies. Their drops and experience are stored in a grave where they fell.
+2. The hologram shows the owner, the items, the experience and both countdowns.
+3. Right click opens it like a chest. Shift + right click takes everything at once.
+4. When the protection ends the grave unlocks for everyone, or despawns, depending on the config.
+5. When the despawn timer ends, whatever is left drops on the ground.
+
+## Protection
+
+| State | Who can open it |
+| --- | --- |
+| Locked | Only the owner, for `protection.duration-seconds` |
+| Unlocked | Anyone, unless `always-owner-only` is on |
+
+`aquagraves.bypass.protection` opens any grave at any time.
+
+## Files
+
+| File | Holds |
+| --- | --- |
+| `config.yml` | Graves, protection, death rules, pickup, appearance, teleport, storage |
+| `messages.yml` | Every string, the hologram lines and the GUI title |
+| `graves.dat` | Every grave in the world |
+| `backups.dat` | Contents of removed graves, for `/aquagraves restore` |
+
+<Callout type="info">
+  There is no database to set up. Graves are saved to `graves.dat` a few seconds after any change, so
+  a crash never duplicates items.
+</Callout>

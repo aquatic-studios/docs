@@ -1,0 +1,67 @@
+---
+title: Placeholders
+description: PlaceholderAPI placeholders and the grave values used in holograms and messages.
+---
+
+import { Callout } from 'nextra/components'
+
+# Placeholders
+
+AquaGraves registers one PlaceholderAPI expansion, `aquagraves`.
+
+<Callout type="info">
+  PlaceholderAPI is optional. Holograms, messages and the GUI title use the grave placeholders below
+  without it.
+</Callout>
+
+## Server
+
+These need no player, so they work on the console and in server wide displays.
+
+| Placeholder | Returns |
+| --- | --- |
+| `%aquagraves_total%` | Graves in the world |
+| `%aquagraves_owners%` | Players who own at least one |
+
+## Player
+
+| Placeholder | Returns |
+| --- | --- |
+| `%aquagraves_graves%` | Graves they own |
+| `%aquagraves_limit%` | How many they may own, `∞` when unlimited |
+| `%aquagraves_protected%` | How many of theirs are still locked |
+
+## Newest grave
+
+Values of the player's newest grave. Empty when they have none.
+
+| Placeholder | Returns |
+| --- | --- |
+| `%aquagraves_last_world%` | World, using `world-name` |
+| `%aquagraves_last_x%` / `%aquagraves_last_y%` / `%aquagraves_last_z%` | Coordinates |
+| `%aquagraves_last_items%` | Items inside |
+| `%aquagraves_last_xp%` | Experience inside |
+| `%aquagraves_last_despawn%` | Time until it despawns |
+| `%aquagraves_last_protection%` | Time until it unlocks |
+| `%aquagraves_last_locked%` | `true` or `false` |
+
+## Grave placeholders
+
+Inside the hologram lines, the GUI title and every message about a grave.
+
+| Placeholder | Returns |
+| --- | --- |
+| `%player%` | Owner |
+| `%items%` | Items inside |
+| `%stacks%` | Stacks inside |
+| `%xp%` | Experience inside |
+| `%despawn-time%` | Time until it despawns |
+| `%protection-time%` | Time until it unlocks |
+| `%lock-status%` | `hologram-locked` or `hologram-unlocked` |
+| `%age%` | Time since it spawned |
+| `%viewers%` | Players with it open |
+| `%world%` | World, using `world-name` |
+| `%x%` / `%y%` / `%z%` | Block coordinates |
+| `%id%` | Short id, the first 8 characters |
+
+`list.entry` and `list.entry-hover` also have `%index%`, the number used by `/aquagraves tp`.

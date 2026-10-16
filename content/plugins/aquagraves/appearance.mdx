@@ -1,0 +1,103 @@
+---
+title: Appearance
+description: The floating head, the hologram, its lines and the grave GUI.
+---
+
+import { Callout } from 'nextra/components'
+
+# Appearance
+
+A grave is a floating player head with a hologram above it. Both are set under `appearance` in
+`config.yml`, and the text is in `messages.yml`.
+
+## Head
+
+```yaml filename="config.yml"
+appearance:
+  head-height: -1.2
+  rotate-head-360: true
+  auto-rotation:
+    enabled: false
+    speed: 10.0
+  custom-skull:
+    enabled: false
+    base64: ""
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `head-height` | `-1.2` | Height of the head relative to the grave. Lower it if it clips into the ground |
+| `rotate-head-360` | `true` | Faces the exact direction the player died looking at. Off snaps to north, east, south or west |
+| `auto-rotation` | off | Spins the head slowly. Costs a packet per second per grave |
+| `custom-skull` | off | One skull for every grave instead of each player's own head, from a base64 texture |
+
+## Hologram
+
+```yaml filename="config.yml"
+  hologram:
+    enabled: true
+    type: AUTO
+    height: 0.30
+    line-height: 0.28
+    view-distance: 48
+    update-interval-ticks: 20
+    background-color: "00000000"
+    alignment: CENTER
+    billboard: VERTICAL
+    see-through: false
+    shadow: true
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `type` | `AUTO` | `TEXT_DISPLAY`, `ARMOR_STAND`, or `AUTO` to pick text displays on 1.19.4+ |
+| `height` | `0.30` | Height of the bottom line above the grave |
+| `line-height` | `0.28` | Gap between lines. Armor stands only |
+| `view-distance` | `48` | Holograms only refresh while a player is this close. Lower it on big servers |
+| `update-interval-ticks` | `20` | How often the countdown refreshes. `20` is once a second |
+
+Text display only:
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `background-color` | `00000000` | `AARRGGBB` in hex. `00000000` is invisible |
+| `alignment` | `CENTER` | `LEFT`, `RIGHT` or `CENTER` |
+| `billboard` | `VERTICAL` | `FIXED`, `VERTICAL`, `HORIZONTAL` or `CENTER` |
+| `see-through` | `false` | Draws the text through blocks |
+| `shadow` | `true` | Outline behind the text |
+
+## Lines
+
+```yaml filename="messages.yml"
+hologram:
+  - "&#33CCFF&l%player%"
+  - "&#8BD5FF%items% &fitems &7| &#8BD5FF%xp% &fxp"
+  - "%lock-status% &7| &#8BD5FF%despawn-time%"
+
+hologram-locked: "&#FFA42D&lLOCKED &f%protection-time%"
+hologram-unlocked: "&#56FF00&lUNLOCKED"
+hologram-forever: "&#8BD5FF∞"
+```
+
+| Key | Is |
+| --- | --- |
+| `hologram` | The lines, top to bottom. Add or remove freely |
+| `hologram-locked` | What `%lock-status%` prints while the grave is protected |
+| `hologram-unlocked` | What it prints once it is open to everyone |
+| `hologram-forever` | Printed instead of a countdown when a timer never ends |
+
+Every [grave placeholder](./placeholders#grave-placeholders) works in the lines.
+
+## GUI
+
+```yaml filename="messages.yml"
+gui-title: "&0%player%&0's Grave"
+```
+
+The grave opens as a chest with this title. Items keep the order set in
+[`death.item-order`](./configuration#death).
+
+<Callout type="info">
+  Time units in every countdown come from the `time` section of `messages.yml`, so `4m 30s` can be
+  translated to any language.
+</Callout>
