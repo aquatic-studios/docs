@@ -1,0 +1,50 @@
+---
+title: Commands
+description: Every AquaBook command and permission.
+---
+
+import { Callout } from 'nextra/components'
+
+# Commands
+
+Base `/aquabook`. Aliases: `/abook`, `/news`, `/novedades`.
+
+| Command | Permission | What it does |
+| --- | --- | --- |
+| `/aquabook` | | Version and author |
+| `/aquabook help` | | Command list |
+| `/aquabook menu` | `aquabook.use` | Opens the news history |
+| `/aquabook open <id>` | `aquabook.use` | Opens one entry. `/aquabook <id>` does the same |
+| `/aquabook create <id>` | `aquabook.create` | Turns the written book in your hand into an entry |
+| `/aquabook create template` | `aquabook.create` | Writes the commented example to `news/` |
+| `/aquabook delete <id>` | `aquabook.delete` | Deletes the entry and its file |
+| `/aquabook setlikes <id> <amount>` | `aquabook.setlikes` | Sets the likes an entry starts with |
+| `/aquabook unread <id>` | `aquabook.unread` | Marks an entry unread again for yourself, removing your like |
+| `/aquabook list` | `aquabook.list` | Every entry with its date, likes and opens |
+| `/aquabook storage` | `aquabook.storage` | Backend, Redis and how much is stored |
+| `/aquabook reload` | `aquabook.reload` | Reloads `config.yml`, `messages.yml` and every entry |
+
+`create` saves the title, author and pages of the held book, stamps today's date and makes it the
+newest entry, so it is the one that greets players on join. The id keeps letters, digits, `-` and
+`_` only.
+
+<Callout type="info">
+  With Redis on, `create`, `delete` and `reload` also reload every other server of the network.
+</Callout>
+
+## Permissions
+
+| Permission | Default | Grants |
+| --- | --- | --- |
+| `aquabook.use` | everyone | The history, opening entries and the book on join |
+| `aquabook.create` | op | `/aquabook create` |
+| `aquabook.delete` | op | `/aquabook delete` |
+| `aquabook.setlikes` | op | `/aquabook setlikes` |
+| `aquabook.unread` | op | `/aquabook unread` |
+| `aquabook.list` | op | `/aquabook list` |
+| `aquabook.storage` | op | `/aquabook storage` |
+| `aquabook.reload` | op | `/aquabook reload` |
+| `aquabook.admin` | op | Everything above, and entries locked behind it |
+
+An entry can also ask for its own node with [`permission`](./news#options). Players without it never
+see it.

@@ -1,0 +1,108 @@
+---
+title: History Menu
+description: The menu that lists every entry, its layout, items and navigation.
+---
+
+import { Callout } from 'nextra/components'
+
+# History Menu
+
+`/aquabook menu` lists every entry the player can see. Clicking one opens the book. Layout and
+sounds are in `config.yml`, names and lore in `messages.yml`.
+
+## Layout
+
+```yaml filename="config.yml"
+gui:
+  rows: 6
+  slots: [10, 11, 12, 13, 14, 15, 16,
+          19, 20, 21, 22, 23, 24, 25,
+          28, 29, 30, 31, 32, 33, 34]
+  sort: newest
+  glow-unread: true
+
+  item:
+    read-material: BOOK
+
+  navigation:
+    previous-slot: 48
+    previous-material: ARROW
+    close-slot: 49
+    close-material: BARRIER
+    next-slot: 50
+    next-material: ARROW
+
+  sounds:
+    open-book: ITEM_BOOK_PAGE_TURN
+    page: UI_BUTTON_CLICK
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `rows` | `6` | Height of the menu |
+| `slots` | 21 slots | Where the entries go, in order. The amount is how many fit per page |
+| `sort` | `newest` | `newest` puts the most recent entry first, `oldest` the opposite |
+| `glow-unread` | `true` | Unread entries glow. Ignored on `ENCHANTED_BOOK`, which glows on its own |
+| `item.read-material` | `BOOK` | Icon once an entry is read. Empty keeps the icon from the news file |
+| `navigation` | | Slot and material of the previous, close and next buttons |
+| `sounds.open-book` | `ITEM_BOOK_PAGE_TURN` | Played when a book opens from the menu |
+| `sounds.page` | `UI_BUTTON_CLICK` | Played when the page changes |
+
+## Items
+
+```yaml filename="messages.yml"
+gui:
+  title: "&8AquaBook | History"
+
+  state-unread: "&#56FF00New"
+  state-read: "&aRead"
+  state-liked: "&dYou liked this &c❤"
+  state-not-liked: "&8No like yet"
+
+  item:
+    name: "&#FFEE00&l%title%"
+    lore:
+      - " "
+      - "&#54ADF4Dated: &f%date%"
+      - " "
+      - "&#FF9E08Click to read"
+    read-name: "&7&l%title%"
+    read-lore:
+      - " "
+      - "&#54ADF4Dated: &f%date%"
+      - " "
+      - "&#FF9E08Click to read it again"
+```
+
+`name` and `lore` are used while the entry is unread, `read-name` and `read-lore` once it is read.
+An entry with its own `lore` in its news file uses that instead.
+
+| Placeholder | Returns |
+| --- | --- |
+| `%title%` / `%author%` / `%date%` / `%id%` | The entry |
+| `%likes%` / `%views%` | Its counters |
+| `%state%` | `state-unread` or `state-read` |
+| `%like-state%` | `state-liked` or `state-not-liked` |
+
+## Navigation
+
+```yaml filename="messages.yml"
+  navigation:
+    previous:
+      name: "&#54ADF4&lPrevious Page"
+      lore:
+        - "&7Page &f%page%&7/&f%pages%"
+    next:
+      name: "&#54ADF4&lNext Page"
+      lore:
+        - "&7Page &f%page%&7/&f%pages%"
+    close:
+      name: "&#FF2D2D&lClose"
+      lore:
+        - "&7Close the news history."
+```
+
+<Callout type="info">
+  Entries locked behind a `permission` never show up for players without it, so each rank sees its
+  own history.
+</Callout>

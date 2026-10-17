@@ -1,0 +1,153 @@
+---
+title: Configuration
+description: Storage, Redis, the book footer and what happens when a player joins.
+---
+
+import { Callout } from 'nextra/components'
+
+# Configuration
+
+Everything lives in `config.yml` and applies with `/aquabook reload`, except storage and Redis which
+need a restart. The history menu is covered in [History Menu](./menu).
+
+```yaml filename="config.yml"
+date-format: "dd/MM/yy"
+```
+
+`date-format` is the format of the date `/aquabook create` stamps on a new entry.
+
+## Storage
+
+Likes, read marks and open counts live in a database. The entries themselves stay in `news/`.
+
+```yaml filename="config.yml"
+storage:
+  type: SQLITE
+  mysql:
+    host: "127.0.0.1"
+    port: 3306
+    database: "aquabook"
+    username: "root"
+    password: ""
+    properties: "useSSL=false"
+  sync-interval-seconds: 60
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `type` | `SQLITE` | `SQLITE`, `MYSQL` or `H2`. The driver is downloaded on startup |
+| `mysql` | | Connection, only read with `MYSQL` |
+| `mysql.properties` | `useSSL=false` | Extra JDBC parameters, separated by `&` |
+| `sync-interval-seconds` | `60` | How often likes and opens are pulled back from the database |
+
+<Callout type="warning">
+  Changing `type` needs a restart and does not migrate anything. A network of servers needs
+  `MYSQL`, so every server reads the same likes and read marks.
+</Callout>
+
+## Redis
+
+Only makes likes and read marks show up instantly on the other servers. The database stays the
+source of truth, so without Redis everything still works.
+
+```yaml filename="config.yml"
+redis:
+  enabled: false
+  host: "127.0.0.1"
+  port: 6379
+  password: ""
+  server-id: ""
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `enabled` | `false` | Turns it on |
+| `host` / `port` / `password` | | Connection |
+| `server-id` | empty | Name of this server, like `lobby` or `survival`. Empty picks a random one |
+
+With Redis on, `sync-interval-seconds` can go up, the counters already arrive live. Creating,
+deleting or reloading news on one server reloads it on all of them.
+
+## Book
+
+```yaml filename="config.yml"
+book:
+  default-color: BLACK
+  reopen-delay: 1
+  after-action: CLOSE
+
+  footer:
+    enabled: true
+    page: last
+
+    like:
+      allow-unlike: false
+      marks-read: true
+
+    menu:
+      enabled: true
+      only-when-read: true
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `default-color` | `BLACK` | Colour of text without one. The page is light, keep it dark |
+| `reopen-delay` | `1` | Ticks before reacting to a button inside the book |
+| `after-action` | `CLOSE` | What happens after a like or a read mark |
+| `footer.enabled` | `true` | The like, read and history line at the bottom |
+| `footer.page` | `last` | `last` puts it on the last page, `all` on every page |
+| `footer.like.allow-unlike` | `false` | Off means a like can never be taken back |
+| `footer.like.marks-read` | `true` | A like also counts as reading the entry |
+| `footer.menu.enabled` | `true` | The shortcut back to the history |
+| `footer.menu.only-when-read` | `true` | Only shows that shortcut once the entry is read |
+
+| `after-action` | Does |
+| --- | --- |
+| `CLOSE` | Closes the book |
+| `MENU` | Opens the history |
+| `REOPEN` | Opens the book again with the footer updated |
+
+A single entry can drop the footer with `footer: false` in its [news file](./news#options).
+
+## Join
+
+```yaml filename="config.yml"
+join:
+  auto-open:
+    enabled: true
+    only-latest: true
+    delay: 1
+    max: 1
+    gap: 40
+
+  notify: true
+  delay: 1
+  only-if-unread: true
+  click-command: "/aquabook menu"
+  sound: ENTITY_EXPERIENCE_ORB_PICKUP
+```
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `auto-open.enabled` | `true` | Opens what the player has not read yet, right on their screen |
+| `auto-open.only-latest` | `true` | Only the newest entry greets the player, older unread ones stay in the history |
+| `auto-open.delay` | `1` | Ticks after joining. Raise it only if a slow client misses the book |
+| `auto-open.max` | `1` | Pending entries opened at most, only with `only-latest` off |
+| `auto-open.gap` | `40` | Ticks between one book and the next |
+| `notify` | `true` | Chat notice, sent at the same moment as the book |
+| `delay` | `1` | Ticks before that notice |
+| `only-if-unread` | `true` | Only sends it when something is still unread |
+| `click-command` | `/aquabook menu` | Run when the notice is clicked |
+| `sound` | `ENTITY_EXPERIENCE_ORB_PICKUP` | Played with the notice |
+
+<Callout type="info">
+  Keep `only-latest` on. Otherwise every new entry stacks one more book on every join.
+</Callout>
+
+Entries with `auto-open: false` never open on join, they only wait in the history. The notice text
+is `join.message` in `messages.yml`, with `%unread%`, `%total%` and `%player%`.
+
+## Config updates
+
+`config.yml` and `messages.yml` carry a `version` at the bottom. When a release adds options they
+are added on startup, keeping your values. Leave `version` alone.

@@ -1,6 +1,7 @@
 import type { MetaRecord } from 'nextra'
 
 export default {
+  aquabook: 'AquaBook',
   aquaclan: 'AquaClan',
   aquagraves: 'AquaGraves',
   aqualang: 'AquaLang',

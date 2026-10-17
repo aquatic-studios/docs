@@ -1,0 +1,302 @@
+---
+title: Writing News
+description: News files, pages, clickable text, placeholders and colours.
+---
+
+import { Callout } from 'nextra/components'
+
+# Writing News
+
+Every entry is one file in `news/`. The file name is its id, so `news/update-1.yml` is opened with
+`/aquabook open update-1`.
+
+The fastest way to start is writing the book in game and running `/aquabook create <id>` with it in
+your hand. `/aquabook create template` writes a commented file with every option instead.
+
+## Options
+
+```yaml filename="news/hi.yml"
+title: "<color:#33CCFF>Hi</color>"
+author: "Aquatic Studios"
+date: "01/01/26"
+timestamp: 0
+
+icon: ENCHANTED_BOOK
+custom-model-data: 0
+permission: ""
+auto-open: true
+footer: true
+lore: []
+```
+
+| Key | What it does |
+| --- | --- |
+| `title` | Book title, also the name in the history menu |
+| `author` | Shown as the book author |
+| `date` | Shown in the menu, written with `date-format` from `config.yml` |
+| `timestamp` | Used to sort, newest first. `0` falls back to `date` |
+| `icon` | Icon in the history menu |
+| `custom-model-data` | Model data for resource packs |
+| `permission` | Node needed to see the entry. Empty means everyone |
+| `auto-open` | `false` keeps it in the history but never opens it on join |
+| `footer` | `false` hides the like, read and history line |
+| `lore` | Custom icon lore. Empty uses the one from `messages.yml` |
+
+<Callout type="info">
+  The newest entry is the one that opens on join. `/aquabook create` stamps the current time, so a
+  new entry always goes first.
+</Callout>
+
+## Pages
+
+`pages` is a list of pages, and every page is a list of text chunks. A chunk is either plain text or
+a map with one action.
+
+```yaml filename="news/update.yml"
+pages:
+  # page 1
+  - - "&0&lPlain text
+
+"
+    - "&4Red &2green &1blue
+
+"
+    - text: "&2Go to page 2 &a>"
+      hover: "&dJumps ahead"
+      page: 2
+
+  # page 2
+  - - "&0&lLinks
+
+"
+    - text: "&2Open a website &a>"
+      url: "https://www.spigotmc.org/"
+```
+
+| Action | What it does |
+| --- | --- |
+| `hover` | Text shown when the cursor is over the chunk |
+| `url` | Opens a link, the client asks first |
+| `command` | Runs a command as the player |
+| `suggest` | Writes the text in the chat box |
+| `copy` | Copies the text to the clipboard |
+| `page` | Jumps to another page of the same book |
+
+`hover` can go together with any of the others.
+
+<Callout type="warning">
+  A page fits about 19 characters per line and 14 lines, and the footer takes 3 of them on the page
+  it sits on. Use `
+` for a line break and `
+
+` for a blank line.
+</Callout>
+
+## Placeholders
+
+| Placeholder | Returns |
+| --- | --- |
+| `%title%` | Title of the entry |
+| `%author%` | Its author |
+| `%date%` | Its date |
+| `%id%` | Its id |
+| `%likes%` | Likes, including the ones set with `setlikes` |
+| `%views%` | Times it was opened |
+| `%player%` | The reader |
+| `%version%` | AquaBook version |
+| `%server-version%` | Minecraft version of the server |
+
+Any PlaceholderAPI placeholder works too, like `%player_name%`.
+
+## Colours
+
+| Format | Example |
+| --- | --- |
+| Legacy | `&a`, `&l` |
+| Hex | `&#RRGGBB` |
+| MiniMessage | `<bold>`, `<#RRGGBB>`, `<gradient:#33CCFF:#0F6E9E>`, `<rainbow>` |
+
+The page is light, so keep the text dark. Plain text without a colour uses `book.default-color` from
+`config.yml`.
+
+## Footer
+
+The line at the bottom of the book: likes, a read mark and a shortcut to the history.
+
+```
+❤ 172   ·   ✔ Ok   ·   ≡≡≡
+```
+
+Where it goes and what each button does is set in [Configuration](./configuration#book), the text
+in `messages.yml`:
+
+```yaml filename="messages.yml"
+book:
+  footer-prefix: "
+
+
+"
+  footer-separator: "&8   ·   "
+
+  like: "&c❤ %likes%"
+  like-hover: "&dClick to leave your like &c❤"
+  liked: "&7❤ %likes%"
+  liked-hover: "&7Thanks for your like &c❤"
+
+  read: "&9✔ Ok"
+  read-hover: "&fClick to mark it as read &9✔"
+  already-read: "&7✔"
+  already-read-hover: "&7You already marked this one as read"
+
+  menu: "&9&n≡≡≡"
+  menu-hover: "&fClick to see more news"
+```
+
+## Default files
+
+<details>
+<summary>`hi.yml`</summary>
+
+```yaml filename="news/hi.yml"
+title: "<color:#33CCFF>Hi</color>"
+author: "Aquatic Studios"
+date: "01/01/26"
+timestamp: 0
+
+icon: ENCHANTED_BOOK
+custom-model-data: 0
+permission: ""
+auto-open: true
+footer: true
+lore: []
+
+pages:
+  - - "<gradient:#33CCFF:#0F6E9E><bold>AquaBook</bold></gradient>\n\n"
+    - "&0You are using\n&0AquaBook &8v%version%\n\n"
+    - "&0Server version\n&8%server-version%\n\n"
+    - text: "&2Spigot page &a>"
+      hover: "&dOpens the resource page"
+      url: "https://www.spigotmc.org/resources/authors/aquatic-studios.1990546/"
+    - "\n"
+    - text: "&2Discord &a>"
+      hover: "&dJoin the support server"
+      url: "https://discord.gg/cdT5g5xsVq"
+
+  - - "&0&lYour turn\n\n"
+    - "&0MiniMessage and\n&0PlaceholderAPI\n&0both work here.\n\n"
+    - text: "&2/aquabook\n&2create template &a>"
+      hover: "&dClick to run it\n&7Needs aquabook.admin"
+      command: "/aquabook create template"
+    - "\n"
+    - "&0Files live in\n&8/AquaBook/news"
+```
+
+</details>
+
+<details>
+<summary>`template.yml`</summary>
+
+```yaml filename="news/template.yml"
+# commented example, copy it and rename the file: the file name is the id.
+# it sits behind aquabook.admin and never pops up on join, so it bothers nobody.
+
+# book title, also the name shown in the history menu
+title: "&#FFEE00Template"
+
+# shown as the book author
+author: "Aquatic Studios"
+
+# date shown in the menu, written with date-format from config.yml
+date: "01/01/26"
+
+# used to sort, newest first. 0 falls back to the date above
+# the newest entry is the one that greets players on join
+timestamp: 0
+
+# icon in the history menu
+icon: ENCHANTED_BOOK
+custom-model-data: 0
+
+# empty means everyone sees it
+permission: "aquabook.admin"
+
+# false keeps it in the history but never opens it on join
+auto-open: false
+
+# false hides the like / read / history line at the bottom
+footer: true
+
+# custom lore for the icon, empty uses the one from messages.yml
+lore: []
+
+# pages of the book, each page is a list of text chunks.
+# a chunk is either plain text or a map with one action.
+#
+# actions:      hover    text shown when the cursor is over it
+#               url      opens a link
+#               command  runs a command as the player
+#               suggest  writes the command in the chat box
+#               copy     copies text to the clipboard
+#               page     jumps to another page of this book
+#
+# placeholders: %title% %author% %date% %id% %likes% %views%
+#               %player% %version% %server-version%
+#               any PlaceholderAPI placeholder, like %player_name%
+#
+# colours:      &a legacy, &#RRGGBB hex, and MiniMessage tags from
+#               Kyori Adventure: <bold> <gradient:..> <rainbow> <#RRGGBB>
+#
+# a page fits about 19 characters per line and 14 lines, and the
+# footer eats 3 of them. use \n for a line break, \n\n for a blank one.
+pages:
+  # page 1
+  - - "&0&lPlain text\n\n"
+    - "&0Black text on the\n&0page, colours work\n&0the same as chat.\n\n"
+    - "&4Red &2green &1blue\n\n"
+    - text: "&2Go to page 2 &a>"
+      hover: "&dJumps ahead"
+      page: 2
+
+  # page 2
+  - - "&0&lLinks\n\n"
+    - text: "&2Open a website &a>"
+      hover: "&dAsks before opening"
+      url: "https://www.spigotmc.org/"
+    - "\n\n"
+    - text: "&2Run a command &a>"
+      hover: "&dRuns /aquabook menu"
+      command: "/aquabook menu"
+    - "\n\n"
+    - text: "&2Suggest a text &a>"
+      hover: "&dWrites it in the chat box"
+      suggest: "/aquabook create "
+    - "\n\n"
+    - text: "&2Copy the ip &a>"
+      hover: "&dCopies it to the clipboard"
+      copy: "play.example.com"
+
+  # page 3
+  - - "&0&lPlaceholders\n\n"
+    - "&0Hi &8%player%&0!\n"
+    - "&0Entry: &8%id%\n"
+    - "&0Date: &8%date%\n"
+    - "&0Likes: &8%likes%\n"
+    - "&0Reads: &8%views%\n"
+    - "&0Ver: &8%version%\n\n"
+    - text: "&2Go to page 4 &a>"
+      hover: "&dJumps ahead"
+      page: 4
+
+  # page 4
+  - - "&0&lMiniMessage\n\n"
+    - "<gradient:#33CCFF:#0F6E9E>gradient text</gradient>\n"
+    - "<rainbow>rainbow text</rainbow>\n\n"
+    - "&0&lPlaceholderAPI\n"
+    - "&0Hi &8%player_name%\n"
+    - "&0Ping &8%player_ping%\n\n"
+    - text: "&2Back to page 1 &a>"
+      hover: "&dJumps back"
+      page: 1
+```
+
+</details>

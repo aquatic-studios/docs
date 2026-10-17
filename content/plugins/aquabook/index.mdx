@@ -1,0 +1,37 @@
+---
+title: AquaBook
+description: News books with likes, read marks and a history menu.
+asIndexPage: true
+---
+
+import { Callout } from 'nextra/components'
+
+# AquaBook
+
+Publish server news as written books. The newest one opens on join, players like it or mark it as
+read from a line at the bottom of the book, and every entry stays in a history menu.
+
+**Soft-depend:** PlaceholderAPI
+
+## An entry
+
+1. Write a book in game and run `/aquabook create <id>`, or write the file by hand.
+2. The next time a player joins, the newest entry opens on their screen.
+3. The last page ends with a like, a read mark and a shortcut to the history.
+4. `/aquabook menu` lists every entry, new ones glowing until they are read.
+
+## Files
+
+| File | Holds |
+| --- | --- |
+| `config.yml` | Storage, Redis, the history menu, the book footer and what happens on join |
+| `messages.yml` | Every string, the menu items and the footer text |
+| `news/*.yml` | One file per entry, the file name is its id |
+
+Two examples ship in `news/`: `hi.yml`, a short welcome, and `template.yml`, a commented entry that
+shows every option. The template is hidden behind `aquabook.admin` and never opens on join.
+
+<Callout type="info">
+  Likes and read marks are saved in a database. With [Redis](./configuration#redis) they show up
+  instantly on every server of a network.
+</Callout>
